@@ -2,3 +2,4 @@ node_modules/
 .venv/
 _extracted.txt
 *.pdf
+search-slides-extract.txt
