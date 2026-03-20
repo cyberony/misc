@@ -27,6 +27,33 @@ OpenClaw is an open-source, self-hosted agent system that can run through many c
 | Pricing model | Open-source software; infra/model costs depend on your setup | Tiered subscriptions (`Hobby`, `Pro`, `Pro+`, `Ultra`, plus Teams/Enterprise) |
 | Enterprise controls | Depends on your deployment discipline and custom governance | Built-in SSO/SCIM/admin controls/audit features in enterprise plans |
 
+## If you already use Cursor for automation/workflows
+
+Your observation is valid: many advanced users already do substantial automation in Cursor (agentic edits, shell orchestration, repo-wide tasks, docs generation, migration scripts, and review workflows). In that reality, OpenClaw's value is narrower and more specific.
+
+### Where Cursor already covers most workflow needs
+
+- In-editor workflow automation: plan -> edit -> run -> fix loops happen quickly in one place.
+- Project-scoped orchestration: strong for tasks that live in code repos and terminals.
+- Team governance: built-in admin/privacy/compliance controls can be enough for org use.
+- Lower operational burden: no separate gateway/channel stack to maintain.
+
+### Where OpenClaw can still add distinct value
+
+- Cross-channel agent presence: same assistant reachable in Telegram/Slack/Discord/WhatsApp and others.
+- Always-on remote runtime: persistent gateway on server/home machine even when IDE is closed.
+- Self-hosting preference: architecture and state live under your control (config/workspace/session paths).
+- Non-IDE interaction model: useful when workflows are initiated by messages/events instead of opening an editor.
+
+### Practical conclusion for power Cursor users
+
+If your automation is mostly "inside repos + terminal + coding tasks", Cursor may already deliver 80-95% of what you need, and OpenClaw may feel like extra operational overhead.
+
+OpenClaw becomes compelling mainly when you need at least one of these:
+1) multi-channel chat-native operations,  
+2) always-on autonomous service behavior, or  
+3) stronger self-hosting/control requirements than managed IDE tooling provides.
+
 ## Pros and cons
 
 ## OpenClaw: Pros
@@ -85,6 +112,12 @@ Choose **Cursor first** if you need:
 
 Use **both together** if you need:
 - Best coding UX (`Cursor`) plus independent automation/operator workflows (`OpenClaw`).
+
+## "Should I switch?" quick answer
+
+- If Cursor already handles your automation comfortably: **do not switch**; keep Cursor as primary.
+- If you need channel-native bots or always-on autonomous runs: **add OpenClaw selectively** for those workflows.
+- If you care most about minimal setup and speed: **Cursor-only** is usually the pragmatic choice.
 
 ## Risks and caveats
 
