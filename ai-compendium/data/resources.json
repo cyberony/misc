@@ -1,0 +1,116 @@
+{
+  "resources": [
+    {
+      "id": "sample-ffmpeg",
+      "title": "FFmpeg",
+      "url": "https://ffmpeg.org/",
+      "category": "Video Tools",
+      "tags": [
+        "video",
+        "audio",
+        "ffmpeg",
+        "transcoding"
+      ],
+      "description": "The Swiss-army tool for video/audio processing: remuxing, transcoding, filters, subtitles, and more.",
+      "examples": "Example: Convert MP4 to H.264/AAC, extract audio, burn subtitles, apply video filters.",
+      "votes": 5,
+      "createdAt": "2026-03-19T00:00:00.000Z",
+      "updatedAt": "2026-03-19T00:00:00.000Z"
+    },
+    {
+      "id": "sample-whisper",
+      "title": "OpenAI Whisper (STT)",
+      "url": "https://github.com/openai/whisper",
+      "category": "NLP / Speech",
+      "tags": [
+        "stt",
+        "speech-to-text",
+        "transcription",
+        "whisper"
+      ],
+      "description": "Robust speech-to-text for many accents/languages; runs locally with models.",
+      "examples": "Example: Transcribe meeting audio into text + timestamps.",
+      "votes": 18,
+      "createdAt": "2026-03-19T00:00:00.000Z",
+      "updatedAt": "2026-03-19T18:29:49.731Z"
+    },
+    {
+      "id": "sample-elevenlabs",
+      "title": "ElevenLabs TTS",
+      "url": "https://elevenlabs.io/",
+      "category": "TTS Tools",
+      "tags": [
+        "tts",
+        "voice",
+        "text-to-speech"
+      ],
+      "description": "High-quality text-to-speech voices with expressive output.",
+      "examples": "Example: Generate narration for a slide deck script.",
+      "votes": 3,
+      "createdAt": "2026-03-19T00:00:00.000Z",
+      "updatedAt": "2026-03-19T00:00:00.000Z"
+    },
+    {
+      "id": "sample-pydub",
+      "title": "pydub",
+      "url": "https://github.com/jiaaro/pydub",
+      "category": "Audio Tools",
+      "tags": [
+        "audio",
+        "python",
+        "slicing"
+      ],
+      "description": "Simple audio manipulation in Python (cut/trim/overlap) on top of FFmpeg.",
+      "examples": "Example: Split a long recording into per-speaker segments.",
+      "votes": 2,
+      "createdAt": "2026-03-19T00:00:00.000Z",
+      "updatedAt": "2026-03-19T00:00:00.000Z"
+    },
+    {
+      "id": "a383380a-12e7-49f1-b975-ef7f0a8ab005",
+      "title": "Some video tool",
+      "category": "voiceover",
+      "url": "https://elevenlabs.io/",
+      "tags": [
+        "audio",
+        "voiceover"
+      ],
+      "description": "NA",
+      "examples": "",
+      "votes": 0,
+      "createdAt": "2026-03-19T18:20:07.789Z",
+      "updatedAt": "2026-03-19T18:20:07.789Z"
+    },
+    {
+      "id": "b52b9ca0-8256-482f-9a48-8fbd492622ee",
+      "title": "Test Tool",
+      "category": "NLP",
+      "url": null,
+      "tags": [
+        "nlp",
+        "tooling"
+      ],
+      "description": "desc",
+      "examples": "ex",
+      "votes": 0,
+      "createdAt": "2026-03-19T18:21:51.370Z",
+      "updatedAt": "2026-03-19T18:21:51.370Z"
+    },
+    {
+      "id": "de89a289-bda7-45fa-bacb-67787bdd9953",
+      "title": "ElevenLab",
+      "category": "voiceover",
+      "url": "https://elevenlabs.io/",
+      "tags": [
+        "voiceover",
+        "audio",
+        "presentations"
+      ],
+      "description": "for voiceovers in presentation videos",
+      "examples": "",
+      "votes": 0,
+      "createdAt": "2026-03-19T18:29:40.481Z",
+      "updatedAt": "2026-03-19T18:29:40.481Z"
+    }
+  ]
+}

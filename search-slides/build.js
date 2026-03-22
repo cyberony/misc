@@ -1,42 +1,32 @@
 #!/usr/bin/env node
 /**
- * Build search-slides/index.html from extracted PDF text.
+ * Build index.html from content/01.md … 108.md and slides/1.png … 108.png.
+ * - Viewer shows the PDF image per slide (looks like the PDF).
+ * - Content from content/N.md is the editable source (edit those files or ask the AI to).
  * Run: node build.js
- * Expects search-slides-extract.txt in parent dir (or pass path as arg).
+ * Requires: content/*.md (run init-content.js once), slides/*.png (run pdf-to-slides.mjs).
  */
 const fs = require('fs');
 const path = require('path');
 
-const extractPath = process.argv[2] || path.join(__dirname, '..', 'search-slides-extract.txt');
-const raw = fs.readFileSync(extractPath, 'utf8');
+const contentDir = path.join(__dirname, 'content');
+const TOTAL = 108;
 
-// Split into slides: each slide starts with a line that is just a number
-const allChunks = raw.trim().split(/\n(?=\d+\n)/);
-const cover = allChunks[0].trim(); // "Search  MSAI 348  ..."
-// Take first chunk that starts with "2\n", then "3\n", ... "107\n" (so we get 106 content slides in order)
-const restChunks = allChunks.slice(1);
-const slideChunks = [];
-for (let n = 2; n <= 107; n++) {
-  const prefix = n + '\n';
-  const idx = restChunks.findIndex((c) => c.startsWith(prefix));
-  if (idx >= 0) {
-    slideChunks.push(restChunks[idx]);
-  }
+const contents = [];
+for (let i = 1; i <= TOTAL; i++) {
+  const n = i.toString().padStart(2, '0');
+  const p = path.join(contentDir, n + '.md');
+  const raw = fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : '(No content yet.)';
+  // Escape for embedding in HTML (show as pre or simple HTML)
+  const escaped = raw
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+  contents.push(escaped);
 }
 
-const slides = [
-  { num: '1', content: cover.replace(/\t/g, '  ') },
-  ...slideChunks.map((chunk) => {
-    const firstNewline = chunk.indexOf('\n');
-    const num = chunk.slice(0, firstNewline).trim();
-    const content = chunk.slice(firstNewline + 1).trim();
-    const contentClean = content.replace(/\t/g, '  ');
-    return { num, content: contentClean };
-  }),
-];
-
-const total = slides.length;
-const slidesJson = JSON.stringify(slides.map((s) => ({ num: s.num, content: s.content })));
+const contentsJson = JSON.stringify(contents);
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -44,150 +34,100 @@ const html = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Search — MSAI 348 Intro to AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     :root {
-      --bg: #1a1b26;
-      --fg: #c0caf5;
-      --muted: #565f89;
-      --accent: #7aa2f7;
-      --slide-bg: #24283b;
-      --border: #3b4261;
+      --bg: #0f0f12;
+      --bg-elevated: #18181c;
+      --fg: #e4e4e7;
+      --fg-muted: #71717a;
+      --accent: #6366f1;
+      --border: #27272a;
+      --radius: 8px;
     }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1rem;
-    }
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-    }
-    .toolbar button {
-      background: var(--slide-bg);
-      color: var(--accent);
-      border: 1px solid var(--border);
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    .toolbar button:hover {
-      background: var(--border);
-    }
-    .toolbar .counter {
-      color: var(--muted);
-      font-variant-numeric: tabular-nums;
-    }
-    .slide-container {
-      width: 100%;
-      max-width: 900px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .slide {
-      width: 100%;
-      background: var(--slide-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 2rem 2.5rem;
-      min-height: 400px;
-      white-space: pre-wrap;
-      font-size: clamp(0.9rem, 2vw, 1.05rem);
-      line-height: 1.5;
-      tab-size: 8;
-    }
-    .slide h2 {
-      margin: 0 0 1rem 0;
-      font-size: 1.25rem;
-      color: var(--accent);
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.5rem;
-    }
-    .slide-num {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      color: var(--muted);
-      font-size: 0.875rem;
-    }
-    .slide-wrapper {
-      position: relative;
-      width: 100%;
-    }
-    .hint {
-      margin-top: 1rem;
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
+    body { margin: 0; min-height: 100vh; font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--fg); display: flex; flex-direction: column; overflow: hidden; }
+    .header { flex-shrink: 0; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--bg-elevated); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .header h1 { margin: 0; font-size: 1rem; font-weight: 600; }
+    .header .meta { font-size: 0.8125rem; color: var(--fg-muted); }
+    .nav { display: flex; align-items: center; gap: 0.5rem; }
+    .nav button { background: var(--bg); color: var(--fg); border: 1px solid var(--border); width: 40px; height: 40px; border-radius: var(--radius); cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; }
+    .nav button:hover:not(:disabled) { background: var(--bg-elevated); border-color: var(--accent); color: var(--accent); }
+    .nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .counter { min-width: 5ch; text-align: center; font-variant-numeric: tabular-nums; font-size: 0.875rem; color: var(--fg-muted); }
+    .main { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .slide-wrap { max-width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+    .slide-img { max-width: 100%; max-height: calc(100vh - 200px); width: auto; height: auto; display: block; border-radius: 4px; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+    .source-toggle { font-size: 0.75rem; color: var(--fg-muted); cursor: pointer; user-select: none; }
+    .source-toggle:hover { color: var(--accent); }
+    .source-content { display: none; max-width: 900px; width: 100%; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; font-size: 0.8125rem; white-space: pre-wrap; max-height: 200px; overflow: auto; }
+    .source-content.open { display: block; }
+    .hint { font-size: 0.75rem; color: var(--fg-muted); text-align: center; margin-top: 0.25rem; }
   </style>
 </head>
 <body>
-  <div class="toolbar">
-    <button type="button" id="prev" aria-label="Previous slide">← Previous</button>
-    <span class="counter" id="counter">1 / ${total}</span>
-    <button type="button" id="next" aria-label="Next slide">Next →</button>
-  </div>
-  <div class="slide-container">
-    <div class="slide-wrapper">
-      <div class="slide" id="slide" role="region" aria-live="polite"></div>
-      <span class="slide-num" id="slideNum" aria-hidden="true"></span>
+  <header class="header">
+    <div><h1>Search</h1><span class="meta">MSAI 348: Intro to AI — Mohammed A. Alam</span></div>
+    <nav class="nav">
+      <button type="button" id="prev" aria-label="Previous">←</button>
+      <span class="counter" id="counter">1 / ${TOTAL}</span>
+      <button type="button" id="next" aria-label="Next">→</button>
+    </nav>
+  </header>
+  <main class="main">
+    <div class="slide-wrap">
+      <img id="slideImg" class="slide-img" src="slides/1.png" alt="Slide 1">
+      <span class="source-toggle" id="sourceToggle">Show editable source (content/N.md)</span>
+      <pre class="source-content" id="sourceContent"></pre>
     </div>
-    <p class="hint">Use ← → arrow keys or buttons to navigate</p>
-  </div>
+  </main>
+  <p class="hint">← → or Space to navigate. Slide text lives in content/01.md … 108.md — edit those (or ask the AI) then run node build.js.</p>
 
   <script>
-    const slides = ${slidesJson};
-    const total = ${total};
-    const el = document.getElementById('slide');
-    const counterEl = document.getElementById('counter');
-    const slideNumEl = document.getElementById('slideNum');
-
-    function escapeHtml(s) {
-      const d = document.createElement('div');
-      d.textContent = s;
-      return d.innerHTML;
-    }
-
+    const contents = ${contentsJson};
+    const total = ${TOTAL};
     let index = 0;
+    const slideImg = document.getElementById('slideImg');
+    const counterEl = document.getElementById('counter');
+    const sourceContent = document.getElementById('sourceContent');
+    const sourceToggle = document.getElementById('sourceToggle');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
 
-    function render() {
-      const s = slides[index];
-      el.innerHTML = '<h2>Slide ' + escapeHtml(s.num) + '</h2>' + escapeHtml(s.content);
-      counterEl.textContent = (index + 1) + ' / ' + total;
-      slideNumEl.textContent = s.num + ' of 107';
+    function updateSlide() {
+      const n = index + 1;
+      slideImg.src = 'slides/' + n + '.png';
+      slideImg.alt = 'Slide ' + n;
+      counterEl.textContent = n + ' / ' + total;
+      sourceContent.textContent = contents[index];
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === total - 1;
     }
+
+    sourceToggle.addEventListener('click', () => {
+      sourceContent.classList.toggle('open');
+      sourceToggle.textContent = sourceContent.classList.contains('open') ? 'Hide editable source' : 'Show editable source (content/N.md)';
+    });
 
     function go(delta) {
       index = Math.max(0, Math.min(index + delta, total - 1));
-      render();
+      updateSlide();
     }
 
-    document.getElementById('prev').addEventListener('click', () => go(-1));
-    document.getElementById('next').addEventListener('click', () => go(1));
+    prevBtn.addEventListener('click', () => go(-1));
+    nextBtn.addEventListener('click', () => go(1));
     document.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft') { go(-1); e.preventDefault(); }
       if (e.key === 'ArrowRight' || e.key === ' ') { go(1); e.preventDefault(); }
     });
 
-    render();
+    updateSlide();
   </script>
 </body>
 </html>
 `;
 
-fs.writeFileSync(path.join(__dirname, 'index.html'), html, 'utf8');
-console.log('Wrote index.html with', total, 'slides');
+fs.writeFileSync(path.join(__dirname, 'index-with-source.html'), html, 'utf8');
+console.log('Wrote index-with-source.html (images + editable source panel). Use index.html for image-only.');

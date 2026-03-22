@@ -1,0 +1,103 @@
+#!/usr/bin/env node
+/**
+ * Build image-only index.html (no editable/source panel).
+ * Run: node build-image-only.js
+ * Requires: slides/1.png … 108.png (run pdf-to-slides.mjs first).
+ */
+const fs = require('fs');
+const path = require('path');
+
+const TOTAL = 108;
+
+const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search — MSAI 348 Intro to AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg: #0f0f12;
+      --bg-elevated: #18181c;
+      --fg: #e4e4e7;
+      --fg-muted: #71717a;
+      --accent: #6366f1;
+      --border: #27272a;
+      --radius: 8px;
+    }
+    body { margin: 0; min-height: 100vh; font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--fg); display: flex; flex-direction: column; overflow: hidden; }
+    .header { flex-shrink: 0; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--bg-elevated); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .header h1 { margin: 0; font-size: 1rem; font-weight: 600; }
+    .header .meta { font-size: 0.8125rem; color: var(--fg-muted); }
+    .nav { display: flex; align-items: center; gap: 0.5rem; }
+    .nav button { background: var(--bg); color: var(--fg); border: 1px solid var(--border); width: 40px; height: 40px; border-radius: var(--radius); cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; }
+    .nav button:hover:not(:disabled) { background: var(--bg-elevated); border-color: var(--accent); color: var(--accent); }
+    .nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .counter { min-width: 5ch; text-align: center; font-variant-numeric: tabular-nums; font-size: 0.875rem; color: var(--fg-muted); }
+    .main { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .slide-wrap { max-width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; }
+    .slide-img { max-width: 100%; max-height: calc(100vh - 140px); width: auto; height: auto; display: block; border-radius: 4px; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+    .hint { font-size: 0.75rem; color: var(--fg-muted); text-align: center; margin-top: 0.5rem; }
+    .links { font-size: 0.8rem; margin-top: 0.25rem; }
+    .links a { color: var(--accent); text-decoration: none; }
+    .links a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div><h1>Search</h1><span class="meta">MSAI 348: Intro to AI — Mohammed A. Alam</span></div>
+    <nav class="nav">
+      <button type="button" id="prev" aria-label="Previous">←</button>
+      <span class="counter" id="counter">1 / ${TOTAL}</span>
+      <button type="button" id="next" aria-label="Next">→</button>
+    </nav>
+  </header>
+  <main class="main">
+    <div class="slide-wrap">
+      <img id="slideImg" class="slide-img" src="slides/1.png" alt="Slide 1">
+      <p class="hint">← → or Space to navigate</p>
+      <p class="links"><a href="teach-bfs.html">Teach: BFS (web version)</a></p>
+    </div>
+  </main>
+
+  <script>
+    const total = ${TOTAL};
+    let index = 0;
+    const slideImg = document.getElementById('slideImg');
+    const counterEl = document.getElementById('counter');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+
+    function updateSlide() {
+      const n = index + 1;
+      slideImg.src = 'slides/' + n + '.png';
+      slideImg.alt = 'Slide ' + n;
+      counterEl.textContent = n + ' / ' + total;
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === total - 1;
+    }
+
+    function go(delta) {
+      index = Math.max(0, Math.min(index + delta, total - 1));
+      updateSlide();
+    }
+
+    prevBtn.addEventListener('click', () => go(-1));
+    nextBtn.addEventListener('click', () => go(1));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { go(-1); e.preventDefault(); }
+      if (e.key === 'ArrowRight' || e.key === ' ') { go(1); e.preventDefault(); }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(path.join(__dirname, 'index.html'), html, 'utf8');
+console.log('Wrote index.html (image-only). Run build.js for version with editable source.');

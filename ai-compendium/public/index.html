@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Compendium</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" type="image/png" href="/assets/cat.png" />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <img class="logo" src="/assets/cat.png" alt="CAT logo" />
+        <div>
+          <h1>AI Compendium</h1>
+          <p class="subtitle">A web home for tools to make videos, audio, TTS, NLP, and more.</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <div class="search">
+          <input id="searchInput" type="text" placeholder="Search tools, tags, descriptions..." />
+        </div>
+        <button id="addBtn" class="btn primary">Add Resource</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <section class="panel">
+          <h2>Categories</h2>
+          <div id="categoryList" class="chips"></div>
+          <button id="clearCategory" class="btn ghost small" type="button">All</button>
+        </section>
+
+        <section class="panel">
+          <h2>Popular Tags</h2>
+          <div id="tagList" class="chips"></div>
+          <button id="clearTag" class="btn ghost small" type="button">Any</button>
+        </section>
+
+        <section class="panel note">
+          <h2>How it works</h2>
+          <p>
+            Add a resource, tag it, and vote. The list sorts by total votes so the best tools float to the top.
+          </p>
+        </section>
+      </aside>
+
+      <main class="content">
+        <div class="content-top">
+          <div class="meta">
+            <span id="resultCount" class="pill">0 items</span>
+            <span id="activeFilters" class="muted"></span>
+          </div>
+          <div class="sort">
+            <label for="sortSelect">Sort:</label>
+            <select id="sortSelect">
+              <option value="votes_desc">Most votes</option>
+              <option value="votes_asc">Least votes</option>
+              <option value="recent_desc">Recently added</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="resourceGrid" class="grid" role="list"></div>
+      </main>
+    </div>
+
+    <!-- Resource detail modal -->
+    <div id="detailModal" class="modal" hidden>
+      <div class="modal-card">
+        <div class="modal-head">
+          <div>
+            <h2 id="detailTitle">Resource</h2>
+            <div class="detail-sub">
+              <span id="detailCategory" class="pill muted">Category</span>
+              <span id="detailVotes" class="pill">0 votes</span>
+            </div>
+          </div>
+          <button class="icon-btn" id="detailClose" type="button" aria-label="Close" onclick="document.getElementById('detailModal').hidden=true;document.getElementById('detailModal').style.display='none';">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <p id="detailDesc" class="lead"></p>
+
+          <div class="detail-tags">
+            <div id="detailTagPills" class="chips"></div>
+          </div>
+
+          <div class="detail-examples">
+            <h3>Examples</h3>
+            <pre id="detailExamples" class="codebox"></pre>
+          </div>
+
+          <div class="detail-links">
+            <a id="detailUrl" class="btn" href="#" target="_blank" rel="noreferrer">Open link</a>
+          </div>
+
+          <div class="vote-row">
+            <button id="voteDown" class="btn danger">Vote -1</button>
+            <button id="voteUp" class="btn primary">Vote +1</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add resource modal -->
+    <div id="addModal" class="modal" hidden>
+      <div class="modal-card">
+        <div class="modal-head">
+          <div>
+            <h2>Add resource</h2>
+            <p class="subtitle">Keep it short, add tags, and include an example.</p>
+          </div>
+          <button class="icon-btn" id="addClose" type="button" aria-label="Close" onclick="document.getElementById('addModal').hidden=true;document.getElementById('addModal').style.display='none';document.getElementById('addForm').reset();">✕</button>
+        </div>
+
+        <form id="addForm" class="modal-body">
+          <label>
+            Title
+            <input name="title" required />
+          </label>
+
+          <label>
+            Category
+            <input name="category" placeholder="e.g., Video Tools" />
+          </label>
+
+          <label>
+            Tags (comma-separated)
+            <input name="tags" placeholder="e.g., video, ffmpeg, subtitles" />
+          </label>
+
+          <label>
+            Link (optional)
+            <input name="url" placeholder="https://..." />
+          </label>
+
+          <label>
+            Description
+            <textarea name="description" rows="4" placeholder="What is this tool, and who is it for?"></textarea>
+          </label>
+
+          <label>
+            Examples (optional)
+            <textarea name="examples" rows="4" placeholder="Describe a use case or workflow."></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button class="btn ghost" type="button" id="addCancel" onclick="document.getElementById('addModal').hidden=true;document.getElementById('addModal').style.display='none';document.getElementById('addForm').reset();">Cancel</button>
+            <button class="btn primary" type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script defer src="/app.js"></script>
+  </body>
+</html>
+
