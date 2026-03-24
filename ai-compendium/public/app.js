@@ -458,7 +458,10 @@ function renderGrid() {
     card.className = 'card';
     card.setAttribute('role', 'listitem');
 
-    const tags = (r.tags || []).slice(0, 4);
+    const sortedTags = [...(r.tags || [])].sort((a, b) =>
+      String(a).localeCompare(String(b), undefined, { sensitivity: 'base' })
+    );
+    const tags = sortedTags.slice(0, 4);
     const tagHtml = tags.map(t => {
       const key = String(t).trim().toLowerCase();
       return `
@@ -496,7 +499,7 @@ function renderGrid() {
 
       <div class="chips" style="margin-top:-2px">
         ${tagHtml}
-        ${Math.max(0, (r.tags || []).length - tags.length) ? `<span class="muted" style="font-size:12px">+${Math.max(0,(r.tags||[]).length-tags.length)} more</span>` : ''}
+        ${Math.max(0, sortedTags.length - tags.length) ? `<span class="muted" style="font-size:12px">+${Math.max(0, sortedTags.length - tags.length)} more</span>` : ''}
       </div>
 
       <div class="card-footer-row">
