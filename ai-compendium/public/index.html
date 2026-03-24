@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AI Compendium</title>
+    <title>MSAI Compendium of AI Tools</title>
     <link rel="stylesheet" href="/styles.css" />
     <link rel="icon" type="image/png" href="/assets/cat.png" />
   </head>
@@ -14,54 +14,105 @@
       <div class="brand">
         <img class="logo" src="/assets/cat.png" alt="CAT logo" />
         <div>
-          <h1>AI Compendium</h1>
-          <p class="subtitle">A web home for tools to make videos, audio, TTS, NLP, and more.</p>
+          <h1 class="brand-kicker" aria-label="MSAI CAT acronym">MSAI · CAT</h1>
+          <p class="subtitle"><strong>Compendium of AI Tools</strong> to make videos, audio, TTS, NLP, and more</p>
         </div>
       </div>
-
-      <div class="top-actions">
-        <div class="search">
-          <input id="searchInput" type="text" placeholder="Search tools, tags, descriptions..." />
-        </div>
-        <button id="addBtn" class="btn primary">Add Resource</button>
+      <div class="auth-strip">
+        <a id="logoutLink" class="auth-link auth-link-with-icon" href="#" role="button" aria-label="Account">
+          <span class="auth-link-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </span>
+          <span id="authLinkText">Log in</span>
+        </a>
+        <a id="reportBugLink" class="auth-link auth-link-with-icon" href="#" role="button" aria-label="Report a bug">
+          <span class="auth-link-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 2v4"></path>
+              <path d="M16 2v4"></path>
+              <path d="M9 9h6v10a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"></path>
+              <path d="M5 13h4"></path>
+              <path d="M15 13h4"></path>
+              <path d="M4 7h16"></path>
+            </svg>
+          </span>
+          <span>Report Bug</span>
+        </a>
       </div>
     </header>
 
     <div class="layout">
       <aside class="sidebar">
-        <section class="panel">
-          <h2>Categories</h2>
-          <div id="categoryList" class="chips"></div>
-          <button id="clearCategory" class="btn ghost small" type="button">All</button>
-        </section>
+        <details class="panel note how-it-works" id="howItWorks">
+          <summary class="how-it-works-summary">
+            <span class="how-it-works-summary-label">How it works</span>
+            <span class="how-it-works-arrow" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </span>
+          </summary>
+          <div class="how-it-works-body">
+            <p>
+              Add a resource, tag it, and vote. The list sorts by total votes so the best tools float to the top.
+            </p>
+          </div>
+        </details>
 
         <section class="panel">
-          <h2>Popular Tags</h2>
+          <h2>Tags</h2>
           <div id="tagList" class="chips"></div>
-          <button id="clearTag" class="btn ghost small" type="button">Any</button>
-        </section>
-
-        <section class="panel note">
-          <h2>How it works</h2>
-          <p>
-            Add a resource, tag it, and vote. The list sorts by total votes so the best tools float to the top.
-          </p>
         </section>
       </aside>
 
       <main class="content">
-        <div class="content-top">
-          <div class="meta">
-            <span id="resultCount" class="pill">0 items</span>
-            <span id="activeFilters" class="muted"></span>
+        <div class="content-plus-row">
+          <div class="add-resource-cluster">
+            <button
+              id="addBtn"
+              class="fab-add"
+              type="button"
+              aria-label="Add a new resource or tool"
+              title="Add a new resource or tool"
+            >
+              <span class="fab-add-plus" aria-hidden="true">+</span>
+            </button>
+            <label for="addBtn" class="add-resource-hint">Add a new resource or tool</label>
           </div>
-          <div class="sort">
-            <label for="sortSelect">Sort:</label>
-            <select id="sortSelect">
-              <option value="votes_desc">Most votes</option>
-              <option value="votes_asc">Least votes</option>
-              <option value="recent_desc">Recently added</option>
-            </select>
+          <div class="content-search">
+            <div class="search">
+              <span class="search-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+              </span>
+              <input id="searchInput" type="search" placeholder="Search tools, tags, descriptions..." />
+            </div>
+          </div>
+        </div>
+
+        <div class="content-sort-row">
+          <div class="content-header-sortside">
+            <div class="sort">
+              <label for="sortSelect"><strong>Sort</strong>:</label>
+              <select id="sortSelect">
+                <option value="votes_desc">Most votes</option>
+                <option value="votes_asc">Least votes</option>
+                <option value="recent_desc">Recently added</option>
+              </select>
+            </div>
+            <span id="activeFilters" class="muted content-header-filters"></span>
+          </div>
+        </div>
+
+        <div class="content-selected-labels-row" id="selectedLabelsRow" hidden>
+          <div class="selected-labels-line">
+            <span class="selected-labels-prefix">Labels selected:</span>
+            <div class="selected-labels-chips" id="selectedLabelsChips"></div>
           </div>
         </div>
 
@@ -76,7 +127,6 @@
           <div>
             <h2 id="detailTitle">Resource</h2>
             <div class="detail-sub">
-              <span id="detailCategory" class="pill muted">Category</span>
               <span id="detailVotes" class="pill">0 votes</span>
             </div>
           </div>
@@ -100,8 +150,12 @@
           </div>
 
           <div class="vote-row">
-            <button id="voteDown" class="btn danger">Vote -1</button>
-            <button id="voteUp" class="btn primary">Vote +1</button>
+            <button id="voteUp" type="button" class="vote-icon-btn" aria-label="Vote up">
+              <svg class="vote-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            </button>
+            <button id="voteDown" type="button" class="vote-icon-btn" aria-label="Vote down">
+              <svg class="vote-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -122,11 +176,6 @@
           <label>
             Title
             <input name="title" required />
-          </label>
-
-          <label>
-            Category
-            <input name="category" placeholder="e.g., Video Tools" />
           </label>
 
           <label>
@@ -152,6 +201,121 @@
           <div class="form-actions">
             <button class="btn ghost" type="button" id="addCancel" onclick="document.getElementById('addModal').hidden=true;document.getElementById('addModal').style.display='none';document.getElementById('addForm').reset();">Cancel</button>
             <button class="btn primary" type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Auth modal -->
+    <div id="authModal" class="modal" hidden>
+      <div class="modal-card">
+        <div class="modal-head">
+          <div>
+            <h2 id="authTitle">Log in</h2>
+            <p class="subtitle">Create an account or sign in to vote</p>
+          </div>
+          <button class="icon-btn" id="authClose" type="button" aria-label="Close">✕</button>
+        </div>
+
+        <form id="authForm" class="modal-body">
+          <label>
+            Email
+            <input name="email" type="email" autocomplete="email" required />
+          </label>
+          <label id="authNameWrap" hidden>
+            Name
+            <input name="name" autocomplete="name" />
+          </label>
+          <label>
+            Password
+            <div class="password-input-wrap">
+              <input id="authPassword" name="password" type="password" autocomplete="current-password" required />
+              <button id="authPasswordToggle" type="button" class="password-toggle-btn" aria-label="Show password" title="Show password">
+                <span class="icon-eye-show" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+                <span class="icon-eye-hide" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                </span>
+              </button>
+            </div>
+          </label>
+          <div id="authPasswordRules" class="password-rules" hidden>
+            <p class="password-rules-intro">Password must meet all of:</p>
+            <ul class="password-rules-list" aria-live="polite">
+              <li id="auth-pw-req-length" class="password-rule-item">At least 8 characters</li>
+              <li id="auth-pw-req-number" class="password-rule-item">At least one number</li>
+              <li id="auth-pw-req-upper" class="password-rule-item">At least one uppercase letter</li>
+              <li id="auth-pw-req-special" class="password-rule-item">At least one special character</li>
+            </ul>
+          </div>
+          <p id="authError" class="auth-error" hidden></p>
+          <div class="form-actions">
+            <button id="authSwitch" class="btn ghost" type="button">Need an account?</button>
+            <button id="authRecover" class="btn ghost" type="button">Forgot password?</button>
+            <button id="authSubmit" class="btn primary" type="submit">Log in</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Signup success splash -->
+    <div id="signupSplashModal" class="modal" hidden>
+      <div class="modal-card modal-card-compact">
+        <div class="modal-head">
+          <div>
+            <h2>Welcome</h2>
+            <p class="subtitle">Your account is ready</p>
+          </div>
+        </div>
+        <div class="modal-body">
+          <p id="signupSplashText" class="lead">Sign up successful.</p>
+          <div class="form-actions">
+            <button id="signupSplashOk" class="btn primary" type="button">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bug report modal -->
+    <div id="bugModal" class="modal" hidden>
+      <div class="modal-card">
+        <div class="modal-head">
+          <div>
+            <h2>Report bug</h2>
+            <p class="subtitle">Help us improve MSAI CAT</p>
+          </div>
+          <button class="icon-btn" id="bugClose" type="button" aria-label="Close">✕</button>
+        </div>
+        <form id="bugForm" class="modal-body">
+          <label>
+            Bug title
+            <input name="title" required placeholder="Short summary of the issue" />
+          </label>
+          <label>
+            Area (optional)
+            <input name="area" placeholder="e.g., login, voting, add resource" />
+          </label>
+          <label>
+            Steps to reproduce
+            <textarea name="steps" rows="4" required placeholder="1) ... 2) ... 3) ..."></textarea>
+          </label>
+          <label>
+            Expected result (optional)
+            <textarea name="expected" rows="3" placeholder="What should happen?"></textarea>
+          </label>
+          <label>
+            Actual result (optional)
+            <textarea name="actual" rows="3" placeholder="What happened instead?"></textarea>
+          </label>
+          <label>
+            Email (optional)
+            <input name="email" type="email" autocomplete="email" placeholder="you@example.com" />
+          </label>
+          <p id="bugError" class="auth-error" hidden></p>
+          <div class="form-actions">
+            <button id="bugCancel" class="btn ghost" type="button">Cancel</button>
+            <button id="bugSubmit" class="btn primary" type="submit">Submit report</button>
           </div>
         </form>
       </div>

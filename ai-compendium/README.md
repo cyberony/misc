@@ -21,7 +21,7 @@ Resources are stored in:
 Each resource has:
 - `id`
 - `title`
-- `category`
+- `category` (optional legacy field; UI is tag-only)
 - `tags` (array of strings)
 - `url` (optional)
 - `description`
@@ -30,7 +30,7 @@ Each resource has:
 - `createdAt`, `updatedAt`
 
 ## API
-- `GET /api/resources` (optional `category`, `tag`, `q`)
+- `GET /api/resources` (optional `tag`, `q`; `category` still supported for API/filter scripts)
 - `GET /api/resources/:id`
 - `POST /api/resources` (create)
 - `POST /api/resources/:id/vote` with `{ delta: 1 | -1 }`

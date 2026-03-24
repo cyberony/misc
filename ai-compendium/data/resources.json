@@ -30,9 +30,9 @@
       ],
       "description": "Robust speech-to-text for many accents/languages; runs locally with models.",
       "examples": "Example: Transcribe meeting audio into text + timestamps.",
-      "votes": 18,
+      "votes": 17,
       "createdAt": "2026-03-19T00:00:00.000Z",
-      "updatedAt": "2026-03-19T18:29:49.731Z"
+      "updatedAt": "2026-03-23T19:00:38.904Z"
     },
     {
       "id": "sample-elevenlabs",
@@ -111,6 +111,49 @@
       "votes": 0,
       "createdAt": "2026-03-19T18:29:40.481Z",
       "updatedAt": "2026-03-19T18:29:40.481Z"
+    },
+    {
+      "id": "32edabe9-6773-4c41-b5cf-36e5ab74e109",
+      "title": "Test test",
+      "category": "Uncategorized",
+      "url": "something.com",
+      "tags": [
+        "video"
+      ],
+      "description": "bla",
+      "examples": "bla",
+      "votes": 0,
+      "createdAt": "2026-03-23T15:44:17.569Z",
+      "updatedAt": "2026-03-23T15:44:17.569Z"
     }
-  ]
+  ],
+  "users": [
+    {
+      "id": "6a218dc3-5a9e-48b8-b98f-587ee82624d0",
+      "email": "msai_test_user3@example.com",
+      "name": "Test User",
+      "passwordHash": "5a3d068a3ca44fe2e002e939106d64f2:2c887018f71f66c9f3472cae79875503585df62c07979bd18570293d2a09a38fe3d8cd94cc17be3395919b9ee10bf85a6d707c590c8a574008fd313bc98a2a3f",
+      "createdAt": "2026-03-23T18:59:53.829Z",
+      "updatedAt": "2026-03-23T18:59:53.913Z"
+    },
+    {
+      "id": "1f63df08-355f-45e1-984a-9a3f6aa33df6",
+      "email": "cyberony@gmail.com",
+      "name": "",
+      "passwordHash": "c9e06f2f2cb7d6acdb53464c65b4eaef:bde5ddc93db7a0d2bcc866f6375eba80b97729310680e5e0c1ae592cee1198f52ee1fe4fc3df7f1b98ebdf04be0ddc12010db204e82ec08b18741c959bfba731",
+      "createdAt": "2026-03-23T19:00:23.734Z"
+    }
+  ],
+  "sessions": {
+    "f10aba59165ef322fc3e3dbf42a7a44e51c6d1b029b123c9537f9fbc94413ccc": {
+      "userId": "6a218dc3-5a9e-48b8-b98f-587ee82624d0",
+      "createdAt": "2026-03-23T18:59:53.939Z",
+      "expiresAt": 1775501993939
+    }
+  },
+  "votesByUser": {
+    "1f63df08-355f-45e1-984a-9a3f6aa33df6": {
+      "sample-whisper": 1
+    }
+  }
 }
