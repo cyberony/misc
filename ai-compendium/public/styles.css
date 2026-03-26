@@ -783,6 +783,20 @@ button.tag-pill{
 .modal-card-compact{
   width: min(460px, 100%);
 }
+.reset-password-shell{
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+.reset-password-card{
+  width: min(460px, 100%);
+}
+.modal-head h1{
+  margin: 0;
+  font-size: 18px;
+}
 .modal-head{
   display:flex;
   justify-content: space-between;
@@ -1035,6 +1049,9 @@ input, textarea, select{ background:#ffffff !important; }
   margin: 6px 0 0;
   font-size: 12.5px;
   color: #b42318;
+}
+.auth-error.auth-success{
+  color: #067647;
 }
 
 form label{

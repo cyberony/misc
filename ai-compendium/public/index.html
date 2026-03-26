@@ -212,7 +212,7 @@
         <div class="modal-head">
           <div>
             <h2 id="authTitle">Log in</h2>
-            <p class="subtitle">Create an account or sign in to vote</p>
+            <p id="authSubtitle" class="subtitle">Create an account or sign in to vote</p>
           </div>
           <button class="icon-btn" id="authClose" type="button" aria-label="Close">✕</button>
         </div>
@@ -226,6 +226,7 @@
             Name
             <input name="name" autocomplete="name" />
           </label>
+          <div id="authPasswordBlock">
           <label>
             Password
             <div class="password-input-wrap">
@@ -248,6 +249,7 @@
               <li id="auth-pw-req-upper" class="password-rule-item">At least one uppercase letter</li>
               <li id="auth-pw-req-special" class="password-rule-item">At least one special character</li>
             </ul>
+          </div>
           </div>
           <p id="authError" class="auth-error" hidden></p>
           <div class="form-actions">

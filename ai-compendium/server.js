@@ -1,8 +1,11 @@
+require('dotenv').config();
+
 const express = require('express');
 const fs = require('fs/promises');
 const path = require('path');
 const crypto = require('crypto');
 const { promisify } = require('util');
+const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -38,7 +41,10 @@ async function readDB() {
   const sessions = parsed.sessions && typeof parsed.sessions === 'object' ? parsed.sessions : {};
   const votesByUser = parsed.votesByUser && typeof parsed.votesByUser === 'object' ? parsed.votesByUser : {};
   const bugReports = Array.isArray(parsed.bugReports) ? parsed.bugReports : [];
-  return { resources, users, sessions, votesByUser, bugReports };
+  const passwordResetTokens = Array.isArray(parsed.passwordResetTokens)
+    ? parsed.passwordResetTokens
+    : [];
+  return { resources, users, sessions, votesByUser, bugReports, passwordResetTokens };
 }
 
 async function writeDB(db) {
@@ -61,6 +67,9 @@ function sortByVotes(resources) {
 
 const scryptAsync = promisify(crypto.scrypt);
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
+const RESET_TOKEN_TTL_MS = 1000 * 60 * 30; // 30 minutes
+const FORGOT_RATE_WINDOW_MS = 1000 * 60 * 60; // 1 hour
+const FORGOT_RATE_MAX = 5;
 const PASSWORD_SPECIAL = '!@#$%^&*()_+-=[]{}|;\':",.<>?/~`';
 const PASSWORD_SPECIAL_REGEX = /[!@#$%^&*()_+\-=[\]{}|;':",.<>?/~`]/;
 
@@ -71,10 +80,6 @@ function nowMs() {
 function normalizeEmail(v) {
   return String(v || '').trim().toLowerCase();
 }
-function normalizeText(v) {
-  return String(v || '').trim().toLowerCase();
-}
-
 function validatePassword(password) {
   if (typeof password !== 'string' || password.length < 8) {
     return { ok: false, error: 'Password must be at least 8 characters' };
@@ -132,6 +137,85 @@ function sweepExpiredSessions(db) {
     }
   }
   return changed;
+}
+
+const forgotRateByIp = new Map();
+
+function hashResetToken(raw) {
+  return crypto.createHash('sha256').update(String(raw), 'utf8').digest('hex');
+}
+
+function sweepExpiredPasswordResetTokens(db) {
+  const t = nowMs();
+  const list = db.passwordResetTokens || [];
+  const next = list.filter((x) => Number(x.expiresAt || 0) > t);
+  if (next.length !== list.length) {
+    db.passwordResetTokens = next;
+    return true;
+  }
+  return false;
+}
+
+function getClientIp(req) {
+  const xf = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  if (xf) return xf;
+  return String(req.socket?.remoteAddress || req.ip || '');
+}
+
+function forgotPasswordRateOk(ip) {
+  const now = nowMs();
+  let arr = forgotRateByIp.get(ip) || [];
+  arr = arr.filter((t) => now - t < FORGOT_RATE_WINDOW_MS);
+  if (arr.length >= FORGOT_RATE_MAX) return false;
+  arr.push(now);
+  forgotRateByIp.set(ip, arr);
+  return true;
+}
+
+function getPublicBaseUrl() {
+  const fromEnv = String(process.env.PUBLIC_BASE_URL || '').trim();
+  if (fromEnv) return fromEnv.replace(/\/$/, '');
+  const p = process.env.PORT ? Number(process.env.PORT) : 3000;
+  return `http://localhost:${p}`;
+}
+
+let mailTransport = null;
+function getMailTransport() {
+  if (mailTransport) return mailTransport;
+  const host = process.env.SMTP_HOST || '127.0.0.1';
+  const port = Number(process.env.SMTP_PORT || 1025);
+  const secure = String(process.env.SMTP_SECURE || '').toLowerCase() === 'true';
+  const user = String(process.env.SMTP_USER || '').trim();
+  const pass = String(process.env.SMTP_PASS || '');
+  mailTransport = nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: user ? { user, pass } : undefined,
+  });
+  return mailTransport;
+}
+
+async function sendPasswordResetEmail(toEmail, rawToken) {
+  const from = String(process.env.SMTP_FROM || 'AI Compendium <noreply@localhost>').trim();
+  const base = getPublicBaseUrl();
+  const url = `${base}/reset-password.html?token=${encodeURIComponent(rawToken)}`;
+  const transport = getMailTransport();
+  await transport.sendMail({
+    from,
+    to: toEmail,
+    subject: 'Reset your AI Compendium password',
+    text: `We received a request to reset your password.\n\nOpen this link (valid 30 minutes):\n${url}\n\nIf you did not request this, you can ignore this email.`,
+    html: `<p>We received a request to reset your password.</p><p><a href="${escapeHtmlAttr(url)}">Set a new password</a> (link valid 30 minutes)</p><p>If you did not request this, you can ignore this email.</p>`,
+  });
+}
+
+function escapeHtmlAttr(u) {
+  return String(u)
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
 }
 
 function getAuthUserFromDB(req, db) {
@@ -226,45 +310,108 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-app.post('/api/auth/recover', async (req, res) => {
+const FORGOT_PASSWORD_MESSAGE =
+  'If an account exists for that email, a reset link has been sent. Check your inbox (or Mailpit in development).';
+
+app.post('/api/auth/forgot-password', async (req, res) => {
   try {
     const email = normalizeEmail(req.body?.email);
-    const name = String(req.body?.name || '').trim();
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ error: 'Enter a valid email' });
+    }
+
+    const ip = getClientIp(req);
+    const rateOk = forgotPasswordRateOk(ip);
+
+    await enqueueWrite(async () => {
+      const db = await readDB();
+      sweepExpiredSessions(db);
+      sweepExpiredPasswordResetTokens(db);
+
+      const user = db.users.find((u) => normalizeEmail(u.email) === email);
+      if (!user) {
+        await writeDB(db);
+        return;
+      }
+      if (!rateOk) {
+        await writeDB(db);
+        return;
+      }
+
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const tokenHash = hashResetToken(rawToken);
+      db.passwordResetTokens = (db.passwordResetTokens || []).filter((t) => t.userId !== user.id);
+      db.passwordResetTokens.push({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        tokenHash,
+        expiresAt: nowMs() + RESET_TOKEN_TTL_MS,
+        createdAt: new Date().toISOString(),
+      });
+      await writeDB(db);
+
+      try {
+        await sendPasswordResetEmail(user.email, rawToken);
+      } catch (err) {
+        console.error('sendPasswordResetEmail failed:', err?.message || err);
+      }
+    });
+
+    res.json({ ok: true, message: FORGOT_PASSWORD_MESSAGE });
+  } catch (e) {
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const rawToken = String(req.body?.token || '').trim();
     const newPassword = String(req.body?.newPassword || '');
-    if (!email || !email.includes('@')) return res.status(400).json({ error: 'Enter a valid email' });
+    if (!rawToken) return res.status(400).json({ error: 'Missing token' });
     const pwValidation = validatePassword(newPassword);
     if (!pwValidation.ok) return res.status(400).json({ error: pwValidation.error });
 
-    let changed = false;
+    const tokenHash = hashResetToken(rawToken);
     await enqueueWrite(async () => {
       const db = await readDB();
-      const user = db.users.find(u => normalizeEmail(u.email) === email);
-      if (!user) {
-        const err = new Error('No account found for this email');
-        err.statusCode = 404;
+      sweepExpiredSessions(db);
+      sweepExpiredPasswordResetTokens(db);
+
+      const idx = (db.passwordResetTokens || []).findIndex((t) => t.tokenHash === tokenHash);
+      if (idx === -1) {
+        const err = new Error('Invalid or expired reset link');
+        err.statusCode = 400;
         throw err;
       }
-      // Light identity check for this local app: if account has a name, require exact match.
-      if (user.name && normalizeText(user.name) !== normalizeText(name)) {
-        const err = new Error('Name does not match this account');
-        err.statusCode = 403;
+      const record = db.passwordResetTokens[idx];
+      if (Number(record.expiresAt) <= nowMs()) {
+        db.passwordResetTokens.splice(idx, 1);
+        await writeDB(db);
+        const err = new Error('Invalid or expired reset link');
+        err.statusCode = 400;
+        throw err;
+      }
+      const user = db.users.find((u) => u.id === record.userId);
+      if (!user) {
+        db.passwordResetTokens.splice(idx, 1);
+        await writeDB(db);
+        const err = new Error('Invalid or expired reset link');
+        err.statusCode = 400;
         throw err;
       }
       user.passwordHash = await hashPassword(newPassword);
       user.updatedAt = new Date().toISOString();
-      // Invalidate all sessions for this user after password reset.
+      db.passwordResetTokens = (db.passwordResetTokens || []).filter((t) => t.userId !== user.id);
       for (const [token, session] of Object.entries(db.sessions || {})) {
         if (session && session.userId === user.id) delete db.sessions[token];
       }
-      changed = true;
       await writeDB(db);
     });
 
-    if (!changed) return res.status(500).json({ error: 'Password reset failed' });
-    res.json({ ok: true, message: 'Password reset. Please log in with your new password.' });
+    res.json({ ok: true, message: 'Password updated. You can log in.' });
   } catch (e) {
     if (e && typeof e === 'object' && e.statusCode) {
-      return res.status(e.statusCode).json({ error: String(e.message || 'Recovery failed') });
+      return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
     }
     res.status(500).json({ error: String(e?.message || e) });
   }
