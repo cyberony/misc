@@ -92,12 +92,12 @@
               id="addBtn"
               class="fab-add"
               type="button"
-              aria-label="Add a new resource or tool"
-              title="Add a new resource or tool"
+              aria-label="Add a new tool or resource"
+              title="Add a new tool or resource"
             >
               <span class="fab-add-plus" aria-hidden="true">+</span>
             </button>
-            <label for="addBtn" class="add-resource-hint">Add a new resource or tool</label>
+            <label for="addBtn" class="add-resource-hint">Add a new tool or resource</label>
           </div>
           <div class="content-search">
             <div class="search">
@@ -185,7 +185,7 @@
       <div class="modal-card">
         <div class="modal-head">
           <div>
-            <h2>Add resource</h2>
+            <h2>Add tool or resource</h2>
             <p class="subtitle">Keep it short, add tags, and include an example.</p>
           </div>
           <button class="icon-btn" id="addClose" type="button" aria-label="Close" onclick="document.getElementById('addModal').hidden=true;document.getElementById('addModal').style.display='none';document.getElementById('addForm').reset();">✕</button>
@@ -218,7 +218,6 @@
           </label>
 
           <div class="form-actions">
-            <button class="btn ghost" type="button" id="addCancel" onclick="document.getElementById('addModal').hidden=true;document.getElementById('addModal').style.display='none';document.getElementById('addForm').reset();">Cancel</button>
             <button class="btn primary" type="submit">Save</button>
           </div>
         </form>
@@ -347,7 +346,6 @@
           </label>
           <p id="bugError" class="auth-error" hidden></p>
           <div class="form-actions">
-            <button id="bugCancel" class="btn ghost" type="button">Cancel</button>
             <button id="bugSubmit" class="btn primary" type="submit">Submit report</button>
           </div>
         </form>

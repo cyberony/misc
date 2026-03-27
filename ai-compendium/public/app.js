@@ -603,13 +603,21 @@ function applyFilters() {
 
 function applySort(list) {
   const sorted = [...list];
+  const byTitleAsc = (a, b) =>
+    String(a?.title || '').localeCompare(String(b?.title || ''), undefined, { sensitivity: 'base' });
   if (state.sort === 'votes_asc') {
-    sorted.sort((a, b) => (a.votes || 0) - (b.votes || 0));
+    sorted.sort((a, b) => {
+      const voteDiff = (a.votes || 0) - (b.votes || 0);
+      return voteDiff !== 0 ? voteDiff : byTitleAsc(a, b);
+    });
   } else if (state.sort === 'recent_desc') {
     sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
   } else {
     // votes_desc default
-    sorted.sort((a, b) => (b.votes || 0) - (a.votes || 0));
+    sorted.sort((a, b) => {
+      const voteDiff = (b.votes || 0) - (a.votes || 0);
+      return voteDiff !== 0 ? voteDiff : byTitleAsc(a, b);
+    });
   }
   return sorted;
 }
@@ -1280,7 +1288,6 @@ function wireUI() {
   // Add modal
   $('#addBtn').addEventListener('click', openAddModal);
   $('#addClose').addEventListener('click', closeAddModal);
-  $('#addCancel').addEventListener('click', closeAddModal);
   addModal.addEventListener('click', (e) => {
     if (e.target === addModal) closeAddModal();
   });
@@ -1372,7 +1379,6 @@ function wireUI() {
     openBugModal();
   });
   $('#bugClose').addEventListener('click', closeBugModal);
-  $('#bugCancel').addEventListener('click', closeBugModal);
   bugModal.addEventListener('click', (e) => {
     if (e.target === bugModal) closeBugModal();
   });

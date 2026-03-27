@@ -30,9 +30,9 @@
       ],
       "description": "Robust speech-to-text for many accents/languages; runs locally with models.",
       "examples": "Example: Transcribe meeting audio into text + timestamps.",
-      "votes": 1,
+      "votes": 2,
       "createdAt": "2026-03-19T00:00:00.000Z",
-      "updatedAt": "2026-03-27T15:26:35.470Z"
+      "updatedAt": "2026-03-27T16:34:54.651Z"
     },
     {
       "id": "sample-elevenlabs",
@@ -46,9 +46,9 @@
       ],
       "description": "High-quality text-to-speech voices with expressive output.",
       "examples": "Example: Generate narration for a slide deck script.",
-      "votes": 1,
+      "votes": 2,
       "createdAt": "2026-03-19T00:00:00.000Z",
-      "updatedAt": "2026-03-27T15:26:37.773Z"
+      "updatedAt": "2026-03-27T16:34:51.684Z"
     },
     {
       "id": "sample-pydub",
@@ -78,9 +78,9 @@
       ],
       "description": "Fast short-form editor with templates, auto-captions, and social export.",
       "examples": "Example: Create a 30-second reel with auto subtitles and transitions.",
-      "votes": 1,
+      "votes": 2,
       "createdAt": "2026-03-27T06:11:00.000Z",
-      "updatedAt": "2026-03-27T15:26:29.706Z"
+      "updatedAt": "2026-03-27T16:34:46.669Z"
     },
     {
       "id": "sample-descript",
@@ -94,9 +94,9 @@
       ],
       "description": "Edit audio and video by editing the transcript text.",
       "examples": "Example: Remove filler words from a podcast by deleting text.",
-      "votes": 0,
+      "votes": 1,
       "createdAt": "2026-03-27T06:12:00.000Z",
-      "updatedAt": "2026-03-27T06:12:00.000Z"
+      "updatedAt": "2026-03-27T16:36:13.992Z"
     },
     {
       "id": "sample-heygen",
@@ -171,6 +171,12 @@
       "sample-capcut": 1,
       "sample-whisper": 1,
       "sample-elevenlabs": 1
+    },
+    "8f85509d-a9f9-4095-96f6-6779571ec596": {
+      "sample-capcut": 1,
+      "sample-elevenlabs": 1,
+      "sample-whisper": 1,
+      "sample-descript": 1
     }
   },
   "bugReports": [],
