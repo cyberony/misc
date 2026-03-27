@@ -12,6 +12,8 @@ const state = {
   authMode: 'login',
   recoverLinkSent: false,
   pendingAction: null,
+  adminViewMode: localStorage.getItem('msai_admin_view_mode') || 'admin',
+  adminUsers: [],
 };
 
 const detailModal = $('#detailModal');
@@ -19,6 +21,7 @@ const addModal = $('#addModal');
 const authModal = $('#authModal');
 const signupSplashModal = $('#signupSplashModal');
 const bugModal = $('#bugModal');
+const profileModal = $('#profileModal');
 const PASSWORD_SPECIAL = '!@#$%^&*()_+-=[]{}|;\':",.<>?/~`';
 const PASSWORD_SPECIAL_REGEX = /[!@#$%^&*()_+\-=[\]{}|;':",.<>?/~`]/;
 
@@ -188,13 +191,126 @@ function setAuthToken(token) {
 function updateAuthUI() {
   const logoutLink = $('#logoutLink');
   const authLinkText = $('#authLinkText');
-  if (state.currentUser) {
-    authLinkText.textContent = 'Log out';
-    logoutLink.hidden = false;
-  } else {
-    authLinkText.textContent = 'Log in';
-    logoutLink.hidden = false;
+  const adminModeWrap = $('#adminViewModeWrap');
+  const adminModeSelect = $('#adminViewMode');
+  const accountMenu = $('#accountMenu');
+  const loggedIn = Boolean(state.currentUser);
+  authLinkText.textContent = 'Log in';
+  logoutLink.hidden = false;
+  if (authLinkText) authLinkText.hidden = loggedIn;
+  if (accountMenu) {
+    accountMenu.hidden = !loggedIn;
+    accountMenu.value = '';
   }
+  if (state.currentUser?.role === 'admin') {
+    if (adminModeWrap) adminModeWrap.hidden = false;
+    if (adminModeSelect) adminModeSelect.value = state.adminViewMode === 'user' ? 'user' : 'admin';
+  } else {
+    state.adminViewMode = 'admin';
+    localStorage.setItem('msai_admin_view_mode', state.adminViewMode);
+    if (adminModeWrap) adminModeWrap.hidden = true;
+  }
+  renderAdminAccountsPanel();
+}
+
+function getEffectiveRole() {
+  if (state.currentUser?.role !== 'admin') return 'user';
+  return state.adminViewMode === 'user' ? 'user' : 'admin';
+}
+
+function isAdminModeActive() {
+  return state.currentUser?.role === 'admin' && getEffectiveRole() === 'admin';
+}
+
+async function fetchAdminUsers() {
+  if (state.currentUser?.role !== 'admin') {
+    state.adminUsers = [];
+    return;
+  }
+  const res = await apiFetch('/api/admin/users');
+  if (!res.ok) {
+    state.adminUsers = [];
+    return;
+  }
+  const data = await res.json().catch(() => ({}));
+  state.adminUsers = Array.isArray(data.users) ? data.users : [];
+}
+
+function renderAdminAccountsPanel() {
+  const panel = $('#adminAccountsPanel');
+  const list = $('#adminUserList');
+  const searchInput = $('#adminUserSearch');
+  if (!panel || !list || !searchInput) return;
+
+  if (!isAdminModeActive()) {
+    panel.hidden = true;
+    list.innerHTML = '';
+    return;
+  }
+
+  panel.hidden = false;
+  const q = String(searchInput.value || '').trim().toLowerCase();
+  const users = [...(state.adminUsers || [])].sort((a, b) =>
+    String(a.email || '').localeCompare(String(b.email || ''), undefined, { sensitivity: 'base' }),
+  );
+  const filtered = users.filter((u) => {
+    if (state.currentUser && u.id === state.currentUser.id) return false;
+    const hay = `${String(u.email || '')} ${String(u.name || '')}`.toLowerCase();
+    return !q || hay.includes(q);
+  });
+  if (!filtered.length) {
+    list.innerHTML = '<p class="muted admin-user-empty">No matching accounts</p>';
+    return;
+  }
+
+  list.innerHTML = filtered
+    .map((u) => `
+      <div class="admin-user-row">
+        <div class="admin-user-meta">
+          <p class="admin-user-email">${escapeHTML(u.email || '')}</p>
+          <p class="admin-user-name">${escapeHTML(u.name || '(no name)')}</p>
+        </div>
+        <label class="admin-role-select-wrap">
+          <span class="admin-role-label">Role</span>
+          <select data-admin-user-role="${escapeAttr(u.id)}">
+            <option value="user"${u.role === 'user' ? ' selected' : ''}>User</option>
+            <option value="admin"${u.role === 'admin' ? ' selected' : ''}>Admin</option>
+          </select>
+        </label>
+      </div>
+    `)
+    .join('');
+
+  list.querySelectorAll('[data-admin-user-role]').forEach((sel) => {
+    sel.addEventListener('change', async (e) => {
+      const target = e.currentTarget;
+      const userId = target.getAttribute('data-admin-user-role');
+      const role = target.value === 'admin' ? 'admin' : 'user';
+      if (!userId) return;
+      const prev = state.adminUsers.find((u) => u.id === userId)?.role || 'user';
+      target.disabled = true;
+      const res = await apiFetch(`/api/admin/users/${encodeURIComponent(userId)}/role`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ role }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        target.value = prev;
+        alert(data.error || `Role update failed (HTTP ${res.status})`);
+      } else {
+        const entry = state.adminUsers.find((u) => u.id === userId);
+        if (entry) entry.role = role;
+        if (state.currentUser && state.currentUser.id === userId) {
+          state.currentUser.role = role;
+          updateAuthUI();
+          renderGrid();
+        }
+      }
+      target.disabled = false;
+      renderAdminAccountsPanel();
+    });
+  });
 }
 
 function clearAuthEmailConflict() {
@@ -370,9 +486,34 @@ function closeBugModal() {
   $('#bugError').textContent = '';
 }
 
+function openProfileModal() {
+  if (!state.currentUser) return;
+  const form = $('#profileForm');
+  if (form && typeof form.reset === 'function') form.reset();
+  $('#profileName').value = state.currentUser.name || '';
+  $('#profileEmail').value = state.currentUser.email || '';
+  $('#profileCurrentPassword').value = '';
+  $('#profileNewPassword').value = '';
+  $('#profileNewPasswordConfirm').value = '';
+  const errEl = $('#profileError');
+  if (errEl) {
+    errEl.hidden = true;
+    errEl.textContent = '';
+    errEl.classList.remove('auth-success');
+  }
+  profileModal.hidden = false;
+  profileModal.style.display = 'flex';
+}
+
+function closeProfileModal() {
+  profileModal.hidden = true;
+  profileModal.style.display = 'none';
+}
+
 async function hydrateSession() {
   if (!state.authToken) {
     state.currentUser = null;
+    state.adminUsers = [];
     updateAuthUI();
     return;
   }
@@ -380,11 +521,13 @@ async function hydrateSession() {
   if (!res.ok) {
     setAuthToken('');
     state.currentUser = null;
+    state.adminUsers = [];
     updateAuthUI();
     return;
   }
   const data = await res.json();
   state.currentUser = data.user || null;
+  await fetchAdminUsers();
   updateAuthUI();
 }
 
@@ -541,6 +684,7 @@ function renderSidebar() {
     };
     tagList.appendChild(btn);
   }
+  renderAdminAccountsPanel();
 }
 
 function renderGrid() {
@@ -625,7 +769,7 @@ function renderGrid() {
         <div class="vote"${state.currentUser ? '' : ' style="display:none"'}>
           <button class="vote-icon-btn" type="button" data-vote="${escapeHTML(r.id)}" data-delta="1" aria-label="Vote up">${VOTE_ICON_UP}</button>
           <button class="vote-icon-btn" type="button" data-vote="${escapeHTML(r.id)}" data-delta="-1" aria-label="Vote down">${VOTE_ICON_DOWN}</button>
-          ${state.currentUser?.role === 'admin'
+          ${getEffectiveRole() === 'admin'
             ? `<button class="vote-icon-btn vote-icon-btn-danger" type="button" data-delete-resource="${escapeHTML(r.id)}" aria-label="Delete resource" title="Delete resource">${TRASH_ICON}</button>`
             : ''}
         </div>
@@ -781,7 +925,7 @@ async function vote(id, delta) {
 }
 
 async function deleteResource(id) {
-  if (!state.currentUser || state.currentUser.role !== 'admin') return;
+  if (!state.currentUser || getEffectiveRole() !== 'admin') return;
   const confirmed = window.confirm('Delete this resource card? This cannot be undone.');
   if (!confirmed) return;
   const res = await apiFetch(`/api/resources/${encodeURIComponent(id)}`, { method: 'DELETE' });
@@ -998,9 +1142,63 @@ async function logout() {
   }
   setAuthToken('');
   state.currentUser = null;
+  state.adminUsers = [];
   state.userVotes = {};
   state.pendingAction = null;
   updateAuthUI();
+  await refreshAll();
+}
+
+async function submitProfile(e) {
+  e.preventDefault();
+  const errEl = $('#profileError');
+  if (errEl) {
+    errEl.hidden = true;
+    errEl.textContent = '';
+    errEl.classList.remove('auth-success');
+  }
+
+  const email = String($('#profileEmail')?.value || '').trim();
+  const name = String($('#profileName')?.value || '').trim();
+  const currentPassword = String($('#profileCurrentPassword')?.value || '');
+  const newPassword = String($('#profileNewPassword')?.value || '');
+  const newPasswordConfirm = String($('#profileNewPasswordConfirm')?.value || '');
+
+  if (newPassword && newPassword !== newPasswordConfirm) {
+    if (errEl) {
+      errEl.hidden = false;
+      errEl.textContent = 'New passwords do not match';
+    }
+    return;
+  }
+
+  const payload = { email, name };
+  if (newPassword) {
+    payload.currentPassword = currentPassword;
+    payload.newPassword = newPassword;
+  }
+
+  const res = await apiFetch('/api/auth/profile', {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    if (errEl) {
+      errEl.hidden = false;
+      errEl.textContent = data.error || `Could not update profile (HTTP ${res.status})`;
+    }
+    return;
+  }
+
+  state.currentUser = data.user || state.currentUser;
+  updateAuthUI();
+  if (errEl) {
+    errEl.hidden = false;
+    errEl.classList.add('auth-success');
+    errEl.textContent = 'Profile updated';
+  }
   await refreshAll();
 }
 
@@ -1092,9 +1290,23 @@ function wireUI() {
   // Auth modal + controls
   $('#logoutLink').addEventListener('click', (e) => {
     e.preventDefault();
-    if (state.currentUser) logout();
-    else openAuthModal('login');
+    if (state.currentUser) return;
+    openAuthModal('login');
   });
+  const accountMenu = $('#accountMenu');
+  if (accountMenu) {
+    accountMenu.addEventListener('change', async (e) => {
+      const action = e.target.value;
+      e.target.value = '';
+      if (action === 'settings') {
+        openProfileModal();
+        return;
+      }
+      if (action === 'logout') {
+        await logout();
+      }
+    });
+  }
   $('#authClose').addEventListener('click', closeAuthModal);
   $('#authSwitch').addEventListener('click', () => {
     if (state.authMode === 'recover') {
@@ -1104,6 +1316,19 @@ function wireUI() {
     setAuthMode(state.authMode === 'signup' ? 'login' : 'signup');
   });
   $('#authRecover').addEventListener('click', () => setAuthMode('recover'));
+  const adminModeSelect = $('#adminViewMode');
+  if (adminModeSelect) {
+    adminModeSelect.addEventListener('change', async (e) => {
+      const next = e.target.value === 'user' ? 'user' : 'admin';
+      state.adminViewMode = next;
+      localStorage.setItem('msai_admin_view_mode', next);
+      if (next === 'admin') await fetchAdminUsers();
+      renderGrid();
+      renderSidebar();
+    });
+  }
+  const adminUserSearch = $('#adminUserSearch');
+  if (adminUserSearch) adminUserSearch.addEventListener('input', () => renderAdminAccountsPanel());
   const authEmail = $('#authEmail');
   if (authEmail) authEmail.addEventListener('input', clearAuthEmailConflict);
   const authPassword = $('#authPassword');
@@ -1152,6 +1377,15 @@ function wireUI() {
     if (e.target === bugModal) closeBugModal();
   });
   $('#bugForm').addEventListener('submit', submitBugReport);
+  $('#profileClose').addEventListener('click', closeProfileModal);
+  $('#profileLogout').addEventListener('click', async () => {
+    await logout();
+    closeProfileModal();
+  });
+  $('#profileForm').addEventListener('submit', submitProfile);
+  profileModal.addEventListener('click', (e) => {
+    if (e.target === profileModal) closeProfileModal();
+  });
 }
 
 wireUI();

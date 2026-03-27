@@ -12,6 +12,7 @@
   --danger:#ff4d6d;
   --ok:#36d399;
   --radius: 18px;
+  --search-placeholder-color: rgba(100, 116, 139, 0.9);
 }
 
 *{ box-sizing:border-box; }
@@ -54,6 +55,67 @@ body{
   align-items: center;
   gap: 12px;
   margin-left: auto;
+}
+.admin-view-mode{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: rgba(11, 18, 32, 0.66);
+}
+.admin-view-mode[hidden]{
+  display: none !important;
+}
+.admin-view-mode select{
+  height: 28px;
+  min-width: 93px;
+  border-radius: 10px;
+  padding: 3px 8px;
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: normal;
+  border: 1px solid rgba(11, 18, 32, 0.16);
+  background-color: #fff;
+  color: var(--search-placeholder-color);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
+}
+.account-actions-wrap{
+  display: inline-flex;
+  align-items: center;
+}
+.account-actions-wrap[hidden]{
+  display: none !important;
+}
+.account-actions-select{
+  height: 28px;
+  min-width: 93px;
+  border-radius: 10px;
+  padding: 3px 22px 3px 8px;
+  font-size: 13px;
+  border: 1px solid rgba(11, 18, 32, 0.16);
+  background-color: #fff;
+  color: var(--search-placeholder-color);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M2.5 4.5 6 8l3.5-3.5' stroke='%23475569' stroke-width='1.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 7px center;
+  background-size: 11px 11px;
+}
+.account-actions-select,
+.admin-role-select-wrap select{
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: normal;
 }
 .auth-link{
   font-size: 13px;
@@ -286,9 +348,11 @@ button.selected-label-chip:hover .selected-label-remove{
   border-radius: 10px;
   cursor: pointer;
   appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   background-color: #fff;
   border: 1px solid rgba(11, 18, 32, 0.22);
-  color: var(--muted);
+  color: var(--search-placeholder-color);
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M2.5 4.5 6 8l3.5-3.5' stroke='%23475569' stroke-width='1.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -301,7 +365,7 @@ button.selected-label-chip:hover .selected-label-remove{
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
 }
 .content-header-sortside .sort select option{
-  color: var(--muted);
+  color: var(--search-placeholder-color);
   background-color: #fff;
 }
 
@@ -360,6 +424,9 @@ button.selected-label-chip:hover .selected-label-remove{
     0 10px 24px rgba(37, 99, 235, 0.1),
     0 0 0 1px rgba(255, 255, 255, 0.08) inset;
   transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.search input::placeholder{
+  color: var(--search-placeholder-color);
 }
 .search:has(.search-icon) input{
   padding-left: 42px;
@@ -469,6 +536,64 @@ button.selected-label-chip:hover .selected-label-remove{
   color: rgba(255,255,255,.86);
 }
 .chips{ display:flex; flex-wrap: wrap; gap: 8px; }
+.admin-accounts-panel{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.admin-accounts-panel[hidden]{
+  display: none !important;
+}
+.admin-accounts-panel input[type="search"]{
+  width: 100%;
+}
+.admin-user-list{
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow: auto;
+}
+.admin-user-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 9px;
+  border: 1px solid rgba(11, 18, 32, 0.12);
+  border-radius: 12px;
+}
+.admin-user-meta{
+  min-width: 0;
+}
+.admin-user-email{
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(11, 18, 32, 0.86);
+  overflow-wrap: anywhere;
+}
+.admin-user-name{
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: rgba(11, 18, 32, 0.62);
+  overflow-wrap: anywhere;
+}
+.admin-role-select-wrap{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(11, 18, 32, 0.65);
+}
+.admin-role-select-wrap select{
+  height: 26px;
+  border-radius: 9px;
+  padding: 3px 22px 3px 8px;
+  font-size: 12px;
+}
+.admin-user-empty{
+  margin: 2px 0 0;
+}
 
 .content{
   border-radius: var(--radius);

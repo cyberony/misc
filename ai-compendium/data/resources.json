@@ -139,13 +139,36 @@
       "passwordHash": "bddfde261472e7657427aa1274c87789:c67e8c6053f84758966bb7244262f7e40298840175cd9fe620ace92b896c76fae80d212c7736df612c0ccb91447be840515cd334ef470d66ebd0880c2b0a45e6",
       "createdAt": "2026-03-27T15:22:59.640Z",
       "role": "admin"
+    },
+    {
+      "id": "8f85509d-a9f9-4095-96f6-6779571ec596",
+      "email": "mohammed.alam@northwestern.edu",
+      "name": "",
+      "role": "user",
+      "passwordHash": "fd8adf2570033af0ebd435738a522f41:2485755521bc6eae8c27bc06203b6a9afd0dba44234d1d94cc9e10a9bec8eaf0e7bf50ae09ce57c0a7da833dfae52fab9b23151344d7a202a2635d4cf60515eb",
+      "createdAt": "2026-03-27T15:37:00.318Z"
     }
   ],
   "sessions": {
-    "fa18d9934decf5d2a4117b698af46fd4e1199ea8514af63b767fbf5d6e68590c": {
+    "c86b086edaed04ae60040b41d9be74f33c710d895aa17cbe4d30767a839e3c3f": {
       "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
-      "createdAt": "2026-03-27T15:24:19.780Z",
-      "expiresAt": 1775834659780
+      "createdAt": "2026-03-27T15:38:07.281Z",
+      "expiresAt": 1775835487281
+    },
+    "911725b381cfdf43c618d04fa748cb10242f6b22e17cd1f810e71f2cedab3203": {
+      "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
+      "createdAt": "2026-03-27T15:48:48.457Z",
+      "expiresAt": 1775836128457
+    },
+    "57dc812c44e68db229742e4330e51e29768b4e1266930f853ea134c49a907083": {
+      "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
+      "createdAt": "2026-03-27T15:51:50.193Z",
+      "expiresAt": 1775836310193
+    },
+    "55eadd806a095b3c5b90a572138b610ab5a1ef123d10474abf5c2317bdf1da95": {
+      "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
+      "createdAt": "2026-03-27T16:10:30.754Z",
+      "expiresAt": 1775837430754
     }
   },
   "votesByUser": {

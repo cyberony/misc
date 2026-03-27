@@ -467,6 +467,74 @@ app.get('/api/auth/me', async (req, res) => {
   }
 });
 
+app.patch('/api/auth/profile', async (req, res) => {
+  try {
+    const nextEmail = normalizeEmail(req.body?.email);
+    const nextName = String(req.body?.name || '').trim();
+    const currentPassword = String(req.body?.currentPassword || '');
+    const newPassword = String(req.body?.newPassword || '');
+    if (!nextEmail || !nextEmail.includes('@')) {
+      return res.status(400).json({ error: 'Enter a valid email' });
+    }
+
+    let outUser = null;
+    await enqueueWrite(async () => {
+      const db = await readDB();
+      sweepExpiredSessions(db);
+      const user = getAuthUserFromDB(req, db);
+      if (!user) {
+        const err = new Error('Authentication required');
+        err.statusCode = 401;
+        throw err;
+      }
+
+      const emailTaken = db.users.some(
+        (u) => u.id !== user.id && normalizeEmail(u.email) === nextEmail,
+      );
+      if (emailTaken) {
+        const err = new Error('Email already in use');
+        err.statusCode = 409;
+        throw err;
+      }
+
+      user.email = nextEmail;
+      user.name = nextName;
+      user.updatedAt = new Date().toISOString();
+
+      if (newPassword) {
+        if (!currentPassword) {
+          const err = new Error('Current password is required to set a new password');
+          err.statusCode = 400;
+          throw err;
+        }
+        const ok = await verifyPassword(currentPassword, user.passwordHash);
+        if (!ok) {
+          const err = new Error('Current password is incorrect');
+          err.statusCode = 401;
+          throw err;
+        }
+        const pwValidation = validatePassword(newPassword);
+        if (!pwValidation.ok) {
+          const err = new Error(pwValidation.error);
+          err.statusCode = 400;
+          throw err;
+        }
+        user.passwordHash = await hashPassword(newPassword);
+      }
+
+      outUser = publicUser(user);
+      await writeDB(db);
+    });
+
+    return res.json({ ok: true, user: outUser });
+  } catch (e) {
+    if (e && typeof e === 'object' && e.statusCode) {
+      return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
+    }
+    return res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
 app.post('/api/auth/logout', async (req, res) => {
   try {
     const token = getBearerToken(req);
@@ -710,6 +778,69 @@ app.delete('/api/resources/:id', async (req, res) => {
       return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
     }
     return res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
+app.get('/api/admin/users', async (req, res) => {
+  try {
+    const db = await readDB();
+    sweepExpiredSessions(db);
+    const user = getAuthUserFromDB(req, db);
+    if (!user) return res.status(401).json({ error: 'Authentication required' });
+    if (!isAdminUser(user)) return res.status(403).json({ error: 'Admin access required' });
+
+    const users = (db.users || []).map((u) => ({
+      id: u.id,
+      email: u.email,
+      name: u.name || '',
+      role: u.role === 'admin' ? 'admin' : 'user',
+      createdAt: u.createdAt,
+    }));
+    res.json({ users });
+  } catch (e) {
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
+app.patch('/api/admin/users/:id/role', async (req, res) => {
+  try {
+    const targetId = String(req.params.id || '').trim();
+    const role = String(req.body?.role || '').trim().toLowerCase();
+    if (!targetId) return res.status(400).json({ error: 'Missing user id' });
+    if (!['admin', 'user'].includes(role)) return res.status(400).json({ error: 'role must be admin or user' });
+
+    let updated = null;
+    await enqueueWrite(async () => {
+      const db = await readDB();
+      sweepExpiredSessions(db);
+      const requester = getAuthUserFromDB(req, db);
+      if (!requester) {
+        const err = new Error('Authentication required');
+        err.statusCode = 401;
+        throw err;
+      }
+      if (!isAdminUser(requester)) {
+        const err = new Error('Admin access required');
+        err.statusCode = 403;
+        throw err;
+      }
+      const user = (db.users || []).find((u) => u.id === targetId);
+      if (!user) {
+        const err = new Error('User not found');
+        err.statusCode = 404;
+        throw err;
+      }
+      user.role = role;
+      user.updatedAt = new Date().toISOString();
+      updated = publicUser(user);
+      await writeDB(db);
+    });
+    res.json({ ok: true, user: updated });
+  } catch (e) {
+    if (e && typeof e === 'object' && e.statusCode) {
+      return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
+    }
+    res.status(500).json({ error: String(e?.message || e) });
   }
 });
 

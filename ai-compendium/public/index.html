@@ -19,6 +19,13 @@
         </div>
       </div>
       <div class="auth-strip">
+        <label id="adminViewModeWrap" class="admin-view-mode" hidden>
+          <span>Mode</span>
+          <select id="adminViewMode" aria-label="View mode">
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </select>
+        </label>
         <a id="logoutLink" class="auth-link auth-link-with-icon" href="#" role="button" aria-label="Account">
           <span class="auth-link-icon" aria-hidden="true">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -27,6 +34,11 @@
             </svg>
           </span>
           <span id="authLinkText">Log in</span>
+          <select id="accountMenu" class="account-actions-select" aria-label="Account actions" hidden>
+            <option value="" selected disabled hidden>Profile</option>
+            <option value="settings">Settings</option>
+            <option value="logout">Log out</option>
+          </select>
         </a>
         <a id="reportBugLink" class="auth-link auth-link-with-icon" href="#" role="button" aria-label="Report a bug">
           <span class="auth-link-icon" aria-hidden="true">
@@ -65,6 +77,11 @@
         <section class="panel">
           <h2>Tags</h2>
           <div id="tagList" class="chips"></div>
+        </section>
+        <section id="adminAccountsPanel" class="panel admin-accounts-panel" hidden>
+          <h2>Account Roles</h2>
+          <input id="adminUserSearch" type="search" placeholder="Search accounts..." aria-label="Search accounts" />
+          <div id="adminUserList" class="admin-user-list"></div>
         </section>
       </aside>
 
@@ -332,6 +349,46 @@
           <div class="form-actions">
             <button id="bugCancel" class="btn ghost" type="button">Cancel</button>
             <button id="bugSubmit" class="btn primary" type="submit">Submit report</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Profile modal -->
+    <div id="profileModal" class="modal" hidden>
+      <div class="modal-card modal-card-compact">
+        <div class="modal-head">
+          <div>
+            <h2>Settings</h2>
+            <p class="subtitle">Update your account details and password.</p>
+          </div>
+          <button class="icon-btn" id="profileClose" type="button" aria-label="Close">✕</button>
+        </div>
+        <form id="profileForm" class="modal-body">
+          <label>
+            Name (optional)
+            <input id="profileName" name="name" autocomplete="name" />
+          </label>
+          <label>
+            Email (required)
+            <input id="profileEmail" name="email" type="email" autocomplete="email" required />
+          </label>
+          <label>
+            Current password (required to change password)
+            <input id="profileCurrentPassword" name="currentPassword" type="password" autocomplete="current-password" />
+          </label>
+          <label>
+            New password (optional)
+            <input id="profileNewPassword" name="newPassword" type="password" autocomplete="new-password" />
+          </label>
+          <label>
+            Confirm new password (optional)
+            <input id="profileNewPasswordConfirm" name="newPasswordConfirm" type="password" autocomplete="new-password" />
+          </label>
+          <p id="profileError" class="auth-error" hidden></p>
+          <div class="form-actions">
+            <button id="profileLogout" class="btn ghost" type="button">Log out</button>
+            <button id="profileSave" class="btn primary" type="submit">Save changes</button>
           </div>
         </form>
       </div>
