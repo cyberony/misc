@@ -125,6 +125,166 @@
       "votes": 0,
       "createdAt": "2026-03-23T15:44:17.569Z",
       "updatedAt": "2026-03-23T15:44:17.569Z"
+    },
+    {
+      "id": "sample-notion-ai",
+      "title": "Notion AI",
+      "category": "Productivity",
+      "url": "https://www.notion.so/product/ai",
+      "tags": [
+        "writing",
+        "nlp",
+        "productivity"
+      ],
+      "description": "Drafts, summaries, and rewrite assistance inside docs and notes.",
+      "examples": "Example: Turn rough meeting notes into a clean action-item summary.",
+      "votes": 0,
+      "createdAt": "2026-03-27T06:10:00.000Z",
+      "updatedAt": "2026-03-27T06:10:00.000Z"
+    },
+    {
+      "id": "sample-capcut",
+      "title": "CapCut",
+      "category": "Video Tools",
+      "url": "https://www.capcut.com/",
+      "tags": [
+        "video",
+        "editing",
+        "subtitles"
+      ],
+      "description": "Fast short-form editor with templates, auto-captions, and social export.",
+      "examples": "Example: Create a 30-second reel with auto subtitles and transitions.",
+      "votes": 0,
+      "createdAt": "2026-03-27T06:11:00.000Z",
+      "updatedAt": "2026-03-27T06:11:00.000Z"
+    },
+    {
+      "id": "sample-descript",
+      "title": "Descript",
+      "category": "Audio / Video",
+      "url": "https://www.descript.com/",
+      "tags": [
+        "audio",
+        "video",
+        "transcription"
+      ],
+      "description": "Edit audio and video by editing the transcript text.",
+      "examples": "Example: Remove filler words from a podcast by deleting text.",
+      "votes": 0,
+      "createdAt": "2026-03-27T06:12:00.000Z",
+      "updatedAt": "2026-03-27T06:12:00.000Z"
+    },
+    {
+      "id": "sample-canva-magic",
+      "title": "Canva Magic Studio",
+      "category": "Design",
+      "url": "https://www.canva.com/magic/",
+      "tags": [
+        "image",
+        "presentation",
+        "design"
+      ],
+      "description": "AI-assisted design tools for slides, images, and quick social graphics.",
+      "examples": "Example: Generate branded presentation slides from a short prompt.",
+      "votes": 0,
+      "createdAt": "2026-03-27T06:13:00.000Z",
+      "updatedAt": "2026-03-27T06:13:00.000Z"
+    },
+    {
+      "id": "sample-runway",
+      "title": "Runway",
+      "category": "Video Gen",
+      "url": "https://runwayml.com/",
+      "tags": [
+        "video",
+        "generative",
+        "editing"
+      ],
+      "description": "Generative video and editing tools including inpainting and motion effects.",
+      "examples": "Example: Replace a background and generate a short b-roll clip.",
+      "votes": 0,
+      "createdAt": "2026-03-27T06:14:00.000Z",
+      "updatedAt": "2026-03-27T06:14:00.000Z"
+    },
+    {
+      "id": "sample-otter",
+      "title": "Otter.ai",
+      "category": "Meetings",
+      "url": "https://otter.ai/",
+      "tags": [
+        "stt",
+        "transcription",
+        "meeting-notes"
+      ],
+      "description": "Live meeting transcription and searchable notes with speaker labels.",
+      "examples": "Example: Auto-transcribe weekly sync and share summary highlights.",
+      "votes": 0,
+      "createdAt": "2026-03-27T06:15:00.000Z",
+      "updatedAt": "2026-03-27T06:15:00.000Z"
+    },
+    {
+      "id": "sample-grammarly",
+      "title": "Grammarly",
+      "category": "Writing",
+      "url": "https://www.grammarly.com/",
+      "tags": [
+        "writing",
+        "grammar",
+        "nlp"
+      ],
+      "description": "Grammar, clarity, and tone suggestions across browser and desktop apps.",
+      "examples": "Example: Rewrite a project update to sound concise and professional.",
+      "votes": 0,
+      "createdAt": "2026-03-27T06:16:00.000Z",
+      "updatedAt": "2026-03-27T06:16:00.000Z"
+    },
+    {
+      "id": "sample-heygen",
+      "title": "HeyGen",
+      "category": "Avatar Video",
+      "url": "https://www.heygen.com/",
+      "tags": [
+        "video",
+        "avatar",
+        "voiceover"
+      ],
+      "description": "Create talking-avatar videos with multilingual voice and lip sync.",
+      "examples": "Example: Produce a product intro in two languages from one script.",
+      "votes": 0,
+      "createdAt": "2026-03-27T06:17:00.000Z",
+      "updatedAt": "2026-03-27T06:17:00.000Z"
+    },
+    {
+      "id": "sample-perplexity",
+      "title": "Perplexity",
+      "category": "Research",
+      "url": "https://www.perplexity.ai/",
+      "tags": [
+        "search",
+        "research",
+        "nlp"
+      ],
+      "description": "Answer engine with source-cited results for quick topic research.",
+      "examples": "Example: Compare tools and gather linked references for a decision memo.",
+      "votes": 0,
+      "createdAt": "2026-03-27T06:18:00.000Z",
+      "updatedAt": "2026-03-27T06:18:00.000Z"
+    },
+    {
+      "id": "sample-suno",
+      "title": "Suno",
+      "category": "Music",
+      "url": "https://suno.com/",
+      "tags": [
+        "audio",
+        "music",
+        "generative"
+      ],
+      "description": "Generate songs from prompts with vocals, style, and arrangement options.",
+      "examples": "Example: Draft a short upbeat intro track for a tutorial series.",
+      "votes": 0,
+      "createdAt": "2026-03-27T06:19:00.000Z",
+      "updatedAt": "2026-03-27T06:19:00.000Z"
     }
   ],
   "users": [

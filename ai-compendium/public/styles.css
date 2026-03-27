@@ -492,12 +492,57 @@ button.selected-label-chip:hover .selected-label-remove{
   margin-top: 0;
   align-items: start;
 }
+
+/* Desktop: keep sidebar static; only cards list scrolls */
+@media (min-width: 981px){
+  body{
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .topbar{
+    flex: 0 0 auto;
+  }
+  .layout{
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: 18px;
+  }
+  .sidebar{
+    align-self: start;
+    position: sticky;
+    top: 0;
+    max-height: 100%;
+  }
+  .content{
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .content-grid-scroll{
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 2px 18px 0;
+    scrollbar-gutter: stable;
+  }
+  #resourceGrid{
+    min-height: 0;
+  }
+}
+
 @media (max-width: 720px){
   .grid{ grid-template-columns: 1fr; }
   .content-search{
     flex: 1 1 100%;
     width: 100%;
     max-width: none;
+  }
+  .content-grid-scroll{
+    overflow: visible;
+    padding: 0;
   }
 }
 
