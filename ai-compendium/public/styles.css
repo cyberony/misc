@@ -136,6 +136,10 @@ body{
   width: calc(50% - 6px);
   max-width: calc(50% - 6px);
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
 }
 .content-search .search{
   width: 100%;
@@ -267,10 +271,12 @@ button.selected-label-chip:hover .selected-label-remove{
   padding: 0;
   font-size: 13px;
   font-weight: 400;
+  color: var(--muted);
   white-space: nowrap;
 }
 .content-header-sortside .sort label strong{
   font-weight: 700;
+  color: inherit;
 }
 .content-header-sortside .sort select{
   margin: 0;
@@ -281,10 +287,22 @@ button.selected-label-chip:hover .selected-label-remove{
   cursor: pointer;
   appearance: none;
   background-color: #fff;
+  border: 1px solid rgba(11, 18, 32, 0.22);
+  color: var(--muted);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M2.5 4.5 6 8l3.5-3.5' stroke='%23475569' stroke-width='1.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 7px center;
   background-size: 11px 11px;
+}
+.content-header-sortside .sort select:focus{
+  border-color: var(--search-steel-focus);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+.content-header-sortside .sort select option{
+  color: var(--muted);
+  background-color: #fff;
 }
 
 /* Round + button only; caption sits outside (see .add-resource-hint) */
@@ -946,6 +964,11 @@ body{
 }
 
 .btn{
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-decoration: none;
   color: var(--text);
   background: #ffffff;
   border: 1px solid rgba(11,18,32,.16);
@@ -999,24 +1022,36 @@ html{ background:#ffffff !important; }
 .card{ background:#ffffff !important; border:1px solid rgba(11,18,32,.10) !important; }
 .modal{ background: rgba(0,0,0,.55) !important; }
 .modal-card{ background:#ffffff !important; border:1px solid rgba(11,18,32,.12) !important; }
+/* Search stays white/steel — not the blue modal field style */
 .search input{
   background: #ffffff !important;
   border: 2px solid var(--search-steel-border) !important;
+  color: var(--text);
   box-shadow: var(--search-field-shadow) !important;
   transition: box-shadow 0.18s ease, border-color 0.18s ease;
 }
 .search input:focus{
   border-color: var(--search-steel-focus) !important;
   box-shadow: var(--search-field-shadow-focus) !important;
+  outline: none;
 }
-input, textarea, select{ background:#ffffff !important; }
-.content-header-sortside .sort select{
-  padding: 5px 26px 5px 8px !important;
-  appearance: none !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23475569' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round' d='M2.5 4.5 6 8l3.5-3.5'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: right 7px center !important;
-  background-size: 11px 11px !important;
+/* Blue-tint fields: modals only (not search, not sort) */
+#authForm input:not(.auth-input-error),
+#authForm textarea,
+#addForm input,
+#addForm textarea,
+#bugForm input,
+#bugForm textarea,
+#resetForm input{
+  background: rgba(37, 99, 235, 0.08) !important;
+  border-color: rgba(37, 99, 235, 0.38) !important;
+}
+.content-field-label{
+  display: block;
+  margin: 0 0 6px 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(11, 18, 32, 0.78);
 }
 .pill, .votes{ background: rgba(11,18,32,.04) !important; border:1px solid rgba(11,18,32,.10) !important; }
 .card-title-band .votes{
@@ -1050,6 +1085,13 @@ input, textarea, select{ background:#ffffff !important; }
   font-size: 12.5px;
   color: #b42318;
 }
+.auth-email-field-error{
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #b42318;
+  line-height: 1.35;
+}
 .auth-error.auth-success{
   color: #067647;
 }
@@ -1070,34 +1112,10 @@ input, textarea, select{
   color: var(--text);
   outline:none;
 }
-#addForm input,
-#addForm textarea{
-  background: #ffffff;
-  border: 1px solid rgba(11, 18, 32, 0.26);
-}
-#addForm input[required],
-#addForm textarea[required]{
-  background: rgba(37, 99, 235, 0.08);
-  border-color: rgba(37, 99, 235, 0.38);
-}
 #addForm input:focus,
 #addForm textarea:focus{
-  border-color: rgba(37, 99, 235, 0.62);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
-}
-#authForm input{
-  background: #ffffff;
-  border: 1px solid rgba(11, 18, 32, 0.26);
-}
-#bugForm input,
-#bugForm textarea{
-  background: #ffffff;
-  border: 1px solid rgba(11, 18, 32, 0.26);
-}
-#bugForm input[required],
-#bugForm textarea[required]{
-  background: rgba(37, 99, 235, 0.08);
-  border-color: rgba(37, 99, 235, 0.38);
+  border-color: rgba(37, 99, 235, 0.62) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
 }
 #authForm .password-input-wrap{
   position: relative;
@@ -1106,14 +1124,33 @@ input, textarea, select{
   width: 100%;
   padding-right: 40px;
 }
+#resetForm .password-input-wrap{
+  position: relative;
+}
+#resetForm .password-input-wrap input{
+  width: 100%;
+  padding-right: 40px;
+}
 #authForm input:focus{
-  border-color: rgba(37, 99, 235, 0.62);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+  border-color: rgba(37, 99, 235, 0.62) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+}
+#resetForm input:focus{
+  border-color: rgba(37, 99, 235, 0.62) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
 }
 #bugForm input:focus,
 #bugForm textarea:focus{
-  border-color: rgba(37, 99, 235, 0.62);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+  border-color: rgba(37, 99, 235, 0.62) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+}
+#authEmail.auth-input-error{
+  border-color: #b42318 !important;
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.14) !important;
+}
+#authEmail.auth-input-error:focus{
+  border-color: #b42318 !important;
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.18) !important;
 }
 .password-toggle-btn{
   position: absolute;
@@ -1132,6 +1169,30 @@ input, textarea, select{
   cursor: pointer;
   padding: 0;
 }
+/* Two stacked SVGs in one slot; display:none on <g> inside a single SVG is unreliable */
+.password-toggle-icon-wrap{
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.password-toggle-icon-wrap svg{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.password-toggle-icon-wrap .password-toggle-eye-off-svg{
+  display: none;
+}
+.password-toggle-btn.showing .password-toggle-icon-wrap .password-toggle-eye-open-svg{
+  display: none;
+}
+.password-toggle-btn.showing .password-toggle-icon-wrap .password-toggle-eye-off-svg{
+  display: block;
+}
 .password-toggle-btn:hover{
   background: rgba(11, 18, 32, 0.06);
   color: rgba(11, 18, 32, 0.8);
@@ -1140,9 +1201,22 @@ input, textarea, select{
   outline: 2px solid rgba(37, 99, 235, 0.35);
   outline-offset: 2px;
 }
-.password-toggle-btn .icon-eye-hide{ display: none; }
-.password-toggle-btn.showing .icon-eye-show{ display: none; }
-.password-toggle-btn.showing .icon-eye-hide{ display: inline-flex; }
+/* Hide browser-native password reveal controls (we use custom eye buttons). */
+#authForm input[type="password"]::-ms-reveal,
+#authForm input[type="password"]::-ms-clear,
+#resetForm input[type="password"]::-ms-reveal,
+#resetForm input[type="password"]::-ms-clear{
+  display: none;
+}
+#authForm input[type="password"]::-webkit-credentials-auto-fill-button,
+#resetForm input[type="password"]::-webkit-credentials-auto-fill-button{
+  visibility: hidden;
+  pointer-events: none;
+}
+#authForm input[type="password"]::-webkit-textfield-decoration-container,
+#resetForm input[type="password"]::-webkit-textfield-decoration-container{
+  display: none;
+}
 .password-rules{
   margin-top: 4px;
 }

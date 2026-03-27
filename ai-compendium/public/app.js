@@ -10,6 +10,7 @@ const state = {
   authToken: localStorage.getItem('msai_auth_token') || '',
   userVotes: {},
   authMode: 'login',
+  recoverLinkSent: false,
   pendingAction: null,
 };
 
@@ -194,29 +195,100 @@ function updateAuthUI() {
   }
 }
 
+function clearAuthEmailConflict() {
+  const emailIn = $('#authEmail');
+  const emailErr = $('#authEmailError');
+  if (emailIn) emailIn.classList.remove('auth-input-error');
+  if (emailErr) {
+    emailErr.hidden = true;
+    emailErr.textContent = '';
+  }
+}
+
+function clearAuthPasswordConfirmError() {
+  const el = $('#authPasswordConfirmError');
+  if (!el) return;
+  el.hidden = true;
+  el.textContent = '';
+}
+
+/** Browsers often autofill password after paint; re-clear a few times for sign-up. */
+function scheduleClearSignupPasswordFields() {
+  const clear = () => {
+    const pw = $('#authPassword');
+    const pwc = $('#authPasswordConfirm');
+    if (pw) pw.value = '';
+    if (pwc) pwc.value = '';
+  };
+  clear();
+  requestAnimationFrame(clear);
+  setTimeout(clear, 50);
+  setTimeout(clear, 200);
+}
+
 function setAuthMode(mode) {
+  clearAuthEmailConflict();
+  clearAuthPasswordConfirmError();
   state.authMode = ['login', 'signup', 'recover'].includes(mode) ? mode : 'login';
   const isSignup = state.authMode === 'signup';
   const isRecover = state.authMode === 'recover';
+  if (!isRecover) state.recoverLinkSent = false;
   $('#authTitle').textContent = isSignup ? 'Sign up' : (isRecover ? 'Forgot password' : 'Log in');
-  $('#authSubmit').textContent = isSignup ? 'Create account' : (isRecover ? 'Send reset link' : 'Log in');
-  $('#authSwitch').textContent = isSignup ? 'Already have an account?' : 'Need an account?';
+  $('#authSubmit').textContent = isSignup
+    ? 'Create account'
+    : (isRecover ? (state.recoverLinkSent ? 'Resend reset link' : 'Send reset link') : 'Log in');
+  $('#authSwitch').textContent = isRecover
+    ? 'Back to log in'
+    : (isSignup ? 'Already have an account?' : 'Need an account?');
+  const authSwitch = $('#authSwitch');
+  if (authSwitch) {
+    authSwitch.hidden = false;
+    authSwitch.style.display = '';
+  }
   const sub = $('#authSubtitle');
   if (sub) {
-    sub.textContent = isRecover
-      ? 'Enter your email. If an account exists, we’ll send a reset link.'
-      : 'Create an account or sign in to vote';
+    if (isRecover) {
+      sub.textContent = state.recoverLinkSent
+        ? 'If the email exists, we sent a link. You can resend below if needed.'
+        : 'Enter your email. If an account exists, we’ll send a reset link.';
+    } else {
+      sub.textContent = 'Create an account or sign in to vote and add a resource or tool.';
+    }
   }
-  $('#authNameWrap').hidden = !isSignup;
+  const nameWrap = $('#authNameWrap');
+  if (nameWrap) {
+    nameWrap.hidden = !isSignup;
+    nameWrap.style.display = isSignup ? '' : 'none';
+  }
   const pwBlock = $('#authPasswordBlock');
   if (pwBlock) pwBlock.hidden = isRecover;
+  const pwConfirmWrap = $('#authPasswordConfirmWrap');
+  if (pwConfirmWrap) {
+    pwConfirmWrap.hidden = !isSignup;
+    pwConfirmWrap.style.display = isSignup ? '' : 'none';
+  }
   $('#authPasswordRules').hidden = !isSignup;
   const pw = $('#authPassword');
   if (pw) {
     pw.required = !isRecover;
+    pw.disabled = isRecover;
     pw.setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
+    if (isSignup) pw.value = '';
   }
-  $('#authRecover').hidden = isSignup || isRecover;
+  const pwConfirm = $('#authPasswordConfirm');
+  if (pwConfirm) {
+    pwConfirm.required = isSignup;
+    if (isSignup) pwConfirm.value = '';
+  }
+  if (isSignup) scheduleClearSignupPasswordFields();
+  const nameInput = $('#authNameWrap input[name="name"]');
+  if (nameInput) nameInput.required = false;
+  const authRecover = $('#authRecover');
+  if (authRecover) {
+    const hideRecoverBtn = isSignup || isRecover;
+    authRecover.hidden = hideRecoverBtn;
+    authRecover.style.display = hideRecoverBtn ? 'none' : '';
+  }
   const errEl = $('#authError');
   errEl.hidden = true;
   errEl.textContent = '';
@@ -231,17 +303,31 @@ function openAuthModal(mode = 'login') {
 }
 
 function closeAuthModal() {
+  clearAuthEmailConflict();
+  clearAuthPasswordConfirmError();
   authModal.hidden = true;
   authModal.style.display = 'none';
   const form = $('#authForm');
   if (form && typeof form.reset === 'function') form.reset();
+  state.recoverLinkSent = false;
   const pw = $('#authPassword');
   const toggle = $('#authPasswordToggle');
-  if (pw) pw.type = 'password';
+  if (pw) {
+    pw.type = 'password';
+    pw.disabled = false;
+  }
   if (toggle) {
     toggle.classList.remove('showing');
     toggle.setAttribute('aria-label', 'Show password');
     toggle.setAttribute('title', 'Show password');
+  }
+  const pwC = $('#authPasswordConfirm');
+  const toggleC = $('#authPasswordConfirmToggle');
+  if (pwC) pwC.type = 'password';
+  if (toggleC) {
+    toggleC.classList.remove('showing');
+    toggleC.setAttribute('aria-label', 'Show confirm password');
+    toggleC.setAttribute('title', 'Show confirm password');
   }
   const ae = $('#authError');
   if (ae) {
@@ -745,7 +831,9 @@ async function submitAuth(e) {
     password: String(fd.get('password') || ''),
   };
   if (state.authMode === 'signup') {
+    clearAuthPasswordConfirmError();
     payload.name = String(fd.get('name') || '').trim();
+    const confirmPassword = String(fd.get('confirmPassword') || '');
     const pwErr = validatePasswordClient(payload.password);
     if (pwErr) {
       const errEl = $('#authError');
@@ -754,31 +842,69 @@ async function submitAuth(e) {
       updateAuthPasswordRules();
       return;
     }
+    if (payload.password !== confirmPassword) {
+      const confirmErr = $('#authPasswordConfirmError');
+      if (confirmErr) {
+        confirmErr.hidden = false;
+        confirmErr.textContent = 'Passwords do not match';
+      }
+      return;
+    }
   }
   if (state.authMode === 'recover') {
-    const resForgot = await fetch('/api/auth/forgot-password', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: payload.email }),
-    });
+    const startedAt = Date.now();
+    const errEl = $('#authError');
+    const submitBtn = $('#authSubmit');
+    if (errEl) {
+      errEl.hidden = true;
+      errEl.textContent = '';
+      errEl.classList.remove('auth-success');
+    }
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+    }
+
+    let resForgot;
     let dataForgot = {};
     try {
-      dataForgot = await resForgot.json();
+      resForgot = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: payload.email }),
+      });
+      try {
+        dataForgot = await resForgot.json();
+      } catch {
+        dataForgot = {};
+      }
     } catch {
-      dataForgot = {};
+      resForgot = { ok: false, status: 0 };
+    } finally {
+      const elapsed = Date.now() - startedAt;
+      const minSendingMs = 500;
+      if (elapsed < minSendingMs) {
+        await new Promise(resolve => setTimeout(resolve, minSendingMs - elapsed));
+      }
+      if (submitBtn) submitBtn.disabled = false;
     }
+
     if (!resForgot.ok) {
       const errEl = $('#authError');
       errEl.hidden = false;
       errEl.classList.remove('auth-success');
       errEl.textContent = dataForgot.error || `Request failed (HTTP ${resForgot.status})`;
+      if (submitBtn) submitBtn.textContent = state.recoverLinkSent ? 'Resend reset link' : 'Send reset link';
       return;
     }
-    setAuthMode('login');
+    state.recoverLinkSent = true;
+    if (submitBtn) submitBtn.textContent = 'Resend reset link';
+    const sub = $('#authSubtitle');
+    if (sub) sub.textContent = 'If the email exists, we sent a link. You can resend below if needed.';
     const okEl = $('#authError');
     okEl.hidden = false;
     okEl.classList.add('auth-success');
-    okEl.textContent = dataForgot.message || 'Check your email for a reset link.';
+    okEl.textContent = dataForgot.message || 'Reset link sent. If it does not arrive, click Resend reset link.';
     return;
   }
 
@@ -796,6 +922,27 @@ async function submitAuth(e) {
     data = {};
   }
   if (!res.ok) {
+    const msg = String(data.error || '');
+    const emailTaken =
+      state.authMode === 'signup' &&
+      (res.status === 409 || /already in use/i.test(msg));
+    if (emailTaken) {
+      const errEl = $('#authError');
+      if (errEl) {
+        errEl.hidden = true;
+        errEl.textContent = '';
+        errEl.classList.remove('auth-success');
+      }
+      const emailIn = $('#authEmail');
+      const emailErr = $('#authEmailError');
+      if (emailIn) emailIn.classList.add('auth-input-error');
+      if (emailErr) {
+        emailErr.hidden = false;
+        emailErr.textContent = msg || 'This email is already in use.';
+      }
+      return;
+    }
+    clearAuthEmailConflict();
     const errEl = $('#authError');
     errEl.hidden = false;
     errEl.textContent = data.error || `Authentication failed (HTTP ${res.status})`;
@@ -923,20 +1070,39 @@ function wireUI() {
   });
   $('#authClose').addEventListener('click', closeAuthModal);
   $('#authSwitch').addEventListener('click', () => {
+    if (state.authMode === 'recover') {
+      setAuthMode('login');
+      return;
+    }
     setAuthMode(state.authMode === 'signup' ? 'login' : 'signup');
   });
   $('#authRecover').addEventListener('click', () => setAuthMode('recover'));
+  const authEmail = $('#authEmail');
+  if (authEmail) authEmail.addEventListener('input', clearAuthEmailConflict);
+  const authPassword = $('#authPassword');
+  if (authPassword) authPassword.addEventListener('input', clearAuthPasswordConfirmError);
+  const authPasswordConfirm = $('#authPasswordConfirm');
+  if (authPasswordConfirm) authPasswordConfirm.addEventListener('input', clearAuthPasswordConfirmError);
   $('#authPassword').addEventListener('input', updateAuthPasswordRules);
-  $('#authPasswordToggle').addEventListener('click', () => {
-    const input = $('#authPassword');
-    const btn = $('#authPasswordToggle');
+  function wirePasswordToggle(inputId, btnId, showLabel, hideLabel) {
+    const input = $(inputId);
+    const btn = $(btnId);
     if (!input || !btn) return;
-    const show = input.type === 'password';
-    input.type = show ? 'text' : 'password';
-    btn.classList.toggle('showing', show);
-    btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-    btn.setAttribute('title', show ? 'Hide password' : 'Show password');
-  });
+    btn.addEventListener('click', () => {
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.classList.toggle('showing', show);
+      btn.setAttribute('aria-label', show ? hideLabel : showLabel);
+      btn.setAttribute('title', show ? hideLabel : showLabel);
+    });
+  }
+  wirePasswordToggle('#authPassword', '#authPasswordToggle', 'Show password', 'Hide password');
+  wirePasswordToggle(
+    '#authPasswordConfirm',
+    '#authPasswordConfirmToggle',
+    'Show confirm password',
+    'Hide confirm password',
+  );
   authModal.addEventListener('click', (e) => {
     if (e.target === authModal) closeAuthModal();
   });

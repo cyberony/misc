@@ -1,8 +1,8 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const express = require('express');
 const fs = require('fs/promises');
-const path = require('path');
 const crypto = require('crypto');
 const { promisify } = require('util');
 const nodemailer = require('nodemailer');
@@ -186,13 +186,21 @@ function getMailTransport() {
   const port = Number(process.env.SMTP_PORT || 1025);
   const secure = String(process.env.SMTP_SECURE || '').toLowerCase() === 'true';
   const user = String(process.env.SMTP_USER || '').trim();
-  const pass = String(process.env.SMTP_PASS || '');
+  const pass = String(process.env.SMTP_PASS || '').replace(/\s/g, '');
   mailTransport = nodemailer.createTransport({
     host,
     port,
     secure,
     auth: user ? { user, pass } : undefined,
+    connectionTimeout: 20_000,
+    greetingTimeout: 20_000,
+    socketTimeout: 25_000,
+    // Gmail and most providers on 587 use STARTTLS (not implicit TLS on 465).
+    ...(!secure && port === 587 ? { requireTLS: true } : {}),
   });
+  if (String(process.env.SMTP_LOG_CONFIG || '').toLowerCase() === 'true') {
+    console.log(`[mail] SMTP ${host}:${port} secure=${secure} auth=${user ? 'yes' : 'no'}`);
+  }
   return mailTransport;
 }
 
@@ -323,6 +331,9 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     const ip = getClientIp(req);
     const rateOk = forgotPasswordRateOk(ip);
 
+    /** Set when we saved a token and must send mail (or roll back if SMTP fails). */
+    let mailPayload = null;
+
     await enqueueWrite(async () => {
       const db = await readDB();
       sweepExpiredSessions(db);
@@ -349,13 +360,33 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         createdAt: new Date().toISOString(),
       });
       await writeDB(db);
-
-      try {
-        await sendPasswordResetEmail(user.email, rawToken);
-      } catch (err) {
-        console.error('sendPasswordResetEmail failed:', err?.message || err);
-      }
+      mailPayload = { toEmail: user.email, rawToken, userId: user.id };
     });
+
+    if (mailPayload) {
+      try {
+        await sendPasswordResetEmail(mailPayload.toEmail, mailPayload.rawToken);
+      } catch (err) {
+        const detail = err?.response || err?.message || String(err);
+        console.error('sendPasswordResetEmail failed:', detail);
+        await enqueueWrite(async () => {
+          const db = await readDB();
+          db.passwordResetTokens = (db.passwordResetTokens || []).filter(
+            (t) => t.userId !== mailPayload.userId,
+          );
+          await writeDB(db);
+        });
+        if (String(process.env.SMTP_DEBUG || '').toLowerCase() === 'true') {
+          return res.status(503).json({
+            error: `Could not send email. ${typeof detail === 'string' ? detail : err?.message || 'Check SMTP_* in .env and server logs.'}`,
+          });
+        }
+        return res.status(503).json({
+          error:
+            'Could not send the reset email. Check that SMTP is configured in .env (see .env.example) and the server log for details.',
+        });
+      }
+    }
 
     res.json({ ok: true, message: FORGOT_PASSWORD_MESSAGE });
   } catch (e) {

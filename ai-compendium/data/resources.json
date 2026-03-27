@@ -30,9 +30,9 @@
       ],
       "description": "Robust speech-to-text for many accents/languages; runs locally with models.",
       "examples": "Example: Transcribe meeting audio into text + timestamps.",
-      "votes": 17,
+      "votes": 15,
       "createdAt": "2026-03-19T00:00:00.000Z",
-      "updatedAt": "2026-03-23T19:00:38.904Z"
+      "updatedAt": "2026-03-27T04:57:10.829Z"
     },
     {
       "id": "sample-elevenlabs",
@@ -140,8 +140,30 @@
       "id": "1f63df08-355f-45e1-984a-9a3f6aa33df6",
       "email": "cyberony@gmail.com",
       "name": "",
-      "passwordHash": "c9e06f2f2cb7d6acdb53464c65b4eaef:bde5ddc93db7a0d2bcc866f6375eba80b97729310680e5e0c1ae592cee1198f52ee1fe4fc3df7f1b98ebdf04be0ddc12010db204e82ec08b18741c959bfba731",
-      "createdAt": "2026-03-23T19:00:23.734Z"
+      "passwordHash": "475fba9adabcc1375de16022c77773e0:2251483ef99d976618ccd9d30c363993ce4ea24d5d8b6243afe82511ad877da48d4a2114ea4be693efa707d2d4ca8bb46b9b22ade1bbdf9f861b2ed418d9da5c",
+      "createdAt": "2026-03-23T19:00:23.734Z",
+      "updatedAt": "2026-03-27T04:56:39.537Z"
+    },
+    {
+      "id": "5516efe0-1136-40c6-b4e4-7c3a5d253e19",
+      "email": "something@nothing.ru",
+      "name": "asfafasd",
+      "passwordHash": "059b43a99a84aa752e68ce7ecd5441a4:47a471bdf49e2e6e49731c6fe8b8ead1ec99dfd5b044d8af5f6863bbbaab20f3947969991201b33d8e77cdeffb0ae687ff2766ab077b501cb1191ba13c5fb14d",
+      "createdAt": "2026-03-27T04:08:32.927Z"
+    },
+    {
+      "id": "59c68744-146e-43d8-9663-1cfeca8b3a9a",
+      "email": "cd@ef.com",
+      "name": "afasdfsadf",
+      "passwordHash": "f0ccb731138bbebfbbd4dda81dce0f75:69288786985f1d5b42d1237e298dc62d24a2b369d0c5c0e6f67f94af8e11fed3dd20bfc3ec4ff633ed0106716c530f1587e97d49fe4da99b0295a63f64923010",
+      "createdAt": "2026-03-27T04:33:12.617Z"
+    },
+    {
+      "id": "7d3a6043-703f-441d-83eb-29509fb3eeab",
+      "email": "qa@qw.com",
+      "name": "",
+      "passwordHash": "b5ca3c5591b8d361611f2ec18a749e02:de1adbedfe40ab75006e843459741b5c6489cbc34ffed44c381634998e021ec93af0cd801b94cb35de108c945afbdbac3bfb77dccd9c6127b9a8fac55d0d5637",
+      "createdAt": "2026-03-27T04:51:56.633Z"
     }
   ],
   "sessions": {
@@ -153,8 +175,17 @@
   },
   "votesByUser": {
     "1f63df08-355f-45e1-984a-9a3f6aa33df6": {
-      "sample-whisper": 1
+      "sample-whisper": -1
     }
   },
-  "bugReports": []
+  "bugReports": [],
+  "passwordResetTokens": [
+    {
+      "id": "77c861d2-57ec-428f-b926-17dc8bb2cec4",
+      "userId": "1f63df08-355f-45e1-984a-9a3f6aa33df6",
+      "tokenHash": "59d2acf508341d7abae363488ffb1fd8039356812dc932c3cf3b143108af1223",
+      "expiresAt": 1774590399377,
+      "createdAt": "2026-03-27T05:16:39.377Z"
+    }
+  ]
 }
