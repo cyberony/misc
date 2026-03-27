@@ -117,8 +117,13 @@ function publicUser(user) {
     id: user.id,
     email: user.email,
     name: user.name || '',
+    role: user.role === 'admin' ? 'admin' : 'user',
     createdAt: user.createdAt,
   };
+}
+
+function isAdminUser(user) {
+  return Boolean(user && user.role === 'admin');
 }
 
 function getBearerToken(req) {
@@ -262,6 +267,7 @@ app.post('/api/auth/signup', async (req, res) => {
         id: crypto.randomUUID(),
         email,
         name,
+        role: 'user',
         passwordHash: await hashPassword(password),
         createdAt: now,
       };
@@ -655,6 +661,55 @@ app.post('/api/resources/:id/vote', async (req, res) => {
       return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
     }
     res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
+app.delete('/api/resources/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id || '').trim();
+    if (!id) return res.status(400).json({ error: 'Missing resource id' });
+
+    let deleted = null;
+    await enqueueWrite(async () => {
+      const db = await readDB();
+      sweepExpiredSessions(db);
+      const user = getAuthUserFromDB(req, db);
+      if (!user) {
+        const err = new Error('Authentication required');
+        err.statusCode = 401;
+        throw err;
+      }
+      if (!isAdminUser(user)) {
+        const err = new Error('Admin access required');
+        err.statusCode = 403;
+        throw err;
+      }
+
+      const idx = db.resources.findIndex((r) => r.id === id);
+      if (idx === -1) {
+        const err = new Error('Not found');
+        err.statusCode = 404;
+        throw err;
+      }
+      deleted = db.resources[idx];
+      db.resources.splice(idx, 1);
+
+      // Clean vote references for this resource.
+      for (const userId of Object.keys(db.votesByUser || {})) {
+        if (db.votesByUser[userId] && Object.prototype.hasOwnProperty.call(db.votesByUser[userId], id)) {
+          delete db.votesByUser[userId][id];
+        }
+      }
+
+      await writeDB(db);
+    });
+
+    return res.json({ ok: true, resource: deleted });
+  } catch (e) {
+    if (e && typeof e === 'object' && e.statusCode) {
+      return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
+    }
+    return res.status(500).json({ error: String(e?.message || e) });
   }
 });
 

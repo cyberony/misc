@@ -821,6 +821,16 @@ button.tag-pill{
   cursor: not-allowed;
   background: transparent;
 }
+.vote-icon-btn-danger{
+  color: rgba(180, 35, 24, 0.72);
+}
+.vote-icon-btn-danger:hover{
+  background: rgba(180, 35, 24, 0.10);
+  color: rgba(180, 35, 24, 0.96);
+}
+.vote-icon-btn-danger:active{
+  background: rgba(180, 35, 24, 0.16);
+}
 
 .modal{
   position: fixed;

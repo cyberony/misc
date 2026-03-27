@@ -29,6 +29,8 @@ const VOTE_ICON_UP =
   '<svg class="vote-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
 const VOTE_ICON_DOWN =
   '<svg class="vote-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>';
+const TRASH_ICON =
+  '<svg class="vote-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
 
 function escapeHTML(str) {
   return String(str)
@@ -623,6 +625,9 @@ function renderGrid() {
         <div class="vote"${state.currentUser ? '' : ' style="display:none"'}>
           <button class="vote-icon-btn" type="button" data-vote="${escapeHTML(r.id)}" data-delta="1" aria-label="Vote up">${VOTE_ICON_UP}</button>
           <button class="vote-icon-btn" type="button" data-vote="${escapeHTML(r.id)}" data-delta="-1" aria-label="Vote down">${VOTE_ICON_DOWN}</button>
+          ${state.currentUser?.role === 'admin'
+            ? `<button class="vote-icon-btn vote-icon-btn-danger" type="button" data-delete-resource="${escapeHTML(r.id)}" aria-label="Delete resource" title="Delete resource">${TRASH_ICON}</button>`
+            : ''}
         </div>
       </div>
     `;
@@ -653,6 +658,15 @@ function renderGrid() {
         e.stopPropagation();
         const id = btn.getAttribute('data-vote');
         vote(id, delta);
+      });
+    });
+
+    card.querySelectorAll('[data-delete-resource]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-delete-resource');
+        if (!id) return;
+        await deleteResource(id);
       });
     });
 
@@ -764,6 +778,19 @@ async function vote(id, delta) {
   if (activeDetailId) {
     await openDetail(activeDetailId);
   }
+}
+
+async function deleteResource(id) {
+  if (!state.currentUser || state.currentUser.role !== 'admin') return;
+  const confirmed = window.confirm('Delete this resource card? This cannot be undone.');
+  if (!confirmed) return;
+  const res = await apiFetch(`/api/resources/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    alert(data.error || `Delete failed (HTTP ${res.status})`);
+    return;
+  }
+  await refreshAll();
 }
 
 function openAddModal() {

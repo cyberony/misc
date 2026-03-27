@@ -13,7 +13,7 @@
       ],
       "description": "The Swiss-army tool for video/audio processing: remuxing, transcoding, filters, subtitles, and more.",
       "examples": "Example: Convert MP4 to H.264/AAC, extract audio, burn subtitles, apply video filters.",
-      "votes": 5,
+      "votes": 0,
       "createdAt": "2026-03-19T00:00:00.000Z",
       "updatedAt": "2026-03-19T00:00:00.000Z"
     },
@@ -30,9 +30,9 @@
       ],
       "description": "Robust speech-to-text for many accents/languages; runs locally with models.",
       "examples": "Example: Transcribe meeting audio into text + timestamps.",
-      "votes": 15,
+      "votes": 1,
       "createdAt": "2026-03-19T00:00:00.000Z",
-      "updatedAt": "2026-03-27T04:57:10.829Z"
+      "updatedAt": "2026-03-27T15:26:35.470Z"
     },
     {
       "id": "sample-elevenlabs",
@@ -46,9 +46,9 @@
       ],
       "description": "High-quality text-to-speech voices with expressive output.",
       "examples": "Example: Generate narration for a slide deck script.",
-      "votes": 3,
+      "votes": 1,
       "createdAt": "2026-03-19T00:00:00.000Z",
-      "updatedAt": "2026-03-19T00:00:00.000Z"
+      "updatedAt": "2026-03-27T15:26:37.773Z"
     },
     {
       "id": "sample-pydub",
@@ -62,85 +62,9 @@
       ],
       "description": "Simple audio manipulation in Python (cut/trim/overlap) on top of FFmpeg.",
       "examples": "Example: Split a long recording into per-speaker segments.",
-      "votes": 2,
+      "votes": 0,
       "createdAt": "2026-03-19T00:00:00.000Z",
       "updatedAt": "2026-03-19T00:00:00.000Z"
-    },
-    {
-      "id": "a383380a-12e7-49f1-b975-ef7f0a8ab005",
-      "title": "Some video tool",
-      "category": "voiceover",
-      "url": "https://elevenlabs.io/",
-      "tags": [
-        "audio",
-        "voiceover"
-      ],
-      "description": "NA",
-      "examples": "",
-      "votes": 0,
-      "createdAt": "2026-03-19T18:20:07.789Z",
-      "updatedAt": "2026-03-19T18:20:07.789Z"
-    },
-    {
-      "id": "b52b9ca0-8256-482f-9a48-8fbd492622ee",
-      "title": "Test Tool",
-      "category": "NLP",
-      "url": null,
-      "tags": [
-        "nlp",
-        "tooling"
-      ],
-      "description": "desc",
-      "examples": "ex",
-      "votes": 0,
-      "createdAt": "2026-03-19T18:21:51.370Z",
-      "updatedAt": "2026-03-19T18:21:51.370Z"
-    },
-    {
-      "id": "de89a289-bda7-45fa-bacb-67787bdd9953",
-      "title": "ElevenLab",
-      "category": "voiceover",
-      "url": "https://elevenlabs.io/",
-      "tags": [
-        "voiceover",
-        "audio",
-        "presentations"
-      ],
-      "description": "for voiceovers in presentation videos",
-      "examples": "",
-      "votes": 0,
-      "createdAt": "2026-03-19T18:29:40.481Z",
-      "updatedAt": "2026-03-19T18:29:40.481Z"
-    },
-    {
-      "id": "32edabe9-6773-4c41-b5cf-36e5ab74e109",
-      "title": "Test test",
-      "category": "Uncategorized",
-      "url": "something.com",
-      "tags": [
-        "video"
-      ],
-      "description": "bla",
-      "examples": "bla",
-      "votes": 0,
-      "createdAt": "2026-03-23T15:44:17.569Z",
-      "updatedAt": "2026-03-23T15:44:17.569Z"
-    },
-    {
-      "id": "sample-notion-ai",
-      "title": "Notion AI",
-      "category": "Productivity",
-      "url": "https://www.notion.so/product/ai",
-      "tags": [
-        "writing",
-        "nlp",
-        "productivity"
-      ],
-      "description": "Drafts, summaries, and rewrite assistance inside docs and notes.",
-      "examples": "Example: Turn rough meeting notes into a clean action-item summary.",
-      "votes": 0,
-      "createdAt": "2026-03-27T06:10:00.000Z",
-      "updatedAt": "2026-03-27T06:10:00.000Z"
     },
     {
       "id": "sample-capcut",
@@ -154,9 +78,9 @@
       ],
       "description": "Fast short-form editor with templates, auto-captions, and social export.",
       "examples": "Example: Create a 30-second reel with auto subtitles and transitions.",
-      "votes": 0,
+      "votes": 1,
       "createdAt": "2026-03-27T06:11:00.000Z",
-      "updatedAt": "2026-03-27T06:11:00.000Z"
+      "updatedAt": "2026-03-27T15:26:29.706Z"
     },
     {
       "id": "sample-descript",
@@ -175,70 +99,6 @@
       "updatedAt": "2026-03-27T06:12:00.000Z"
     },
     {
-      "id": "sample-canva-magic",
-      "title": "Canva Magic Studio",
-      "category": "Design",
-      "url": "https://www.canva.com/magic/",
-      "tags": [
-        "image",
-        "presentation",
-        "design"
-      ],
-      "description": "AI-assisted design tools for slides, images, and quick social graphics.",
-      "examples": "Example: Generate branded presentation slides from a short prompt.",
-      "votes": 0,
-      "createdAt": "2026-03-27T06:13:00.000Z",
-      "updatedAt": "2026-03-27T06:13:00.000Z"
-    },
-    {
-      "id": "sample-runway",
-      "title": "Runway",
-      "category": "Video Gen",
-      "url": "https://runwayml.com/",
-      "tags": [
-        "video",
-        "generative",
-        "editing"
-      ],
-      "description": "Generative video and editing tools including inpainting and motion effects.",
-      "examples": "Example: Replace a background and generate a short b-roll clip.",
-      "votes": 0,
-      "createdAt": "2026-03-27T06:14:00.000Z",
-      "updatedAt": "2026-03-27T06:14:00.000Z"
-    },
-    {
-      "id": "sample-otter",
-      "title": "Otter.ai",
-      "category": "Meetings",
-      "url": "https://otter.ai/",
-      "tags": [
-        "stt",
-        "transcription",
-        "meeting-notes"
-      ],
-      "description": "Live meeting transcription and searchable notes with speaker labels.",
-      "examples": "Example: Auto-transcribe weekly sync and share summary highlights.",
-      "votes": 0,
-      "createdAt": "2026-03-27T06:15:00.000Z",
-      "updatedAt": "2026-03-27T06:15:00.000Z"
-    },
-    {
-      "id": "sample-grammarly",
-      "title": "Grammarly",
-      "category": "Writing",
-      "url": "https://www.grammarly.com/",
-      "tags": [
-        "writing",
-        "grammar",
-        "nlp"
-      ],
-      "description": "Grammar, clarity, and tone suggestions across browser and desktop apps.",
-      "examples": "Example: Rewrite a project update to sound concise and professional.",
-      "votes": 0,
-      "createdAt": "2026-03-27T06:16:00.000Z",
-      "updatedAt": "2026-03-27T06:16:00.000Z"
-    },
-    {
       "id": "sample-heygen",
       "title": "HeyGen",
       "category": "Avatar Video",
@@ -253,22 +113,6 @@
       "votes": 0,
       "createdAt": "2026-03-27T06:17:00.000Z",
       "updatedAt": "2026-03-27T06:17:00.000Z"
-    },
-    {
-      "id": "sample-perplexity",
-      "title": "Perplexity",
-      "category": "Research",
-      "url": "https://www.perplexity.ai/",
-      "tags": [
-        "search",
-        "research",
-        "nlp"
-      ],
-      "description": "Answer engine with source-cited results for quick topic research.",
-      "examples": "Example: Compare tools and gather linked references for a decision memo.",
-      "votes": 0,
-      "createdAt": "2026-03-27T06:18:00.000Z",
-      "updatedAt": "2026-03-27T06:18:00.000Z"
     },
     {
       "id": "sample-suno",
@@ -289,63 +133,28 @@
   ],
   "users": [
     {
-      "id": "6a218dc3-5a9e-48b8-b98f-587ee82624d0",
-      "email": "msai_test_user3@example.com",
-      "name": "Test User",
-      "passwordHash": "5a3d068a3ca44fe2e002e939106d64f2:2c887018f71f66c9f3472cae79875503585df62c07979bd18570293d2a09a38fe3d8cd94cc17be3395919b9ee10bf85a6d707c590c8a574008fd313bc98a2a3f",
-      "createdAt": "2026-03-23T18:59:53.829Z",
-      "updatedAt": "2026-03-23T18:59:53.913Z"
-    },
-    {
-      "id": "1f63df08-355f-45e1-984a-9a3f6aa33df6",
+      "id": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
       "email": "cyberony@gmail.com",
       "name": "",
-      "passwordHash": "475fba9adabcc1375de16022c77773e0:2251483ef99d976618ccd9d30c363993ce4ea24d5d8b6243afe82511ad877da48d4a2114ea4be693efa707d2d4ca8bb46b9b22ade1bbdf9f861b2ed418d9da5c",
-      "createdAt": "2026-03-23T19:00:23.734Z",
-      "updatedAt": "2026-03-27T04:56:39.537Z"
-    },
-    {
-      "id": "5516efe0-1136-40c6-b4e4-7c3a5d253e19",
-      "email": "something@nothing.ru",
-      "name": "asfafasd",
-      "passwordHash": "059b43a99a84aa752e68ce7ecd5441a4:47a471bdf49e2e6e49731c6fe8b8ead1ec99dfd5b044d8af5f6863bbbaab20f3947969991201b33d8e77cdeffb0ae687ff2766ab077b501cb1191ba13c5fb14d",
-      "createdAt": "2026-03-27T04:08:32.927Z"
-    },
-    {
-      "id": "59c68744-146e-43d8-9663-1cfeca8b3a9a",
-      "email": "cd@ef.com",
-      "name": "afasdfsadf",
-      "passwordHash": "f0ccb731138bbebfbbd4dda81dce0f75:69288786985f1d5b42d1237e298dc62d24a2b369d0c5c0e6f67f94af8e11fed3dd20bfc3ec4ff633ed0106716c530f1587e97d49fe4da99b0295a63f64923010",
-      "createdAt": "2026-03-27T04:33:12.617Z"
-    },
-    {
-      "id": "7d3a6043-703f-441d-83eb-29509fb3eeab",
-      "email": "qa@qw.com",
-      "name": "",
-      "passwordHash": "b5ca3c5591b8d361611f2ec18a749e02:de1adbedfe40ab75006e843459741b5c6489cbc34ffed44c381634998e021ec93af0cd801b94cb35de108c945afbdbac3bfb77dccd9c6127b9a8fac55d0d5637",
-      "createdAt": "2026-03-27T04:51:56.633Z"
+      "passwordHash": "bddfde261472e7657427aa1274c87789:c67e8c6053f84758966bb7244262f7e40298840175cd9fe620ace92b896c76fae80d212c7736df612c0ccb91447be840515cd334ef470d66ebd0880c2b0a45e6",
+      "createdAt": "2026-03-27T15:22:59.640Z",
+      "role": "admin"
     }
   ],
   "sessions": {
-    "f10aba59165ef322fc3e3dbf42a7a44e51c6d1b029b123c9537f9fbc94413ccc": {
-      "userId": "6a218dc3-5a9e-48b8-b98f-587ee82624d0",
-      "createdAt": "2026-03-23T18:59:53.939Z",
-      "expiresAt": 1775501993939
+    "fa18d9934decf5d2a4117b698af46fd4e1199ea8514af63b767fbf5d6e68590c": {
+      "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
+      "createdAt": "2026-03-27T15:24:19.780Z",
+      "expiresAt": 1775834659780
     }
   },
   "votesByUser": {
-    "1f63df08-355f-45e1-984a-9a3f6aa33df6": {
-      "sample-whisper": -1
+    "e19c0caa-64d1-42ea-9de0-ba39580378c3": {
+      "sample-capcut": 1,
+      "sample-whisper": 1,
+      "sample-elevenlabs": 1
     }
   },
   "bugReports": [],
-  "passwordResetTokens": [
-    {
-      "id": "77c861d2-57ec-428f-b926-17dc8bb2cec4",
-      "userId": "1f63df08-355f-45e1-984a-9a3f6aa33df6",
-      "tokenHash": "59d2acf508341d7abae363488ffb1fd8039356812dc932c3cf3b143108af1223",
-      "expiresAt": 1774590399377,
-      "createdAt": "2026-03-27T05:16:39.377Z"
-    }
-  ]
+  "passwordResetTokens": []
 }
