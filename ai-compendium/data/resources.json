@@ -83,22 +83,6 @@
       "updatedAt": "2026-03-27T16:34:46.669Z"
     },
     {
-      "id": "sample-descript",
-      "title": "Descript",
-      "category": "Audio / Video",
-      "url": "https://www.descript.com/",
-      "tags": [
-        "audio",
-        "video",
-        "transcription"
-      ],
-      "description": "Edit audio and video by editing the transcript text.",
-      "examples": "Example: Remove filler words from a podcast by deleting text.",
-      "votes": 1,
-      "createdAt": "2026-03-27T06:12:00.000Z",
-      "updatedAt": "2026-03-27T16:36:13.992Z"
-    },
-    {
       "id": "sample-heygen",
       "title": "HeyGen",
       "category": "Avatar Video",
@@ -164,6 +148,11 @@
       "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
       "createdAt": "2026-03-27T15:51:50.193Z",
       "expiresAt": 1775836310193
+    },
+    "3f1bb329cf154ef813ef46aa0fc11e64328c31566d6a322696a4919accc3f690": {
+      "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
+      "createdAt": "2026-03-27T16:46:36.851Z",
+      "expiresAt": 1775839596851
     }
   },
   "votesByUser": {
@@ -175,8 +164,7 @@
     "8f85509d-a9f9-4095-96f6-6779571ec596": {
       "sample-capcut": 1,
       "sample-elevenlabs": 1,
-      "sample-whisper": 1,
-      "sample-descript": 1
+      "sample-whisper": 1
     }
   },
   "bugReports": [],

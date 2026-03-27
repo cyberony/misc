@@ -65,6 +65,212 @@ function sortByVotes(resources) {
   return [...resources].sort((a, b) => (b.votes || 0) - (a.votes || 0));
 }
 
+function normalizeUrlValue(rawUrl) {
+  const raw = String(rawUrl || '').trim();
+  if (!raw) return '';
+  const withScheme = /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(raw) ? raw : `https://${raw}`;
+  let u;
+  try {
+    u = new URL(withScheme);
+  } catch {
+    return '';
+  }
+  if (!['http:', 'https:'].includes(u.protocol)) return '';
+  u.hash = '';
+  const blockedParams = new Set([
+    'utm_source',
+    'utm_medium',
+    'utm_campaign',
+    'utm_term',
+    'utm_content',
+    'gclid',
+    'fbclid',
+    'ref',
+    'source',
+  ]);
+  const nextParams = new URLSearchParams();
+  for (const [k, v] of u.searchParams.entries()) {
+    const key = String(k || '').toLowerCase();
+    if (blockedParams.has(key)) continue;
+    nextParams.append(k, v);
+  }
+  u.search = nextParams.toString() ? `?${nextParams.toString()}` : '';
+  u.pathname = u.pathname.replace(/\/+$/, '') || '/';
+  return u.toString().toLowerCase();
+}
+
+function hostWithoutWww(hostname) {
+  return String(hostname || '').toLowerCase().replace(/^www\./, '');
+}
+
+function apexDomain(hostname) {
+  const parts = hostWithoutWww(hostname).split('.').filter(Boolean);
+  if (parts.length < 2) return hostWithoutWww(hostname);
+  return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`;
+}
+
+function urlIdentityKeys(rawUrl) {
+  const normalized = normalizeUrlValue(rawUrl);
+  if (!normalized) return [];
+  const u = new URL(normalized);
+  const host = hostWithoutWww(u.hostname);
+  const apex = apexDomain(host);
+  const segments = u.pathname.split('/').filter(Boolean).map((s) => s.toLowerCase());
+  const keys = new Set();
+  const fullNoQuery = `${host}${u.pathname}`;
+  keys.add(fullNoQuery);
+  keys.add(host);
+  keys.add(apex);
+  if (segments.length) {
+    keys.add(`${host}/${segments[0]}`);
+    keys.add(`${apex}/${segments[0]}`);
+  }
+  if ((host === 'github.com' || host === 'gitlab.com') && segments.length >= 2) {
+    keys.add(`${host}/${segments[0]}/${segments[1]}`);
+  }
+  if (host === 'npmjs.com' && segments[0] === 'package' && segments[1]) {
+    keys.add(`${host}/package/${segments[1]}`);
+  }
+  if (host === 'pypi.org' && segments[0] === 'project' && segments[1]) {
+    keys.add(`${host}/project/${segments[1]}`);
+  }
+  return [...keys];
+}
+
+function findDuplicateByUrl(resources, incomingUrl) {
+  const incomingKeys = new Set(urlIdentityKeys(incomingUrl));
+  if (!incomingKeys.size) return null;
+  for (const r of resources || []) {
+    if (!r || !r.url) continue;
+    const existingKeys = urlIdentityKeys(r.url);
+    if (!existingKeys.length) continue;
+    if (existingKeys.some((k) => incomingKeys.has(k))) {
+      return r;
+    }
+  }
+  return null;
+}
+
+function collectTagVocabulary(resources) {
+  const counts = new Map();
+  for (const r of resources || []) {
+    for (const t of r.tags || []) {
+      const k = String(t).trim().toLowerCase();
+      if (!k) continue;
+      counts.set(k, (counts.get(k) || 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 200)
+    .map(([tag]) => tag);
+}
+
+function normalizeSuggestedTag(s) {
+  let t = String(s || '').trim().toLowerCase();
+  t = t.replace(/\s+/g, '-');
+  t = t.replace(/[^a-z0-9-]/g, '');
+  t = t.replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+  return t.slice(0, 48);
+}
+
+async function suggestTagsFromOpenAI({ title, url, description, vocabulary, currentTags }) {
+  const apiKey = String(process.env.OPENAI_API_KEY || '').trim();
+  const model = String(process.env.OPENAI_SUGGEST_MODEL || 'gpt-4o-mini').trim();
+  const vocabSet = new Set(vocabulary.map((t) => String(t).toLowerCase()));
+
+  const payload = {
+    title,
+    url,
+    description,
+    existingTagVocabulary: vocabulary,
+    currentTags,
+  };
+
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      temperature: 0.25,
+      max_tokens: 500,
+      response_format: { type: 'json_object' },
+      messages: [
+        {
+          role: 'system',
+          content: [
+            'You help tag video/audio AI tools in a shared catalog.',
+            'Return JSON only: {"suggestedExisting": string[], "suggestedNew": string[]}.',
+            'suggestedExisting: up to 8 tags chosen ONLY from the provided vocabulary list when they clearly apply.',
+            'suggestedNew: up to 2 new concise tags only if needed; use lowercase, hyphen-separated words (e.g. speech-to-text).',
+            'Avoid generic tags: ai, tool, software, app, website unless nothing else fits.',
+            'Prefer vocabulary matches over inventing new tags.',
+            'Do not repeat tags in currentTags.',
+          ].join(' '),
+        },
+        {
+          role: 'user',
+          content: JSON.stringify(payload),
+        },
+      ],
+    }),
+  });
+
+  const rawText = await res.text();
+  if (!res.ok) {
+    const err = new Error(`OpenAI HTTP ${res.status}`);
+    err.detail = rawText.slice(0, 500);
+    throw err;
+  }
+
+  let data;
+  try {
+    data = JSON.parse(rawText);
+  } catch {
+    throw new Error('Invalid OpenAI response');
+  }
+
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) throw new Error('Empty OpenAI content');
+
+  let parsed;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    throw new Error('OpenAI returned non-JSON');
+  }
+
+  const existingRaw = Array.isArray(parsed.suggestedExisting) ? parsed.suggestedExisting : [];
+  const newRaw = Array.isArray(parsed.suggestedNew) ? parsed.suggestedNew : [];
+
+  const suggestedExisting = [];
+  const seen = new Set(currentTags.map((t) => normalizeSuggestedTag(t)).filter(Boolean));
+  for (const x of existingRaw) {
+    const n = normalizeSuggestedTag(x);
+    if (!n || seen.has(n)) continue;
+    if (vocabSet.has(n)) {
+      suggestedExisting.push(n);
+      seen.add(n);
+    }
+  }
+  if (suggestedExisting.length > 8) suggestedExisting.length = 8;
+
+  const suggestedNew = [];
+  for (const x of newRaw) {
+    const n = normalizeSuggestedTag(x);
+    if (!n || seen.has(n)) continue;
+    if (vocabSet.has(n)) continue;
+    suggestedNew.push(n);
+    seen.add(n);
+    if (suggestedNew.length >= 2) break;
+  }
+
+  return { suggestedExisting, suggestedNew };
+}
+
 const scryptAsync = promisify(crypto.scrypt);
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
 const RESET_TOKEN_TTL_MS = 1000 * 60 * 30; // 30 minutes
@@ -628,6 +834,54 @@ app.get('/api/resources', async (req, res) => {
   }
 });
 
+app.post('/api/resources/suggest-tags', async (req, res) => {
+  try {
+    const title = String(req.body?.title || '').trim();
+    const url = String(req.body?.url || '').trim();
+    const description = String(req.body?.description || '').trim();
+    const currentTags = Array.isArray(req.body?.currentTags)
+      ? req.body.currentTags.map((t) => normalizeSuggestedTag(t)).filter(Boolean)
+      : [];
+
+    if (!title && !url && !description) {
+      return res.status(400).json({ error: 'Provide at least title, url, or description' });
+    }
+
+    const db = await readDB();
+    const vocabulary = collectTagVocabulary(db.resources);
+    const apiKey = String(process.env.OPENAI_API_KEY || '').trim();
+    if (!apiKey) {
+      return res.json({
+        ok: true,
+        suggestedExisting: [],
+        suggestedNew: [],
+        unavailableReason: 'no_api_key',
+      });
+    }
+
+    try {
+      const out = await suggestTagsFromOpenAI({
+        title,
+        url,
+        description,
+        vocabulary,
+        currentTags,
+      });
+      return res.json({ ok: true, ...out });
+    } catch (e) {
+      console.error('suggestTagsFromOpenAI:', e?.message || e);
+      return res.json({
+        ok: true,
+        suggestedExisting: [],
+        suggestedNew: [],
+        unavailableReason: 'openai_failed',
+      });
+    }
+  } catch (e) {
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
 app.get('/api/resources/:id', async (req, res) => {
   try {
     const { resources } = await readDB();
@@ -668,12 +922,29 @@ app.post('/api/resources', async (req, res) => {
 
     await enqueueWrite(async () => {
       const db = await readDB();
+      const duplicate = findDuplicateByUrl(db.resources, url);
+      if (duplicate) {
+        const err = new Error('This product is already in the list.');
+        err.statusCode = 409;
+        err.duplicateResource = {
+          id: duplicate.id,
+          title: duplicate.title,
+          url: duplicate.url || '',
+        };
+        throw err;
+      }
       db.resources.push(resource);
       await writeDB(db);
     });
 
     res.status(201).json({ resource });
   } catch (e) {
+    if (e && typeof e === 'object' && e.statusCode === 409) {
+      return res.status(409).json({
+        error: String(e.message || 'Duplicate resource'),
+        duplicateResource: e.duplicateResource || null,
+      });
+    }
     res.status(500).json({ error: String(e?.message || e) });
   }
 });

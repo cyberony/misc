@@ -14,7 +14,12 @@ const state = {
   pendingAction: null,
   adminViewMode: localStorage.getItem('msai_admin_view_mode') || 'admin',
   adminUsers: [],
+  /** Lowercase tags for the add-resource form (chips + hidden field). */
+  addFormTags: [],
 };
+
+let addSuggestTimer = null;
+let addSuggestSeq = 0;
 
 const detailModal = $('#detailModal');
 const addModal = $('#addModal');
@@ -22,6 +27,7 @@ const authModal = $('#authModal');
 const signupSplashModal = $('#signupSplashModal');
 const bugModal = $('#bugModal');
 const profileModal = $('#profileModal');
+const existingCardModal = $('#existingCardModal');
 const PASSWORD_SPECIAL = '!@#$%^&*()_+-=[]{}|;\':",.<>?/~`';
 const PASSWORD_SPECIAL_REGEX = /[!@#$%^&*()_+\-=[\]{}|;':",.<>?/~`]/;
 
@@ -174,6 +180,227 @@ function tagPillStyleAttr(label) {
 function formatVotes(v) {
   const n = Number(v || 0);
   return `${n} vote${n === 1 ? '' : 's'}`;
+}
+
+function normalizeTagToken(str) {
+  let t = String(str || '').trim().toLowerCase();
+  t = t.replace(/\s+/g, '-');
+  t = t.replace(/[^a-z0-9-]/g, '');
+  t = t.replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+  return t.slice(0, 48);
+}
+
+function syncAddTagsHidden() {
+  const hidden = $('#addTagsHidden');
+  if (hidden) hidden.value = state.addFormTags.join(', ');
+}
+
+/** If tag already exists, remove the old pill so the newly entered one wins (order at end). */
+function addTagReplacingDuplicate(n) {
+  if (!n) return false;
+  state.addFormTags = state.addFormTags.filter((t) => t !== n);
+  state.addFormTags.push(n);
+  return true;
+}
+
+function renderAddTagChips() {
+  const host = $('#addTagChips');
+  if (!host) return;
+  host.innerHTML = state.addFormTags
+    .map(
+      (tag, i) => `
+      <span class="tag-pill add-form-tag-chip" ${tagPillStyleAttr(tag)}>
+        <span class="add-form-tag-text">${escapeHTML(tag)}</span>
+        <button type="button" class="add-form-tag-remove" data-remove-add-tag="${i}" aria-label="Remove ${escapeAttr(tag)}">×</button>
+      </span>
+    `,
+    )
+    .join('');
+  host.querySelectorAll('[data-remove-add-tag]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const i = Number(btn.getAttribute('data-remove-add-tag'));
+      if (Number.isNaN(i)) return;
+      state.addFormTags.splice(i, 1);
+      renderAddTagChips();
+      syncAddTagsHidden();
+    });
+  });
+}
+
+function resetAddFormTags() {
+  state.addFormTags = [];
+  const hint = $('#addTagsUnavailable');
+  if (hint) {
+    hint.hidden = true;
+    hint.textContent = '';
+  }
+  const input = $('#addTagInput');
+  if (input) input.value = '';
+  renderAddTagChips();
+  syncAddTagsHidden();
+}
+
+/** Split completed comma segments into pills; leave the rest in the input. */
+function flushAddTagInputCommas() {
+  const input = $('#addTagInput');
+  if (!input || !input.value.includes(',')) return;
+  const parts = input.value.split(',');
+  const tail = parts.pop() ?? '';
+  let didAny = false;
+  for (const part of parts) {
+    const n = normalizeTagToken(part);
+    if (!n) continue;
+    if (addTagReplacingDuplicate(n)) didAny = true;
+  }
+  input.value = tail;
+  if (didAny) {
+    renderAddTagChips();
+    syncAddTagsHidden();
+  }
+}
+
+function flushAddTagInputRemainderAsPill() {
+  const input = $('#addTagInput');
+  if (!input) return;
+  const n = normalizeTagToken(input.value);
+  input.value = '';
+  if (!n) return;
+  addTagReplacingDuplicate(n);
+  renderAddTagChips();
+  syncAddTagsHidden();
+}
+
+function scheduleSuggestTagsForAddForm() {
+  if (!addModal || addModal.hidden) return;
+  clearTimeout(addSuggestTimer);
+  addSuggestTimer = setTimeout(() => {
+    fetchSuggestTagsForAddForm();
+  }, 350);
+}
+
+async function fetchSuggestTagsForAddForm() {
+  const seq = ++addSuggestSeq;
+  const form = $('#addForm');
+  if (!form) return;
+  const title = String(form.querySelector('[name="title"]')?.value || '').trim();
+  const url = String(form.querySelector('[name="url"]')?.value || '').trim();
+  const description = String(form.querySelector('[name="description"]')?.value || '').trim();
+  const urlLooksLikeLink =
+    url.length >= 3 &&
+    (/^https?:\/\//i.test(url) || /\./.test(url));
+  const hasEnough =
+    urlLooksLikeLink ||
+    title.length >= 2 ||
+    description.length >= 4;
+  if (!hasEnough) return;
+
+  try {
+    const res = await apiFetch('/api/resources/suggest-tags', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        url,
+        description,
+        currentTags: state.addFormTags,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (seq !== addSuggestSeq) return;
+
+    const hint = $('#addTagsUnavailable');
+    if (data.unavailableReason === 'no_api_key') {
+      if (hint) {
+        hint.hidden = false;
+        hint.textContent =
+          'Tag suggestions need OPENAI_API_KEY on the server. You can still add tags manually.';
+      }
+    } else if (data.unavailableReason === 'openai_failed') {
+      if (hint) {
+        hint.hidden = false;
+        hint.textContent =
+          'Tag suggestions are temporarily unavailable. You can still add tags manually.';
+      }
+    } else if (hint) {
+      hint.hidden = true;
+      hint.textContent = '';
+    }
+
+    const merged = [
+      ...(Array.isArray(data.suggestedExisting) ? data.suggestedExisting : []),
+      ...(Array.isArray(data.suggestedNew) ? data.suggestedNew : []),
+    ];
+    const seen = new Set();
+    const next = [];
+    for (const t of merged) {
+      const n = normalizeTagToken(t);
+      if (!n || seen.has(n)) continue;
+      seen.add(n);
+      next.push(n);
+    }
+    if (next.length) {
+      state.addFormTags = next;
+      renderAddTagChips();
+      syncAddTagsHidden();
+    }
+  } catch (e) {
+    console.error('fetchSuggestTagsForAddForm', e);
+  }
+}
+
+function normalizeUrlForDuplicateCheck(rawUrl) {
+  const raw = String(rawUrl || '').trim();
+  if (!raw) return '';
+  const withScheme = /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(raw) ? raw : `https://${raw}`;
+  let u;
+  try {
+    u = new URL(withScheme);
+  } catch {
+    return '';
+  }
+  if (!['http:', 'https:'].includes(u.protocol)) return '';
+  u.hash = '';
+  u.pathname = u.pathname.replace(/\/+$/, '') || '/';
+  return u.toString().toLowerCase();
+}
+
+function urlIdentityKeysForDuplicateCheck(rawUrl) {
+  const normalized = normalizeUrlForDuplicateCheck(rawUrl);
+  if (!normalized) return [];
+  const u = new URL(normalized);
+  const host = String(u.hostname || '').toLowerCase().replace(/^www\./, '');
+  const parts = host.split('.').filter(Boolean);
+  const apex = parts.length >= 2 ? `${parts[parts.length - 2]}.${parts[parts.length - 1]}` : host;
+  const segments = u.pathname.split('/').filter(Boolean).map((s) => s.toLowerCase());
+  const keys = new Set();
+  keys.add(`${host}${u.pathname}`);
+  keys.add(host);
+  keys.add(apex);
+  if (segments.length) {
+    keys.add(`${host}/${segments[0]}`);
+    keys.add(`${apex}/${segments[0]}`);
+  }
+  if ((host === 'github.com' || host === 'gitlab.com') && segments.length >= 2) {
+    keys.add(`${host}/${segments[0]}/${segments[1]}`);
+  }
+  if (host === 'npmjs.com' && segments[0] === 'package' && segments[1]) {
+    keys.add(`${host}/package/${segments[1]}`);
+  }
+  if (host === 'pypi.org' && segments[0] === 'project' && segments[1]) {
+    keys.add(`${host}/project/${segments[1]}`);
+  }
+  return [...keys];
+}
+
+function findDuplicateResourceByUrl(url) {
+  const incoming = new Set(urlIdentityKeysForDuplicateCheck(url));
+  if (!incoming.size) return null;
+  for (const r of state.allResources || []) {
+    if (!r || !r.url) continue;
+    const existingKeys = urlIdentityKeysForDuplicateCheck(r.url);
+    if (existingKeys.some((k) => incoming.has(k))) return r;
+  }
+  return null;
 }
 
 async function apiFetch(url, opts = {}) {
@@ -670,7 +897,11 @@ function renderSidebar() {
   const all = state.allResources;
 
   const tags = [...getTagCounts(all).entries()]
-    .sort((a, b) => b[1] - a[1])
+    .sort((a, b) => {
+      const countDiff = b[1] - a[1];
+      if (countDiff !== 0) return countDiff;
+      return String(a[0]).localeCompare(String(b[0]), undefined, { sensitivity: 'base' });
+    })
     .slice(0, 36);
 
   const tagList = $('#tagList');
@@ -714,6 +945,7 @@ function renderGrid() {
   for (const r of list) {
     const card = document.createElement('div');
     card.className = 'card';
+    card.dataset.resourceId = String(r.id || '');
     card.setAttribute('role', 'listitem');
 
     const sortedTags = [...(r.tags || [])].sort((a, b) =>
@@ -951,11 +1183,14 @@ function openAddModal() {
     openAuthModal('login');
     return;
   }
+  resetAddFormTags();
   addModal.hidden = false;
   addModal.style.display = 'flex';
 }
 
 function closeAddModal() {
+  clearTimeout(addSuggestTimer);
+  addSuggestSeq++;
   // Hide first; make reset best-effort so we never get stuck open.
   addModal.hidden = true;
   addModal.style.display = 'none';
@@ -965,6 +1200,30 @@ function closeAddModal() {
   } catch (e) {
     // ignore reset errors
   }
+  resetAddFormTags();
+}
+
+function closeExistingCardModal() {
+  if (!existingCardModal) return;
+  existingCardModal.hidden = true;
+  existingCardModal.style.display = 'none';
+  const host = $('#existingCardPreview');
+  if (host) host.innerHTML = '';
+}
+
+function openExistingCardModal(resourceId) {
+  if (!existingCardModal) return false;
+  const id = String(resourceId || '').trim();
+  if (!id) return false;
+  const source = document.querySelector(`.card[data-resource-id="${CSS.escape(id)}"]`);
+  const host = $('#existingCardPreview');
+  if (!source || !host) return false;
+  host.innerHTML = '';
+  const clone = source.cloneNode(true);
+  host.appendChild(clone);
+  existingCardModal.hidden = false;
+  existingCardModal.style.display = 'flex';
+  return true;
 }
 
 async function submitAdd(e) {
@@ -972,13 +1231,26 @@ async function submitAdd(e) {
   const form = $('#addForm');
   const fd = new FormData(form);
 
+  syncAddTagsHidden();
   const payload = {
     title: fd.get('title'),
-    tags: fd.get('tags'),
+    tags: state.addFormTags.join(', '),
     url: fd.get('url'),
     description: fd.get('description'),
     examples: fd.get('examples'),
   };
+
+  const localDuplicate = findDuplicateResourceByUrl(payload.url);
+  if (localDuplicate?.id) {
+    closeAddModal();
+    const found = openExistingCardModal(localDuplicate.id);
+    alert(
+      `Already exists: ${localDuplicate.title || 'Existing entry'}. ${
+        found ? 'Showing the existing card.' : 'It is already listed.'
+      }`,
+    );
+    return;
+  }
 
   try {
     const res = await apiFetch('/api/resources', {
@@ -989,6 +1261,18 @@ async function submitAdd(e) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
+      if (res.status === 409 && err.duplicateResource && err.duplicateResource.id) {
+        const dup = err.duplicateResource;
+        closeAddModal();
+        await refreshAll();
+        const found = openExistingCardModal(dup.id);
+        alert(
+          `Already exists: ${dup.title || 'Existing entry'}. ${
+            found ? 'Showing the existing card.' : 'It is already listed.'
+          }`,
+        );
+        return;
+      }
       alert(err.error || `Failed to add (HTTP ${res.status})`);
       return;
     }
@@ -1293,6 +1577,36 @@ function wireUI() {
   });
 
   $('#addForm').addEventListener('submit', submitAdd);
+  const addFormEl = $('#addForm');
+  if (addFormEl) {
+    for (const name of ['title', 'url', 'description']) {
+      const el = addFormEl.querySelector(`[name="${name}"]`);
+      if (el) el.addEventListener('input', scheduleSuggestTagsForAddForm);
+    }
+  }
+  const addTagInput = $('#addTagInput');
+  const addTagsComposite = $('#addTagsComposite');
+  if (addTagInput) {
+    addTagInput.addEventListener('input', () => {
+      flushAddTagInputCommas();
+    });
+    addTagInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        flushAddTagInputRemainderAsPill();
+      }
+    });
+    addTagInput.addEventListener('blur', () => {
+      flushAddTagInputRemainderAsPill();
+    });
+  }
+  if (addTagsComposite && addTagInput) {
+    addTagsComposite.addEventListener('click', (e) => {
+      if (e.target.closest('.add-form-tag-remove')) return;
+      if (e.target === addTagInput) return;
+      addTagInput.focus();
+    });
+  }
 
   // Auth modal + controls
   $('#logoutLink').addEventListener('click', (e) => {
@@ -1388,6 +1702,13 @@ function wireUI() {
   profileModal.addEventListener('click', (e) => {
     if (e.target === profileModal) closeProfileModal();
   });
+  if (existingCardModal) {
+    const existingClose = $('#existingCardClose');
+    if (existingClose) existingClose.addEventListener('click', closeExistingCardModal);
+    existingCardModal.addEventListener('click', (e) => {
+      if (e.target === existingCardModal) closeExistingCardModal();
+    });
+  }
 }
 
 wireUI();

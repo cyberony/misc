@@ -180,6 +180,20 @@
       </div>
     </div>
 
+    <!-- Existing resource preview modal (main-card format) -->
+    <div id="existingCardModal" class="modal" hidden>
+      <div class="modal-card modal-card-compact">
+        <div class="modal-head">
+          <div>
+            <h2>Already exists</h2>
+            <p class="subtitle">This tool or resource is already listed.</p>
+          </div>
+          <button class="icon-btn" id="existingCardClose" type="button" aria-label="Close">✕</button>
+        </div>
+        <div id="existingCardPreview" class="modal-body existing-card-preview"></div>
+      </div>
+    </div>
+
     <!-- Add resource modal -->
     <div id="addModal" class="modal" hidden>
       <div class="modal-card">
@@ -188,7 +202,7 @@
             <h2>Add tool or resource</h2>
             <p class="subtitle">Keep it short, add tags, and include an example.</p>
           </div>
-          <button class="icon-btn" id="addClose" type="button" aria-label="Close" onclick="document.getElementById('addModal').hidden=true;document.getElementById('addModal').style.display='none';document.getElementById('addForm').reset();">✕</button>
+          <button class="icon-btn" id="addClose" type="button" aria-label="Close">✕</button>
         </div>
 
         <form id="addForm" class="modal-body">
@@ -198,14 +212,35 @@
           </label>
 
           <label>
-            Tags (optional, comma-separated)
-            <input name="tags" placeholder="e.g., video, ffmpeg, subtitles" />
+            Link (optional)
+            <input name="url" placeholder="https://..." autocomplete="url" />
           </label>
 
-          <label>
-            Link (optional)
-            <input name="url" placeholder="https://..." />
-          </label>
+          <div class="add-tags-field">
+            <span class="content-field-label">Tags (optional)</span>
+            <p id="addTagsAutoHint" class="add-tags-auto-hint muted">
+              Tags should be comma-separated. Suggested tags appear when you enter a title or link above.
+            </p>
+            <p id="addTagsUnavailable" class="add-tags-unavailable muted" hidden></p>
+            <div
+              id="addTagsComposite"
+              class="add-tags-composite"
+              role="group"
+              aria-label="Tags"
+              aria-live="polite"
+            >
+              <div id="addTagChips" class="add-tag-chips"></div>
+              <input
+                id="addTagInput"
+                class="add-tag-input-inline"
+                type="text"
+                placeholder="e.g. video, audio, subtitles"
+                autocomplete="off"
+                aria-label="Tags, comma-separated"
+              />
+            </div>
+            <input type="hidden" name="tags" id="addTagsHidden" value="" />
+          </div>
 
           <label>
             Description (optional)

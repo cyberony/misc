@@ -696,6 +696,31 @@ button.selected-label-chip:hover .selected-label-remove{
   gap: 8px;
   overflow: hidden; /* clip title band to card radius */
 }
+.card.card-duplicate-focus{
+  animation: cardDuplicatePulse 1.5s ease;
+}
+@keyframes cardDuplicatePulse{
+  0%{
+    box-shadow: 0 12px 32px rgba(0,0,0,.06), 0 0 0 0 rgba(37, 99, 235, 0.32);
+  }
+  30%{
+    box-shadow: 0 12px 32px rgba(0,0,0,.06), 0 0 0 4px rgba(37, 99, 235, 0.28);
+  }
+  100%{
+    box-shadow: 0 12px 32px rgba(0,0,0,.06), 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+.existing-card-preview{
+  padding-top: 10px;
+}
+.existing-card-preview .card{
+  margin: 0;
+}
+.existing-card-preview .card [data-tag],
+.existing-card-preview .card [data-vote],
+.existing-card-preview .card [data-delete-resource]{
+  pointer-events: none;
+}
 
 /* Title strip: lighter steel blue (see STEEL_BLUE_TITLE_BAND in app.js) */
 .card-title-band{
@@ -740,7 +765,14 @@ button.selected-label-chip:hover .selected-label-remove{
 }
 /* Tag pills: theme pastels via --tag-bg / --tag-border / --tag-fg (set in app.js) */
 .tag-pill{
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
   font-size: 12px;
+  line-height: 1.25;
+  font-weight: 400;
+  letter-spacing: normal;
   padding: 6px 10px;
   border-radius: 999px;
   background: var(--tag-bg, rgba(11, 18, 32, 0.06));
@@ -750,8 +782,11 @@ button.selected-label-chip:hover .selected-label-remove{
   user-select: none;
   transition: box-shadow 0.12s ease, filter 0.12s ease;
 }
-button.tag-pill{
+button.tag-pill,
+span.tag-pill{
   font-family: inherit;
+}
+button.tag-pill{
   color: var(--tag-fg, rgba(11, 18, 32, 0.78));
 }
 .tag-pill:hover:not(.tag-pill-active){
@@ -1234,6 +1269,7 @@ html{ background:#ffffff !important; }
 #authForm textarea,
 #addForm input,
 #addForm textarea,
+#addForm .add-tags-composite,
 #bugForm input,
 #bugForm textarea,
 #profileForm input,
@@ -1308,9 +1344,94 @@ input, textarea, select{
   outline:none;
 }
 #addForm input:focus,
-#addForm textarea:focus{
+#addForm textarea:focus,
+#addForm .add-tags-composite:focus-within{
   border-color: rgba(37, 99, 235, 0.62) !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+}
+#addForm .add-tags-field{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: rgba(11,18,32,.82);
+  font-size: 13px;
+}
+.add-tags-auto-hint,
+.add-tags-unavailable{
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+.add-tags-composite{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px;
+}
+.add-tag-chips{
+  display: contents;
+}
+#addForm .add-tag-input-inline{
+  flex: 1 1 120px;
+  min-width: 7rem;
+  width: auto;
+  margin: 0;
+  padding: 0 2px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: inherit;
+  line-height: 1.25;
+}
+#addForm .add-tag-input-inline:focus{
+  border: none !important;
+  box-shadow: none !important;
+  outline: none;
+}
+/* Same typography and pill chrome as #tagList .tag-pill; only layout + remove affordance differ */
+.add-form-tag-chip.tag-pill{
+  cursor: default;
+  max-width: 100%;
+  gap: 4px;
+}
+.add-form-tag-chip .add-form-tag-text{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+  font: inherit;
+  color: inherit;
+}
+.add-form-tag-remove{
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.55;
+}
+.add-form-tag-remove:hover{
+  opacity: 0.95;
+  background: rgba(11, 18, 32, 0.08);
 }
 #authForm .password-input-wrap{
   position: relative;
