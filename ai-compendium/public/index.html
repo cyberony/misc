@@ -40,7 +40,7 @@
             <option value="logout">Log out</option>
           </select>
         </a>
-        <a id="reportBugLink" class="auth-link auth-link-with-icon" href="#" role="button" aria-label="Report a bug">
+        <a id="reportBugLink" class="auth-link auth-link-with-icon auth-link-feedback" href="#" role="button" aria-label="Report a bug or request a feature">
           <span class="auth-link-icon" aria-hidden="true">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M8 2v4"></path>
@@ -51,9 +51,13 @@
               <path d="M4 7h16"></path>
             </svg>
           </span>
-          <span>Report Bug</span>
+          <span class="auth-feedback-label"
+            ><span class="auth-feedback-label-part">Report bug</span
+            ><span class="auth-feedback-sep" aria-hidden="true">/</span
+            ><span class="auth-feedback-label-part">Request feature</span></span
+          >
         </a>
-        <a id="adminBugReportsLink" class="auth-link auth-link-with-icon" href="/bug-reports.html" hidden aria-label="View bug reports">
+        <a id="adminBugReportsLink" class="auth-link auth-link-with-icon" href="/bug-reports.html" hidden aria-label="View bug reports and feature requests">
           <span class="auth-link-icon" aria-hidden="true">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -63,7 +67,7 @@
               <path d="M10 9H8"></path>
             </svg>
           </span>
-          <span>Bug reports</span>
+          <span>Feedback</span>
         </a>
       </div>
     </header>
@@ -177,7 +181,7 @@
           </div>
 
           <div class="detail-links">
-            <a id="detailUrl" class="btn" href="#" target="_blank" rel="noreferrer">Open link</a>
+            <a id="detailUrl" class="btn" href="#" target="_blank" rel="noreferrer">Go to product</a>
           </div>
 
           <div class="vote-row">
@@ -285,7 +289,19 @@
         <form id="authForm" class="modal-body">
           <label class="auth-email-field">
             Email (required)
-            <input id="authEmail" name="email" type="email" autocomplete="email" required />
+            <div class="auth-email-input-wrap">
+              <input id="authEmail" name="email" type="email" autocomplete="email" required />
+              <button
+                type="button"
+                id="authEmailClear"
+                class="auth-email-clear-btn"
+                aria-label="Clear email and password"
+                title="Clear email and password"
+                hidden
+              >
+                ×
+              </button>
+            </div>
             <p id="authEmailError" class="auth-email-field-error" hidden role="alert"></p>
           </label>
           <label id="authNameWrap" hidden>
@@ -356,35 +372,48 @@
       </div>
     </div>
 
-    <!-- Bug report modal -->
+    <!-- Bug / feature report modal -->
     <div id="bugModal" class="modal" hidden>
       <div class="modal-card">
         <div class="modal-head">
           <div>
-            <h2>Report bug</h2>
-            <p class="subtitle">Help us improve MSAI · CAT</p>
+            <h2 id="bugModalHeading">Report bug</h2>
+            <p id="bugModalSubtitle" class="subtitle">Help us improve MSAI · CAT</p>
           </div>
           <button class="icon-btn" id="bugClose" type="button" aria-label="Close">✕</button>
         </div>
         <form id="bugForm" class="modal-body">
+          <div class="feedback-kind-row">
+            <span class="feedback-kind-label" id="feedbackKindLegend">Type</span>
+            <div class="feedback-kind-options" role="radiogroup" aria-labelledby="feedbackKindLegend">
+              <label class="feedback-kind-option">
+                <input type="radio" name="feedbackKind" value="bug" checked />
+                Report bug
+              </label>
+              <label class="feedback-kind-option">
+                <input type="radio" name="feedbackKind" value="feature" />
+                Request feature
+              </label>
+            </div>
+          </div>
           <label>
-            Bug title (required)
+            <span id="bugFormTitleLabel">Bug title (required)</span>
             <input name="title" required placeholder="Short summary of the issue" />
           </label>
           <label>
-            Area (optional)
+            <span id="bugFormAreaLabel">Area (optional)</span>
             <input name="area" placeholder="e.g., login, voting, add resource" />
           </label>
           <label>
-            Steps to reproduce (required)
-            <textarea name="steps" rows="4" required placeholder="1) ... 2) ... 3) ..."></textarea>
+            <span id="bugFormStepsLabel">Steps to reproduce (required)</span>
+            <textarea id="bugFormSteps" name="steps" rows="4" required placeholder="1) ... 2) ... 3) ..."></textarea>
           </label>
-          <label>
-            Expected result (optional)
+          <label id="bugFormExpectedWrap">
+            <span id="bugFormExpectedLabel">Expected result (optional)</span>
             <textarea name="expected" rows="3" placeholder="What should happen?"></textarea>
           </label>
-          <label>
-            Actual result (optional)
+          <label id="bugFormActualWrap">
+            <span id="bugFormActualLabel">Actual result (optional)</span>
             <textarea name="actual" rows="3" placeholder="What happened instead?"></textarea>
           </label>
           <label>

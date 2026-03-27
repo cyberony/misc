@@ -53,21 +53,29 @@ async function load() {
   list.hidden = false;
 
   if (!reports.length) {
-    list.innerHTML = '<p class="muted bug-reports-empty">No bug reports yet.</p>';
+    list.innerHTML = '<p class="muted bug-reports-empty">No feedback yet.</p>';
     return;
   }
 
   list.innerHTML = reports
-    .map(
-      (r) => `
+    .map((r) => {
+      const kind = r.kind === 'feature' ? 'feature' : 'bug';
+      const stepsLabel = kind === 'feature' ? 'Description' : 'Steps';
+      const badgeClass =
+        kind === 'feature' ? 'bug-report-type-badge bug-report-type-feature' : 'bug-report-type-badge bug-report-type-bug';
+      const badgeText = kind === 'feature' ? 'Feature' : 'Bug';
+      return `
       <article class="bug-report-card panel">
         <header class="bug-report-card-head">
-          <h2 class="bug-report-title">${escapeHTML(r.title || '(no title)')}</h2>
+          <div class="bug-report-title-block">
+            <span class="${badgeClass}">${escapeHTML(badgeText)}</span>
+            <h2 class="bug-report-title">${escapeHTML(r.title || '(no title)')}</h2>
+          </div>
           <span class="bug-report-meta">${escapeHTML(r.createdAt || '')} · <span class="bug-report-status">${escapeHTML(r.status || 'open')}</span></span>
         </header>
         ${r.area ? `<p class="bug-report-line"><strong>Area</strong> ${escapeHTML(r.area)}</p>` : ''}
         <div class="bug-report-block">
-          <div class="bug-report-label">Steps</div>
+          <div class="bug-report-label">${escapeHTML(stepsLabel)}</div>
           <pre class="bug-report-pre">${escapeHTML(r.steps || '')}</pre>
         </div>
         ${r.expected ? `<div class="bug-report-block"><div class="bug-report-label">Expected</div><pre class="bug-report-pre">${escapeHTML(r.expected)}</pre></div>` : ''}
@@ -76,8 +84,8 @@ async function load() {
         ${r.meta?.userAgent ? `<p class="bug-report-ua muted">${escapeHTML(r.meta.userAgent)}</p>` : ''}
         <p class="bug-report-id muted">ID ${escapeHTML(r.id || '')}</p>
       </article>
-    `,
-    )
+    `;
+    })
     .join('');
 }
 

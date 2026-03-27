@@ -613,6 +613,41 @@ function clearAuthPasswordConfirmError() {
   el.textContent = '';
 }
 
+function updateAuthEmailClearVisibility() {
+  const btn = $('#authEmailClear');
+  const emailEl = $('#authEmail');
+  if (!btn || !emailEl) return;
+  btn.hidden = !String(emailEl.value || '').trim();
+}
+
+function clearAuthEmailAndPasswordFields() {
+  const emailEl = $('#authEmail');
+  const pw = $('#authPassword');
+  const pwc = $('#authPasswordConfirm');
+  if (emailEl) emailEl.value = '';
+  if (pw) pw.value = '';
+  if (pwc) pwc.value = '';
+  clearAuthEmailConflict();
+  clearAuthPasswordConfirmError();
+  if (pw) pw.type = 'password';
+  const toggle = $('#authPasswordToggle');
+  if (toggle) {
+    toggle.classList.remove('showing');
+    toggle.setAttribute('aria-label', 'Show password');
+    toggle.setAttribute('title', 'Show password');
+  }
+  if (pwc) pwc.type = 'password';
+  const toggleC = $('#authPasswordConfirmToggle');
+  if (toggleC) {
+    toggleC.classList.remove('showing');
+    toggleC.setAttribute('aria-label', 'Show confirm password');
+    toggleC.setAttribute('title', 'Show confirm password');
+  }
+  updateAuthPasswordRules();
+  updateAuthEmailClearVisibility();
+  if (emailEl) emailEl.focus();
+}
+
 /** Browsers often autofill password after paint; re-clear a few times for sign-up. */
 function scheduleClearSignupPasswordFields() {
   const clear = () => {
@@ -695,12 +730,18 @@ function setAuthMode(mode) {
   errEl.textContent = '';
   errEl.classList.remove('auth-success');
   updateAuthPasswordRules();
+  updateAuthEmailClearVisibility();
 }
 
 function openAuthModal(mode = 'login') {
   setAuthMode(mode);
   authModal.hidden = false;
   authModal.style.display = 'flex';
+  updateAuthEmailClearVisibility();
+  requestAnimationFrame(() => updateAuthEmailClearVisibility());
+  setTimeout(updateAuthEmailClearVisibility, 0);
+  setTimeout(updateAuthEmailClearVisibility, 150);
+  setTimeout(updateAuthEmailClearVisibility, 500);
 }
 
 function closeAuthModal() {
@@ -736,6 +777,7 @@ function closeAuthModal() {
     ae.textContent = '';
     ae.classList.remove('auth-success');
   }
+  updateAuthEmailClearVisibility();
 }
 
 function openSignupSplash(message) {
@@ -753,11 +795,56 @@ function closeSignupSplash() {
   }
 }
 
-function openBugModal() {
+function getFeedbackKind() {
+  const r = document.querySelector('#bugForm input[name="feedbackKind"]:checked');
+  return r && r.value === 'feature' ? 'feature' : 'bug';
+}
+
+function applyFeedbackKind(kind) {
+  const isBug = kind !== 'feature';
+  const heading = $('#bugModalHeading');
+  const sub = $('#bugModalSubtitle');
+  if (heading) heading.textContent = isBug ? 'Report bug' : 'Request feature';
+  if (sub) {
+    sub.textContent = isBug
+      ? 'Help us improve MSAI · CAT'
+      : 'Tell us what would help you in MSAI · CAT';
+  }
+  const titleL = $('#bugFormTitleLabel');
+  if (titleL) titleL.textContent = isBug ? 'Bug title (required)' : 'Feature title (required)';
+  const areaL = $('#bugFormAreaLabel');
+  if (areaL) areaL.textContent = 'Area (optional)';
+  const stepsL = $('#bugFormStepsLabel');
+  if (stepsL) {
+    stepsL.textContent = isBug ? 'Steps to reproduce (required)' : 'Description (required)';
+  }
+  const stepsEl = $('#bugFormSteps');
+  if (stepsEl) {
+    stepsEl.placeholder = isBug
+      ? '1) … 2) … 3) …'
+      : 'What would you like to see? Include any context that helps.';
+  }
+  const expWrap = $('#bugFormExpectedWrap');
+  const actWrap = $('#bugFormActualWrap');
+  if (expWrap) expWrap.hidden = !isBug;
+  if (actWrap) actWrap.hidden = !isBug;
+  const expL = $('#bugFormExpectedLabel');
+  const actL = $('#bugFormActualLabel');
+  if (expL) expL.textContent = 'Expected result (optional)';
+  if (actL) actL.textContent = 'Actual result (optional)';
+  const submitBtn = $('#bugSubmit');
+  if (submitBtn) submitBtn.textContent = isBug ? 'Submit bug report' : 'Submit feature request';
+}
+
+function openBugModal(kind = 'bug') {
   $('#bugError').hidden = true;
   $('#bugError').textContent = '';
   bugModal.hidden = false;
   bugModal.style.display = 'flex';
+  const k = kind === 'feature' ? 'feature' : 'bug';
+  const radio = document.querySelector(`#bugForm input[name="feedbackKind"][value="${k}"]`);
+  if (radio) radio.checked = true;
+  applyFeedbackKind(k);
 }
 
 function closeBugModal() {
@@ -767,6 +854,11 @@ function closeBugModal() {
   if (form && typeof form.reset === 'function') form.reset();
   $('#bugError').hidden = true;
   $('#bugError').textContent = '';
+  const expWrap = $('#bugFormExpectedWrap');
+  const actWrap = $('#bugFormActualWrap');
+  if (expWrap) expWrap.hidden = false;
+  if (actWrap) actWrap.hidden = false;
+  applyFeedbackKind('bug');
 }
 
 function openProfileModal() {
@@ -1026,17 +1118,24 @@ function renderGrid() {
       detailsBodyParts.push(`<div class="card-details-block"><h4 class="card-details-heading">Examples</h4><pre class="card-details-pre">${escapeHTML(examples)}</pre></div>`);
     }
     if (url) {
-      detailsBodyParts.push(`<div class="card-details-block"><a class="card-details-link" href="${escapeHTML(url)}" target="_blank" rel="noreferrer">Open link</a></div>`);
+      detailsBodyParts.push(
+        `<div class="card-details-block"><a class="card-details-link" href="${escapeHTML(url)}" target="_blank" rel="noreferrer">Go to product</a></div>`,
+      );
     }
     if (!detailsBodyParts.length) {
       detailsBodyParts.push(`<p class="card-details-empty muted">No examples or link yet.</p>`);
     }
     const detailsBodyHtml = detailsBodyParts.join('');
 
+    const titleText = escapeHTML(r.title || '');
+    const titleHtml = url
+      ? `<a class="card-title-link" href="${escapeHTML(url)}" target="_blank" rel="noreferrer">${titleText}</a>`
+      : titleText;
+
     card.innerHTML = `
       <div class="card-title-band" ${titleBandStyleAttr(r.id)}>
         <div class="card-title-band-inner">
-          <h3 class="card-title-text">${escapeHTML(r.title)}</h3>
+          <h3 class="card-title-text">${titleHtml}</h3>
           <div class="votes">${escapeHTML(formatVotes(r.votes || 0))}</div>
         </div>
       </div>
@@ -1554,12 +1653,14 @@ async function submitBugReport(e) {
   e.preventDefault();
   const form = $('#bugForm');
   const fd = new FormData(form);
+  const kind = getFeedbackKind();
   const payload = {
+    kind,
     title: String(fd.get('title') || '').trim(),
     area: String(fd.get('area') || '').trim(),
     steps: String(fd.get('steps') || '').trim(),
-    expected: String(fd.get('expected') || '').trim(),
-    actual: String(fd.get('actual') || '').trim(),
+    expected: kind === 'feature' ? '' : String(fd.get('expected') || '').trim(),
+    actual: kind === 'feature' ? '' : String(fd.get('actual') || '').trim(),
     email: String(fd.get('email') || '').trim(),
   };
 
@@ -1577,7 +1678,11 @@ async function submitBugReport(e) {
   }
 
   closeBugModal();
-  alert('Thanks. Your bug report has been submitted.');
+  alert(
+    kind === 'feature'
+      ? 'Thanks. Your feature request has been submitted.'
+      : 'Thanks. Your bug report has been submitted.',
+  );
 }
 
 function syncHowItWorksPanel() {
@@ -1707,7 +1812,16 @@ function wireUI() {
   const adminUserSearch = $('#adminUserSearch');
   if (adminUserSearch) adminUserSearch.addEventListener('input', () => renderAdminAccountsPanel());
   const authEmail = $('#authEmail');
-  if (authEmail) authEmail.addEventListener('input', clearAuthEmailConflict);
+  if (authEmail) {
+    authEmail.addEventListener('input', () => {
+      clearAuthEmailConflict();
+      updateAuthEmailClearVisibility();
+    });
+    authEmail.addEventListener('change', updateAuthEmailClearVisibility);
+    authEmail.addEventListener('focus', updateAuthEmailClearVisibility);
+  }
+  const authEmailClear = $('#authEmailClear');
+  if (authEmailClear) authEmailClear.addEventListener('click', clearAuthEmailAndPasswordFields);
   const authPassword = $('#authPassword');
   if (authPassword) authPassword.addEventListener('input', clearAuthPasswordConfirmError);
   const authPasswordConfirm = $('#authPasswordConfirm');
@@ -1743,11 +1857,14 @@ function wireUI() {
     if (e.target === signupSplashModal) closeSignupSplash();
   });
 
-  // Bug report
+  // Bug / feature report
   $('#reportBugLink').addEventListener('click', (e) => {
     e.preventDefault();
-    openBugModal();
+    openBugModal('bug');
   });
+  for (const el of document.querySelectorAll('#bugForm input[name="feedbackKind"]')) {
+    el.addEventListener('change', () => applyFeedbackKind(getFeedbackKind()));
+  }
   $('#bugClose').addEventListener('click', closeBugModal);
   bugModal.addEventListener('click', (e) => {
     if (e.target === bugModal) closeBugModal();

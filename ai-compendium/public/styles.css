@@ -151,6 +151,18 @@ body{
   width: 14px;
   height: 14px;
 }
+.auth-link-feedback .auth-feedback-label{
+  white-space: nowrap;
+  line-height: 1.35;
+}
+.auth-link-feedback.auth-link-with-icon{
+  flex-shrink: 0;
+}
+.auth-feedback-sep{
+  opacity: 0.45;
+  margin: 0 0.4em;
+  font-weight: 400;
+}
 
 .brand{
   display:flex;
@@ -754,6 +766,19 @@ button.selected-label-chip:hover .selected-label-remove{
   color: var(--tb-text, hsl(210 55% 98%));
   min-width: 0;
 }
+.card-title-text .card-title-link{
+  color: inherit;
+  text-decoration: none;
+}
+.card-title-text .card-title-link:hover{
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.card-title-text .card-title-link:focus-visible{
+  outline: 2px solid rgba(255, 255, 255, 0.88);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 .card-title-band .votes{
   flex-shrink: 0;
   color: rgba(255, 255, 255, 0.95);
@@ -857,7 +882,6 @@ button.tag-pill{
 
 .card-footer-row{
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
   flex-wrap: wrap;
@@ -877,6 +901,7 @@ button.tag-pill{
   color: var(--muted);
   font-size: 13px;
   font-weight: 600;
+  line-height: 1.25;
   user-select: none;
   padding: 4px 0;
 }
@@ -947,6 +972,8 @@ button.tag-pill{
   display:flex;
   gap: 8px;
   align-items:center;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 .votes{
   padding: 6px 10px;
@@ -1275,7 +1302,7 @@ html{ background:#ffffff !important; }
 #addForm input,
 #addForm textarea,
 #addForm .add-tags-entry-composite,
-#bugForm input,
+#bugForm input:not([type="radio"]):not([type="checkbox"]),
 #bugForm textarea,
 #profileForm input,
 #resetForm input{
@@ -1477,6 +1504,45 @@ input, textarea, select{
   opacity: 1;
   background: rgba(11, 18, 32, 0.08) !important;
 }
+#authForm .auth-email-input-wrap{
+  position: relative;
+}
+#authForm .auth-email-input-wrap input{
+  width: 100%;
+  padding-right: 36px;
+  box-sizing: border-box;
+}
+.auth-email-clear-btn{
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(11, 18, 32, 0.45);
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+.auth-email-clear-btn:hover{
+  background: rgba(11, 18, 32, 0.06);
+  color: rgba(11, 18, 32, 0.78);
+}
+.auth-email-clear-btn:focus-visible{
+  outline: 2px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
+.auth-email-clear-btn[hidden]{
+  display: none !important;
+}
 #authForm .password-input-wrap{
   position: relative;
 }
@@ -1499,10 +1565,40 @@ input, textarea, select{
   border-color: rgba(37, 99, 235, 0.62) !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
 }
-#bugForm input:focus,
+#bugForm input:not([type="radio"]):not([type="checkbox"]):focus,
 #bugForm textarea:focus{
   border-color: rgba(37, 99, 235, 0.62) !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+}
+.feedback-kind-row{
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 8px 14px;
+  margin-bottom: 10px;
+}
+.feedback-kind-label{
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(11, 18, 32, 0.55);
+}
+.feedback-kind-options{
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 14px;
+}
+.feedback-kind-option{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: rgba(11, 18, 32, 0.82);
+  cursor: pointer;
+}
+.feedback-kind-option input{
+  margin: 0;
+  accent-color: #2563eb;
 }
 #profileForm input:focus{
   border-color: rgba(37, 99, 235, 0.62) !important;
@@ -1656,16 +1752,44 @@ textarea{ resize: vertical; }
 .bug-report-card-head{
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px 12px;
   margin-bottom: 10px;
+}
+.bug-report-title-block{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 10px;
+  flex: 1;
+  min-width: 0;
+}
+.bug-report-type-badge{
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  line-height: 1.2;
+}
+.bug-report-type-bug{
+  background: rgba(180, 35, 24, 0.1);
+  color: #9a3412;
+}
+.bug-report-type-feature{
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
 }
 .bug-report-title{
   margin: 0;
   font-size: 16px;
   font-weight: 700;
   color: rgba(11, 18, 32, 0.92);
+  flex: 1;
+  min-width: 0;
 }
 .bug-report-meta{
   font-size: 12px;

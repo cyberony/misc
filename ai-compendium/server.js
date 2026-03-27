@@ -766,13 +766,22 @@ app.post('/api/bug-reports', async (req, res) => {
     const expected = String(req.body?.expected || '').trim();
     const actual = String(req.body?.actual || '').trim();
     const email = normalizeEmail(req.body?.email || '');
+    const kindRaw = String(req.body?.kind || 'bug').trim().toLowerCase();
+    const kind = kindRaw === 'feature' ? 'feature' : 'bug';
 
-    if (!title) return res.status(400).json({ error: 'Bug title is required' });
-    if (!steps) return res.status(400).json({ error: 'Steps to reproduce are required' });
+    if (!title) {
+      return res.status(400).json({ error: kind === 'feature' ? 'Title is required' : 'Bug title is required' });
+    }
+    if (!steps) {
+      return res.status(400).json({
+        error: kind === 'feature' ? 'Description is required' : 'Steps to reproduce are required',
+      });
+    }
 
     const createdAt = new Date().toISOString();
     const report = {
       id: crypto.randomUUID(),
+      kind,
       title,
       steps,
       area: area || null,
