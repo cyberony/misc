@@ -1050,6 +1050,23 @@ app.delete('/api/resources/:id', async (req, res) => {
   }
 });
 
+app.get('/api/admin/bug-reports', async (req, res) => {
+  try {
+    const db = await readDB();
+    sweepExpiredSessions(db);
+    const user = getAuthUserFromDB(req, db);
+    if (!user) return res.status(401).json({ error: 'Authentication required' });
+    if (!isAdminUser(user)) return res.status(403).json({ error: 'Admin access required' });
+
+    const bugReports = [...(db.bugReports || [])].sort((a, b) =>
+      String(b.createdAt || '').localeCompare(String(a.createdAt || '')),
+    );
+    res.json({ bugReports });
+  } catch (e) {
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
 app.get('/api/admin/users', async (req, res) => {
   try {
     const db = await readDB();

@@ -483,6 +483,8 @@ function updateAuthUI() {
     accountMenu.hidden = !loggedIn;
     accountMenu.value = '';
   }
+  const adminBugReportsLink = $('#adminBugReportsLink');
+  if (adminBugReportsLink) adminBugReportsLink.hidden = !isAdminModeActive();
   if (state.currentUser?.role === 'admin') {
     if (adminModeWrap) adminModeWrap.hidden = false;
     if (adminModeSelect) adminModeSelect.value = state.adminViewMode === 'user' ? 'user' : 'admin';
@@ -1697,6 +1699,7 @@ function wireUI() {
       state.adminViewMode = next;
       localStorage.setItem('msai_admin_view_mode', next);
       if (next === 'admin') await fetchAdminUsers();
+      updateAuthUI();
       renderGrid();
       renderSidebar();
     });
