@@ -1361,8 +1361,14 @@ input, textarea, select{
   font-size: 12.5px;
   line-height: 1.35;
 }
+.add-tags-suggested-and-entry{
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
 .add-tag-suggested-wrap:not([hidden]){
-  margin-bottom: 6px;
+  margin-bottom: 0;
 }
 .add-tag-suggested-chips{
   margin: 0;
@@ -1384,14 +1390,13 @@ input, textarea, select{
   width: 100%;
   box-sizing: border-box;
 }
-button.add-form-suggested-tag.tag-pill{
-  cursor: pointer;
-}
-/* Same typography and pill chrome as #tagList .tag-pill; only layout + remove affordance differ */
+/* Same typography as #tagList .tag-pill; slightly tighter vertical padding so overall height matches list pills (× is shorter than old 22px hit target). */
 .add-form-tag-chip.tag-pill{
   cursor: default;
   max-width: 100%;
   gap: 4px;
+  padding: 5px 10px;
+  box-sizing: border-box;
 }
 .add-form-tag-chip .add-form-tag-text{
   overflow: hidden;
@@ -1401,14 +1406,42 @@ button.add-form-suggested-tag.tag-pill{
   font: inherit;
   color: inherit;
 }
-/* UA button styles often override inherited color — set explicitly (same as sidebar chip ×) */
+/* Suggested: width = label + × (inherits padding from .add-form-tag-chip). */
+.add-form-tag-chip.add-form-suggested-chip.tag-pill{
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  align-self: flex-start;
+}
+.add-form-tag-chip.add-form-suggested-chip .add-form-suggested-add.add-form-tag-text{
+  cursor: pointer;
+  border: none;
+  background: transparent !important;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 400;
+  color: inherit !important;
+  text-align: left;
+  max-width: none;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* × sized to ~line box (12px/1.25) so pill height matches #tagList pills, not 22px tall */
 .add-form-tag-chip .add-form-tag-remove{
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   margin: 0;
   padding: 0;
   border: none;
@@ -1417,8 +1450,8 @@ button.add-form-suggested-tag.tag-pill{
   color: var(--tag-fg, rgba(11, 18, 32, 0.78)) !important;
   cursor: pointer;
   font: inherit;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1;
   opacity: 0.75;
   -webkit-appearance: none;

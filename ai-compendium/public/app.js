@@ -220,11 +220,14 @@ function renderAddSuggestedChips() {
   host.innerHTML = list
     .map(
       (tag) => `
-      <button type="button" class="tag-pill add-form-suggested-tag" ${tagPillStyleAttr(tag)} data-suggested-tag="${escapeAttr(tag)}">${escapeHTML(tag)}</button>
+      <span class="tag-pill add-form-tag-chip add-form-suggested-chip" ${tagPillStyleAttr(tag)}>
+        <button type="button" class="add-form-tag-text add-form-suggested-add" data-suggested-tag="${escapeAttr(tag)}">${escapeHTML(tag)}</button>
+        <button type="button" class="add-form-tag-remove" data-dismiss-suggested="${escapeAttr(tag)}" aria-label="Dismiss suggestion ${escapeAttr(tag)}">×</button>
+      </span>
     `,
     )
     .join('');
-  host.querySelectorAll('[data-suggested-tag]').forEach((btn) => {
+  host.querySelectorAll('.add-form-suggested-add[data-suggested-tag]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const raw = btn.getAttribute('data-suggested-tag');
       const n = normalizeTagToken(raw);
@@ -233,6 +236,16 @@ function renderAddSuggestedChips() {
       renderAddTagChips();
       renderAddSuggestedChips();
       syncAddTagsHidden();
+    });
+  });
+  host.querySelectorAll('[data-dismiss-suggested]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const raw = btn.getAttribute('data-dismiss-suggested');
+      const n = normalizeTagToken(raw);
+      if (!n) return;
+      state.addFormSuggestedTags = state.addFormSuggestedTags.filter((t) => t !== n);
+      renderAddSuggestedChips();
     });
   });
 }

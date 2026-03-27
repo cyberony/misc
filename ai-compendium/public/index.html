@@ -222,18 +222,20 @@
               Tags should be comma-separated. Suggested tags appear in a row above when you enter a title or link.
             </p>
             <p id="addTagsUnavailable" class="add-tags-unavailable muted" hidden></p>
-            <div id="addTagSuggestedWrap" class="add-tag-suggested-wrap" hidden>
-              <div id="addTagSuggestedChips" class="add-tag-suggested-chips chips" aria-live="polite"></div>
-            </div>
-            <div id="addTagsUserBlock" class="add-tags-user-block" role="group" aria-label="Your tags">
-              <div id="addTagChips" class="add-tag-chips-inner"></div>
-              <input
-                id="addTagInput"
-                type="text"
-                placeholder="e.g. video, audio, subtitles"
-                autocomplete="off"
-                aria-label="Tags, comma-separated"
-              />
+            <div class="add-tags-suggested-and-entry">
+              <div id="addTagSuggestedWrap" class="add-tag-suggested-wrap" hidden>
+                <div id="addTagSuggestedChips" class="add-tag-suggested-chips chips" aria-live="polite"></div>
+              </div>
+              <div id="addTagsUserBlock" class="add-tags-user-block" role="group" aria-label="Your tags">
+                <div id="addTagChips" class="add-tag-chips-inner"></div>
+                <input
+                  id="addTagInput"
+                  type="text"
+                  placeholder="e.g. video, audio, subtitles"
+                  autocomplete="off"
+                  aria-label="Tags, comma-separated"
+                />
+              </div>
             </div>
             <input type="hidden" name="tags" id="addTagsHidden" value="" />
           </div>
