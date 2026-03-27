@@ -16,6 +16,8 @@ const state = {
   adminUsers: [],
   /** Lowercase tags for the add-resource form (chips + hidden field). */
   addFormTags: [],
+  /** Suggested tags from API (shown separately; click to add). */
+  addFormSuggestedTags: [],
 };
 
 let addSuggestTimer = null;
@@ -200,7 +202,39 @@ function addTagReplacingDuplicate(n) {
   if (!n) return false;
   state.addFormTags = state.addFormTags.filter((t) => t !== n);
   state.addFormTags.push(n);
+  state.addFormSuggestedTags = state.addFormSuggestedTags.filter((t) => t !== n);
   return true;
+}
+
+function renderAddSuggestedChips() {
+  const wrap = $('#addTagSuggestedWrap');
+  const host = $('#addTagSuggestedChips');
+  if (!wrap || !host) return;
+  const list = state.addFormSuggestedTags.filter((t) => !state.addFormTags.includes(t));
+  if (!list.length) {
+    wrap.hidden = true;
+    host.innerHTML = '';
+    return;
+  }
+  wrap.hidden = false;
+  host.innerHTML = list
+    .map(
+      (tag) => `
+      <button type="button" class="tag-pill add-form-suggested-tag" ${tagPillStyleAttr(tag)} data-suggested-tag="${escapeAttr(tag)}">${escapeHTML(tag)}</button>
+    `,
+    )
+    .join('');
+  host.querySelectorAll('[data-suggested-tag]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const raw = btn.getAttribute('data-suggested-tag');
+      const n = normalizeTagToken(raw);
+      if (!n) return;
+      addTagReplacingDuplicate(n);
+      renderAddTagChips();
+      renderAddSuggestedChips();
+      syncAddTagsHidden();
+    });
+  });
 }
 
 function renderAddTagChips() {
@@ -229,6 +263,7 @@ function renderAddTagChips() {
 
 function resetAddFormTags() {
   state.addFormTags = [];
+  state.addFormSuggestedTags = [];
   const hint = $('#addTagsUnavailable');
   if (hint) {
     hint.hidden = true;
@@ -237,6 +272,7 @@ function resetAddFormTags() {
   const input = $('#addTagInput');
   if (input) input.value = '';
   renderAddTagChips();
+  renderAddSuggestedChips();
   syncAddTagsHidden();
 }
 
@@ -255,6 +291,7 @@ function flushAddTagInputCommas() {
   input.value = tail;
   if (didAny) {
     renderAddTagChips();
+    renderAddSuggestedChips();
     syncAddTagsHidden();
   }
 }
@@ -267,6 +304,7 @@ function flushAddTagInputRemainderAsPill() {
   if (!n) return;
   addTagReplacingDuplicate(n);
   renderAddTagChips();
+  renderAddSuggestedChips();
   syncAddTagsHidden();
 }
 
@@ -292,7 +330,11 @@ async function fetchSuggestTagsForAddForm() {
     urlLooksLikeLink ||
     title.length >= 2 ||
     description.length >= 4;
-  if (!hasEnough) return;
+  if (!hasEnough) {
+    state.addFormSuggestedTags = [];
+    renderAddSuggestedChips();
+    return;
+  }
 
   try {
     const res = await apiFetch('/api/resources/suggest-tags', {
@@ -336,15 +378,15 @@ async function fetchSuggestTagsForAddForm() {
       const n = normalizeTagToken(t);
       if (!n || seen.has(n)) continue;
       seen.add(n);
+      if (state.addFormTags.includes(n)) continue;
       next.push(n);
     }
-    if (next.length) {
-      state.addFormTags = next;
-      renderAddTagChips();
-      syncAddTagsHidden();
-    }
+    state.addFormSuggestedTags = next;
+    renderAddSuggestedChips();
   } catch (e) {
     console.error('fetchSuggestTagsForAddForm', e);
+    state.addFormSuggestedTags = [];
+    renderAddSuggestedChips();
   }
 }
 
@@ -1585,7 +1627,7 @@ function wireUI() {
     }
   }
   const addTagInput = $('#addTagInput');
-  const addTagsComposite = $('#addTagsComposite');
+  const addTagsUserBlock = $('#addTagsUserBlock');
   if (addTagInput) {
     addTagInput.addEventListener('input', () => {
       flushAddTagInputCommas();
@@ -1600,8 +1642,8 @@ function wireUI() {
       flushAddTagInputRemainderAsPill();
     });
   }
-  if (addTagsComposite && addTagInput) {
-    addTagsComposite.addEventListener('click', (e) => {
+  if (addTagsUserBlock && addTagInput) {
+    addTagsUserBlock.addEventListener('click', (e) => {
       if (e.target.closest('.add-form-tag-remove')) return;
       if (e.target === addTagInput) return;
       addTagInput.focus();

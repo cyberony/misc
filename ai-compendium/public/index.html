@@ -219,20 +219,16 @@
           <div class="add-tags-field">
             <span class="content-field-label">Tags (optional)</span>
             <p id="addTagsAutoHint" class="add-tags-auto-hint muted">
-              Tags should be comma-separated. Suggested tags appear when you enter a title or link above.
+              Tags should be comma-separated. Suggested tags appear in a row above when you enter a title or link.
             </p>
             <p id="addTagsUnavailable" class="add-tags-unavailable muted" hidden></p>
-            <div
-              id="addTagsComposite"
-              class="add-tags-composite"
-              role="group"
-              aria-label="Tags"
-              aria-live="polite"
-            >
-              <div id="addTagChips" class="add-tag-chips"></div>
+            <div id="addTagSuggestedWrap" class="add-tag-suggested-wrap" hidden>
+              <div id="addTagSuggestedChips" class="add-tag-suggested-chips chips" aria-live="polite"></div>
+            </div>
+            <div id="addTagsUserBlock" class="add-tags-user-block" role="group" aria-label="Your tags">
+              <div id="addTagChips" class="add-tag-chips-inner"></div>
               <input
                 id="addTagInput"
-                class="add-tag-input-inline"
                 type="text"
                 placeholder="e.g. video, audio, subtitles"
                 autocomplete="off"
