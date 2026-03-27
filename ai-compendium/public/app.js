@@ -1378,10 +1378,6 @@ function wireUI() {
   });
   $('#bugForm').addEventListener('submit', submitBugReport);
   $('#profileClose').addEventListener('click', closeProfileModal);
-  $('#profileLogout').addEventListener('click', async () => {
-    await logout();
-    closeProfileModal();
-  });
   $('#profileForm').addEventListener('submit', submitProfile);
   profileModal.addEventListener('click', (e) => {
     if (e.target === profileModal) closeProfileModal();

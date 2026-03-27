@@ -586,10 +586,24 @@ button.selected-label-chip:hover .selected-label-remove{
   color: rgba(11, 18, 32, 0.65);
 }
 .admin-role-select-wrap select{
-  height: 26px;
-  border-radius: 9px;
+  height: 28px;
+  min-width: 93px;
+  border-radius: 10px;
   padding: 3px 22px 3px 8px;
-  font-size: 12px;
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: normal;
+  border: 1px solid rgba(11, 18, 32, 0.16);
+  background-color: #fff;
+  color: var(--search-placeholder-color);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M2.5 4.5 6 8l3.5-3.5' stroke='%23475569' stroke-width='1.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 7px center;
+  background-size: 11px 11px;
 }
 .admin-user-empty{
   margin: 2px 0 0;
@@ -1222,6 +1236,7 @@ html{ background:#ffffff !important; }
 #addForm textarea,
 #bugForm input,
 #bugForm textarea,
+#profileForm input,
 #resetForm input{
   background: rgba(37, 99, 235, 0.08) !important;
   border-color: rgba(37, 99, 235, 0.38) !important;
@@ -1321,6 +1336,10 @@ input, textarea, select{
 }
 #bugForm input:focus,
 #bugForm textarea:focus{
+  border-color: rgba(37, 99, 235, 0.62) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+}
+#profileForm input:focus{
   border-color: rgba(37, 99, 235, 0.62) !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
 }
