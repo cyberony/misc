@@ -219,23 +219,25 @@
           <div class="add-tags-field">
             <span class="content-field-label">Tags (optional)</span>
             <p id="addTagsAutoHint" class="add-tags-auto-hint muted">
-              Tags should be comma-separated. Suggested tags appear in a row above when you enter a title or link.
+              Tags should be comma-separated. Suggested tags appear when you enter a link above. They stay in this box until you remove them—you do not have to add them. Type your own tags in the same box, separated by commas.
             </p>
             <p id="addTagsUnavailable" class="add-tags-unavailable muted" hidden></p>
-            <div class="add-tags-suggested-and-entry">
-              <div id="addTagSuggestedWrap" class="add-tag-suggested-wrap" hidden>
-                <div id="addTagSuggestedChips" class="add-tag-suggested-chips chips" aria-live="polite"></div>
-              </div>
-              <div id="addTagsUserBlock" class="add-tags-user-block" role="group" aria-label="Your tags">
-                <div id="addTagChips" class="add-tag-chips-inner"></div>
-                <input
-                  id="addTagInput"
-                  type="text"
-                  placeholder="e.g. video, audio, subtitles"
-                  autocomplete="off"
-                  aria-label="Tags, comma-separated"
-                />
-              </div>
+            <div
+              id="addTagsEntryComposite"
+              class="add-tags-entry-composite"
+              role="group"
+              aria-label="Tag suggestions and your tags"
+              aria-live="polite"
+            >
+              <div id="addTagSuggestedChips" class="add-tag-suggested-chips chips"></div>
+              <div id="addTagChips" class="add-tag-chips-inner"></div>
+              <input
+                id="addTagInput"
+                type="text"
+                placeholder="e.g. video, audio, subtitles"
+                autocomplete="off"
+                aria-label="Tags, comma-separated"
+              />
             </div>
             <input type="hidden" name="tags" id="addTagsHidden" value="" />
           </div>

@@ -792,11 +792,12 @@ button.tag-pill{
 .tag-pill:hover:not(.tag-pill-active){
   filter: brightness(0.96);
 }
+/* Keep category tint (inline --tag-*); ring shows selection — same hue as cards/detail/add form */
 .tag-pill-active{
-  background: rgba(37, 99, 235, 0.08) !important;
-  border-color: rgba(37, 99, 235, 0.35) !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.22);
-  color: rgba(11, 18, 32, 0.9) !important;
+  background: var(--tag-bg, rgba(37, 99, 235, 0.08)) !important;
+  border: 1px solid var(--tag-border, rgba(37, 99, 235, 0.35)) !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.38);
+  color: var(--tag-fg, rgba(11, 18, 32, 0.9)) !important;
   filter: none;
 }
 .tag-pill-active:hover{
@@ -1269,6 +1270,7 @@ html{ background:#ffffff !important; }
 #authForm textarea,
 #addForm input,
 #addForm textarea,
+#addForm .add-tags-entry-composite,
 #bugForm input,
 #bugForm textarea,
 #profileForm input,
@@ -1298,10 +1300,10 @@ html{ background:#ffffff !important; }
   filter: brightness(0.96);
 }
 .tag-pill-active{
-  background: rgba(37, 99, 235, 0.07) !important;
-  border-color: rgba(37, 99, 235, 0.32) !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
-  color: rgba(11, 18, 32, 0.9) !important;
+  background: var(--tag-bg, rgba(11, 18, 32, 0.06)) !important;
+  border: 1px solid var(--tag-border, rgba(11, 18, 32, 0.13)) !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.38) !important;
+  color: var(--tag-fg, rgba(11, 18, 32, 0.9)) !important;
   filter: none !important;
 }
 .form-actions{
@@ -1343,7 +1345,8 @@ input, textarea, select{
   outline:none;
 }
 #addForm input:focus,
-#addForm textarea:focus{
+#addForm textarea:focus,
+#addForm .add-tags-entry-composite:focus-within{
   border-color: rgba(37, 99, 235, 0.62) !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
 }
@@ -1361,34 +1364,43 @@ input, textarea, select{
   font-size: 12.5px;
   line-height: 1.35;
 }
-.add-tags-suggested-and-entry{
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  width: 100%;
-}
-.add-tag-suggested-wrap:not([hidden]){
-  margin-bottom: 0;
-}
-.add-tag-suggested-chips{
-  margin: 0;
-}
-.add-tags-user-block{
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-.add-tag-chips-inner{
+.add-tags-entry-composite{
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
   align-items: center;
-  min-height: 0;
-}
-#addForm .add-tags-user-block input[type="text"]{
+  gap: 8px;
   width: 100%;
   box-sizing: border-box;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(37, 99, 235, 0.38);
+}
+.add-tags-entry-composite #addTagSuggestedChips,
+.add-tags-entry-composite #addTagChips{
+  display: contents;
+}
+.add-tag-suggested-chips,
+.add-tag-chips-inner{
+  margin: 0;
+}
+#addForm .add-tags-entry-composite input[type="text"]{
+  flex: 1 1 140px;
+  min-width: 10ch;
+  width: auto;
+  margin: 0;
+  padding: 4px 2px;
+  border: none !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: inherit;
+  line-height: 1.25;
+}
+#addForm .add-tags-entry-composite input[type="text"]:focus{
+  border: none !important;
+  box-shadow: none !important;
+  outline: none;
 }
 /* Same typography as #tagList .tag-pill; slightly tighter vertical padding so overall height matches list pills (× is shorter than old 22px hit target). */
 .add-form-tag-chip.tag-pill{

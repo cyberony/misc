@@ -174,15 +174,13 @@ function normalizeSuggestedTag(s) {
   return t.slice(0, 48);
 }
 
-async function suggestTagsFromOpenAI({ title, url, description, vocabulary, currentTags }) {
+async function suggestTagsFromOpenAI({ url, vocabulary, currentTags }) {
   const apiKey = String(process.env.OPENAI_API_KEY || '').trim();
   const model = String(process.env.OPENAI_SUGGEST_MODEL || 'gpt-4o-mini').trim();
   const vocabSet = new Set(vocabulary.map((t) => String(t).toLowerCase()));
 
   const payload = {
-    title,
     url,
-    description,
     existingTagVocabulary: vocabulary,
     currentTags,
   };
@@ -203,6 +201,8 @@ async function suggestTagsFromOpenAI({ title, url, description, vocabulary, curr
           role: 'system',
           content: [
             'You help tag video/audio AI tools in a shared catalog.',
+            'Infer tags ONLY from the URL string (hostname, path segments, known product or service names implied by the URL).',
+            'Ignore any title or description — they are not provided; use the URL alone.',
             'Return JSON only: {"suggestedExisting": string[], "suggestedNew": string[]}.',
             'suggestedExisting: up to 8 tags chosen ONLY from the provided vocabulary list when they clearly apply.',
             'suggestedNew: up to 2 new concise tags only if needed; use lowercase, hyphen-separated words (e.g. speech-to-text).',
@@ -836,15 +836,15 @@ app.get('/api/resources', async (req, res) => {
 
 app.post('/api/resources/suggest-tags', async (req, res) => {
   try {
-    const title = String(req.body?.title || '').trim();
     const url = String(req.body?.url || '').trim();
-    const description = String(req.body?.description || '').trim();
     const currentTags = Array.isArray(req.body?.currentTags)
       ? req.body.currentTags.map((t) => normalizeSuggestedTag(t)).filter(Boolean)
       : [];
 
-    if (!title && !url && !description) {
-      return res.status(400).json({ error: 'Provide at least title, url, or description' });
+    const urlLooksLikeLink =
+      url.length >= 3 && (/^https?:\/\//i.test(url) || /\./.test(url));
+    if (!urlLooksLikeLink) {
+      return res.status(400).json({ error: 'Provide a link URL for tag suggestions' });
     }
 
     const db = await readDB();
@@ -861,9 +861,7 @@ app.post('/api/resources/suggest-tags', async (req, res) => {
 
     try {
       const out = await suggestTagsFromOpenAI({
-        title,
         url,
-        description,
         vocabulary,
         currentTags,
       });

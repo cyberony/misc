@@ -86,12 +86,12 @@ function titleBandStyleAttr(_resourceId) {
   return `style="${parts.join(';')}"`;
 }
 
-/** Light but vivid: high lightness + strong saturation (candy / high-key, not deep). */
+/** Brighter candy pastels: stronger saturation so each hue reads clearly; same fn everywhere = same tag → same colors. */
 function pastelTagColors(hue) {
   return {
-    bg: `hsla(${hue}, 82%, 94%, 0.98)`,
-    border: `hsla(${hue}, 70%, 80%, 0.92)`,
-    fg: `hsla(${hue}, 32%, 24%, 0.92)`,
+    bg: `hsla(${hue}, 92%, 89%, 1)`,
+    border: `hsla(${hue}, 78%, 66%, 0.98)`,
+    fg: `hsla(${hue}, 44%, 19%, 0.96)`,
   };
 }
 
@@ -165,12 +165,9 @@ function getTagThemeHue(label) {
   return DEFAULT_TAG_HUE;
 }
 
-function getTagThemeStyle(label) {
-  return pastelTagColors(getTagThemeHue(label));
-}
-
 function tagPillStyleVars(label) {
-  const { bg, border, fg } = getTagThemeStyle(label);
+  const hue = getTagThemeHue(label);
+  const { bg, border, fg } = pastelTagColors(hue);
   return `--tag-bg:${bg};--tag-border:${border};--tag-fg:${fg}`;
 }
 
@@ -206,17 +203,27 @@ function addTagReplacingDuplicate(n) {
   return true;
 }
 
+function focusAddTagInputAtEnd() {
+  const input = $('#addTagInput');
+  if (!input) return;
+  const v = input.value;
+  input.focus();
+  try {
+    const n = v.length;
+    input.setSelectionRange(n, n);
+  } catch (_) {
+    /* ignore */
+  }
+}
+
 function renderAddSuggestedChips() {
-  const wrap = $('#addTagSuggestedWrap');
   const host = $('#addTagSuggestedChips');
-  if (!wrap || !host) return;
+  if (!host) return;
   const list = state.addFormSuggestedTags.filter((t) => !state.addFormTags.includes(t));
   if (!list.length) {
-    wrap.hidden = true;
     host.innerHTML = '';
     return;
   }
-  wrap.hidden = false;
   host.innerHTML = list
     .map(
       (tag) => `
@@ -333,17 +340,11 @@ async function fetchSuggestTagsForAddForm() {
   const seq = ++addSuggestSeq;
   const form = $('#addForm');
   if (!form) return;
-  const title = String(form.querySelector('[name="title"]')?.value || '').trim();
   const url = String(form.querySelector('[name="url"]')?.value || '').trim();
-  const description = String(form.querySelector('[name="description"]')?.value || '').trim();
   const urlLooksLikeLink =
     url.length >= 3 &&
     (/^https?:\/\//i.test(url) || /\./.test(url));
-  const hasEnough =
-    urlLooksLikeLink ||
-    title.length >= 2 ||
-    description.length >= 4;
-  if (!hasEnough) {
+  if (!urlLooksLikeLink) {
     state.addFormSuggestedTags = [];
     renderAddSuggestedChips();
     return;
@@ -354,9 +355,7 @@ async function fetchSuggestTagsForAddForm() {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        title,
         url,
-        description,
         currentTags: state.addFormTags,
       }),
     });
@@ -1634,13 +1633,11 @@ function wireUI() {
   $('#addForm').addEventListener('submit', submitAdd);
   const addFormEl = $('#addForm');
   if (addFormEl) {
-    for (const name of ['title', 'url', 'description']) {
-      const el = addFormEl.querySelector(`[name="${name}"]`);
-      if (el) el.addEventListener('input', scheduleSuggestTagsForAddForm);
-    }
+    const urlEl = addFormEl.querySelector('[name="url"]');
+    if (urlEl) urlEl.addEventListener('input', scheduleSuggestTagsForAddForm);
   }
   const addTagInput = $('#addTagInput');
-  const addTagsUserBlock = $('#addTagsUserBlock');
+  const addTagsEntryComposite = $('#addTagsEntryComposite');
   if (addTagInput) {
     addTagInput.addEventListener('input', () => {
       flushAddTagInputCommas();
@@ -1655,11 +1652,12 @@ function wireUI() {
       flushAddTagInputRemainderAsPill();
     });
   }
-  if (addTagsUserBlock && addTagInput) {
-    addTagsUserBlock.addEventListener('click', (e) => {
+  if (addTagsEntryComposite && addTagInput) {
+    addTagsEntryComposite.addEventListener('click', (e) => {
       if (e.target.closest('.add-form-tag-remove')) return;
+      if (e.target.closest('.add-form-suggested-add')) return;
       if (e.target === addTagInput) return;
-      addTagInput.focus();
+      focusAddTagInputAtEnd();
     });
   }
 
