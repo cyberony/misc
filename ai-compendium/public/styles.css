@@ -273,24 +273,23 @@ body{
   gap: 8px;
   min-width: 0;
 }
+/* Same width behavior as #tagList .tag-pill (intrinsic to label + count), not fixed 11.5rem */
 button.selected-label-chip{
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   box-sizing: border-box;
-  /* Match .tag-pill metrics; fixed width so every chip matches */
-  flex: 0 1 11.5rem;
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
   min-width: 0;
-  width: 11.5rem;
-  max-width: min(11.5rem, 100%);
-  min-height: 30px;
-  padding: 6px 8px 6px 10px;
+  padding: 6px 10px;
   font-size: 12px;
   line-height: 1.25;
   cursor: pointer;
 }
 button.selected-label-chip > span:first-of-type{
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
