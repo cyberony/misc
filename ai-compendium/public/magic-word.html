@@ -33,7 +33,11 @@
     </header>
 
     <main class="magic-word-shell">
-      <p id="magicWordGateError" class="magic-word-error" hidden aria-live="polite"></p>
+      <p class="magic-word-error-slot" aria-live="polite">
+        <span class="magic-word-error-ghost" aria-hidden="true"
+          >Set MAGIC_PAGE_PASSWORD in ai-compendium/.env (non-empty), save, restart the server, then use Unlock.</span>
+        <span id="magicWordGateError" class="magic-word-error-live"></span>
+      </p>
 
       <section id="magicWordGate" class="magic-word-crt" aria-label="Unlock with password">
         <div class="magic-word-crt-case">
@@ -47,7 +51,7 @@
                 <div class="magic-word-video-wrap">
                   <iframe
                     class="magic-word-video"
-                    src="https://www.youtube.com/embed/QDySGUFAom0?start=18&amp;autoplay=1&amp;mute=1&amp;playsinline=1&amp;loop=1&amp;playlist=QDySGUFAom0"
+                    src="https://www.youtube.com/embed/QDySGUFAom0?autoplay=1&amp;playsinline=1&amp;loop=1&amp;playlist=QDySGUFAom0"
                     title="YouTube: magic word scene"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowfullscreen

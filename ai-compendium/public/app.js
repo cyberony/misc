@@ -1725,7 +1725,7 @@ function wireBrandInterpunctEasterEgg() {
       count = 0;
       if (resetTimer) clearTimeout(resetTimer);
       resetTimer = null;
-      window.location.href = '/magic-word.html';
+      window.location.href = `/magic-word.html?_=${Date.now()}`;
     }
   });
 }

@@ -1316,7 +1316,7 @@ app.post('/api/magic-page/unlock', (req, res) => {
       /* ignore */
     }
     magicUnlockRecordFailure(ip);
-    return res.status(401).json({ error: 'Wrong password.' });
+    return res.status(401).json({ error: "Ah ah ah! You didn't say the magic word!" });
   }
   let match = false;
   try {
@@ -1326,7 +1326,7 @@ app.post('/api/magic-page/unlock', (req, res) => {
   }
   if (!match) {
     magicUnlockRecordFailure(ip);
-    return res.status(401).json({ error: 'Wrong password.' });
+    return res.status(401).json({ error: "Ah ah ah! You didn't say the magic word!" });
   }
 
   magicUnlockClearFailures(ip);
@@ -1337,6 +1337,16 @@ app.post('/api/magic-page/unlock', (req, res) => {
   res.setHeader(
     'Set-Cookie',
     `${MAGIC_PAGE_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secure}`,
+  );
+  res.json({ ok: true });
+});
+
+app.post('/api/magic-page/logout', (req, res) => {
+  const secure =
+    String(process.env.MAGIC_PAGE_COOKIE_SECURE || '').toLowerCase() === 'true' ? '; Secure' : '';
+  res.setHeader(
+    'Set-Cookie',
+    `${MAGIC_PAGE_COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${secure}`,
   );
   res.json({ ok: true });
 });

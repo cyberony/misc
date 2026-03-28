@@ -1773,12 +1773,28 @@ textarea{ resize: vertical; }
   margin: 0 auto;
   padding: 16px 18px 48px;
 }
-.magic-word-error{
+.magic-word-error-slot{
+  display: grid;
+  grid-template-areas: 'stack';
   margin: 0 0 14px;
   font-size: 13px;
   line-height: 1.45;
-  color: #b42318;
   font-weight: 600;
+}
+.magic-word-error-ghost,
+.magic-word-error-live{
+  grid-area: stack;
+}
+.magic-word-error-ghost{
+  color: transparent;
+  user-select: none;
+  pointer-events: none;
+}
+.magic-word-error-live{
+  color: #b42318;
+}
+.magic-word-error-live:empty{
+  visibility: hidden;
 }
 .magic-word-crt{
   margin: 0 auto;
