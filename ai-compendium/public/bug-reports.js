@@ -9,6 +9,55 @@ function escapeHTML(str) {
     .replaceAll("'", '&#039;');
 }
 
+const CHICAGO_TZ = 'America/Chicago';
+
+/** Format an ISO (UTC) instant for display in Chicago time, e.g. Mar 27, 2026, 4:12:30 PM CDT */
+function formatChicagoDateTime(iso) {
+  const s = String(iso || '').trim();
+  if (!s) return '';
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return s;
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: CHICAGO_TZ,
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZoneName: 'short',
+    }).format(d);
+  } catch {
+    return s;
+  }
+}
+
+/** Stable B1… / F1… labels: order by createdAt (oldest first), separate sequences per kind. */
+function buildFeedbackRefById(reports) {
+  const chron = [...reports].sort((a, b) => {
+    const t = String(a.createdAt || '').localeCompare(String(b.createdAt || ''));
+    if (t !== 0) return t;
+    return String(a.id || '').localeCompare(String(b.id || ''));
+  });
+  const refById = new Map();
+  let b = 0;
+  let f = 0;
+  for (const r of chron) {
+    const id = r.id;
+    if (!id) continue;
+    if (r.kind === 'feature') {
+      f += 1;
+      refById.set(id, `F${f}`);
+    } else {
+      b += 1;
+      refById.set(id, `B${b}`);
+    }
+  }
+  return refById;
+}
+
 function authHeaders() {
   const token = localStorage.getItem('msai_auth_token') || '';
   const h = {};
@@ -57,36 +106,79 @@ async function load() {
     return;
   }
 
+  const refById = buildFeedbackRefById(reports);
+
   list.innerHTML = reports
     .map((r) => {
       const kind = r.kind === 'feature' ? 'feature' : 'bug';
+      const ref = refById.get(r.id) || '';
       const stepsLabel = kind === 'feature' ? 'Description' : 'Steps';
       const badgeClass =
         kind === 'feature' ? 'bug-report-type-badge bug-report-type-feature' : 'bug-report-type-badge bug-report-type-bug';
       const badgeText = kind === 'feature' ? 'Feature' : 'Bug';
+      const st = String(r.status || 'open').toLowerCase();
+      const isOpen = st === 'open';
+      const rid = r.id ? String(r.id) : '';
+      const statusBtn = rid
+        ? isOpen
+          ? `<button type="button" class="btn ghost small bug-report-close-btn" data-feedback-close="${escapeHTML(rid)}">Close</button>`
+          : `<button type="button" class="btn ghost small bug-report-reopen-btn" data-feedback-reopen="${escapeHTML(rid)}">Reopen</button>`
+        : '';
+      const whenChicago = formatChicagoDateTime(r.createdAt);
+      const metaWhen = whenChicago ? `${escapeHTML(whenChicago)} · ` : '';
+      const refHtml = ref
+        ? `<span class="bug-report-ref" aria-label="Reference ${escapeHTML(ref)}">${escapeHTML(ref)}</span>`
+        : '';
+      const closedClass = isOpen ? '' : ' bug-report-card-closed';
       return `
-      <article class="bug-report-card panel">
+      <article class="bug-report-card panel${closedClass}">
         <header class="bug-report-card-head">
           <div class="bug-report-title-block">
-            <span class="${badgeClass}">${escapeHTML(badgeText)}</span>
+            <span class="${badgeClass}">${escapeHTML(badgeText)}${refHtml}</span>
             <h2 class="bug-report-title">${escapeHTML(r.title || '(no title)')}</h2>
           </div>
-          <span class="bug-report-meta">${escapeHTML(r.createdAt || '')} · <span class="bug-report-status">${escapeHTML(r.status || 'open')}</span></span>
+          <div class="bug-report-head-right">
+            <span class="bug-report-meta">${metaWhen}<span class="bug-report-status">${escapeHTML(st)}</span></span>
+            ${statusBtn}
+          </div>
         </header>
         ${r.area ? `<p class="bug-report-line"><strong>Area</strong> ${escapeHTML(r.area)}</p>` : ''}
         <div class="bug-report-block">
           <div class="bug-report-label">${escapeHTML(stepsLabel)}</div>
           <pre class="bug-report-pre">${escapeHTML(r.steps || '')}</pre>
         </div>
-        ${r.expected ? `<div class="bug-report-block"><div class="bug-report-label">Expected</div><pre class="bug-report-pre">${escapeHTML(r.expected)}</pre></div>` : ''}
-        ${r.actual ? `<div class="bug-report-block"><div class="bug-report-label">Actual</div><pre class="bug-report-pre">${escapeHTML(r.actual)}</pre></div>` : ''}
+        ${kind === 'bug' && r.expected ? `<div class="bug-report-block"><div class="bug-report-label">Expected</div><pre class="bug-report-pre">${escapeHTML(r.expected)}</pre></div>` : ''}
+        ${kind === 'bug' && r.actual ? `<div class="bug-report-block"><div class="bug-report-label">Actual</div><pre class="bug-report-pre">${escapeHTML(r.actual)}</pre></div>` : ''}
         ${r.email ? `<p class="bug-report-line"><strong>Contact</strong> ${escapeHTML(r.email)}</p>` : ''}
-        ${r.meta?.userAgent ? `<p class="bug-report-ua muted">${escapeHTML(r.meta.userAgent)}</p>` : ''}
-        <p class="bug-report-id muted">ID ${escapeHTML(r.id || '')}</p>
       </article>
     `;
     })
     .join('');
+}
+
+const bugReportsListEl = $('#bugReportsList');
+if (bugReportsListEl) {
+  bugReportsListEl.addEventListener('click', async (e) => {
+    const raw = e.target;
+    const el = raw?.nodeType === Node.ELEMENT_NODE ? raw : raw?.parentElement;
+    const closeBtn = el?.closest?.('[data-feedback-close]');
+    const reopenBtn = el?.closest?.('[data-feedback-reopen]');
+    const id = closeBtn?.getAttribute('data-feedback-close') || reopenBtn?.getAttribute('data-feedback-reopen');
+    if (!id) return;
+    e.preventDefault();
+    const status = closeBtn ? 'closed' : 'open';
+    const res = await fetch(`/api/admin/bug-reports/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { ...authHeaders(), 'content-type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(data.error || `Could not update status (${res.status})`);
+      return;
+    }
+    await load();
+  });
 }
 
 load();

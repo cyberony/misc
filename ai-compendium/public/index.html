@@ -408,15 +408,17 @@
             <span id="bugFormStepsLabel">Steps to reproduce (required)</span>
             <textarea id="bugFormSteps" name="steps" rows="4" required placeholder="1) ... 2) ... 3) ..."></textarea>
           </label>
-          <label id="bugFormExpectedWrap">
-            <span id="bugFormExpectedLabel">Expected result (optional)</span>
-            <textarea name="expected" rows="3" placeholder="What should happen?"></textarea>
-          </label>
-          <label id="bugFormActualWrap">
-            <span id="bugFormActualLabel">Actual result (optional)</span>
-            <textarea name="actual" rows="3" placeholder="What happened instead?"></textarea>
-          </label>
-          <label>
+          <div id="bugFormBugOnlyFields" class="bug-form-bug-only">
+            <label>
+              <span id="bugFormExpectedLabel">Expected result (optional)</span>
+              <textarea name="expected" rows="3" placeholder="What should happen?"></textarea>
+            </label>
+            <label>
+              <span id="bugFormActualLabel">Actual result (optional)</span>
+              <textarea name="actual" rows="3" placeholder="What happened instead?"></textarea>
+            </label>
+          </div>
+          <label id="bugFormEmailWrap">
             Email (optional)
             <input name="email" type="email" autocomplete="email" placeholder="you@example.com" />
           </label>

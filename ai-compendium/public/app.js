@@ -469,6 +469,11 @@ function setAuthToken(token) {
   else localStorage.removeItem('msai_auth_token');
 }
 
+function syncBugFormEmailField() {
+  const wrap = $('#bugFormEmailWrap');
+  if (wrap) wrap.hidden = Boolean(state.currentUser);
+}
+
 function updateAuthUI() {
   const logoutLink = $('#logoutLink');
   const authLinkText = $('#authLinkText');
@@ -485,6 +490,7 @@ function updateAuthUI() {
   }
   const adminBugReportsLink = $('#adminBugReportsLink');
   if (adminBugReportsLink) adminBugReportsLink.hidden = !isAdminModeActive();
+  syncBugFormEmailField();
   if (state.currentUser?.role === 'admin') {
     if (adminModeWrap) adminModeWrap.hidden = false;
     if (adminModeSelect) adminModeSelect.value = state.adminViewMode === 'user' ? 'user' : 'admin';
@@ -824,14 +830,20 @@ function applyFeedbackKind(kind) {
       ? '1) … 2) … 3) …'
       : 'What would you like to see? Include any context that helps.';
   }
-  const expWrap = $('#bugFormExpectedWrap');
-  const actWrap = $('#bugFormActualWrap');
-  if (expWrap) expWrap.hidden = !isBug;
-  if (actWrap) actWrap.hidden = !isBug;
-  const expL = $('#bugFormExpectedLabel');
-  const actL = $('#bugFormActualLabel');
-  if (expL) expL.textContent = 'Expected result (optional)';
-  if (actL) actL.textContent = 'Actual result (optional)';
+  const bugOnly = $('#bugFormBugOnlyFields');
+  if (bugOnly) bugOnly.hidden = !isBug;
+  if (!isBug) {
+    const expTa = document.querySelector('#bugForm textarea[name="expected"]');
+    const actTa = document.querySelector('#bugForm textarea[name="actual"]');
+    if (expTa) expTa.value = '';
+    if (actTa) actTa.value = '';
+  }
+  if (isBug) {
+    const expL = $('#bugFormExpectedLabel');
+    const actL = $('#bugFormActualLabel');
+    if (expL) expL.textContent = 'Expected result (optional)';
+    if (actL) actL.textContent = 'Actual result (optional)';
+  }
   const submitBtn = $('#bugSubmit');
   if (submitBtn) submitBtn.textContent = isBug ? 'Submit bug report' : 'Submit feature request';
 }
@@ -839,6 +851,7 @@ function applyFeedbackKind(kind) {
 function openBugModal(kind = 'bug') {
   $('#bugError').hidden = true;
   $('#bugError').textContent = '';
+  syncBugFormEmailField();
   bugModal.hidden = false;
   bugModal.style.display = 'flex';
   const k = kind === 'feature' ? 'feature' : 'bug';
@@ -854,11 +867,10 @@ function closeBugModal() {
   if (form && typeof form.reset === 'function') form.reset();
   $('#bugError').hidden = true;
   $('#bugError').textContent = '';
-  const expWrap = $('#bugFormExpectedWrap');
-  const actWrap = $('#bugFormActualWrap');
-  if (expWrap) expWrap.hidden = false;
-  if (actWrap) actWrap.hidden = false;
+  const bugOnly = $('#bugFormBugOnlyFields');
+  if (bugOnly) bugOnly.hidden = false;
   applyFeedbackKind('bug');
+  syncBugFormEmailField();
 }
 
 function openProfileModal() {
@@ -1661,10 +1673,12 @@ async function submitBugReport(e) {
     steps: String(fd.get('steps') || '').trim(),
     expected: kind === 'feature' ? '' : String(fd.get('expected') || '').trim(),
     actual: kind === 'feature' ? '' : String(fd.get('actual') || '').trim(),
-    email: String(fd.get('email') || '').trim(),
   };
+  if (!state.currentUser) {
+    payload.email = String(fd.get('email') || '').trim();
+  }
 
-  const res = await fetch('/api/bug-reports', {
+  const res = await apiFetch('/api/bug-reports', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(payload),

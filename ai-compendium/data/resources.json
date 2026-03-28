@@ -148,6 +148,11 @@
       "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
       "createdAt": "2026-03-27T15:51:50.193Z",
       "expiresAt": 1775836310193
+    },
+    "340851264c54ab9e73c1c44b4c213c344b9edb422ca14b22f2e487f8c5d714e2": {
+      "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
+      "createdAt": "2026-03-27T23:03:20.402Z",
+      "expiresAt": 1775862200402
     }
   },
   "votesByUser": {
@@ -162,6 +167,37 @@
       "sample-whisper": 1
     }
   },
-  "bugReports": [],
+  "bugReports": [
+    {
+      "id": "431fe74b-54a3-4018-90bc-a888e3040580",
+      "kind": "feature",
+      "title": "Paper depot",
+      "steps": "It'd be nice to have a place to store research papers or links to them so students can find them easily using tags or natural-language search (e.g., they can explain something they remember about a paper vaguely). A list of candidate papers would be shown with confidence numbers showing how confident the compendium is about each paper being the one the student's looking for.",
+      "area": null,
+      "expected": null,
+      "actual": null,
+      "email": null,
+      "status": "open",
+      "createdAt": "2026-03-27T22:43:59.599Z",
+      "meta": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+      }
+    },
+    {
+      "id": "6eaf2ae3-2dd9-4ca7-b7a9-e5fb1cfc2719",
+      "kind": "feature",
+      "title": "Bug/Feature assignment",
+      "steps": "Need a way to assign bugs and feature requests to a humans or an AI.",
+      "area": null,
+      "expected": null,
+      "actual": null,
+      "email": "cyberony@gmail.com",
+      "status": "open",
+      "createdAt": "2026-03-27T23:02:05.623Z",
+      "meta": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0"
+      }
+    }
+  ],
   "passwordResetTokens": []
 }

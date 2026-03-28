@@ -1600,6 +1600,11 @@ input, textarea, select{
   margin: 0;
   accent-color: #2563eb;
 }
+/* Bug-only fields: form label { display:flex } can fight [hidden]; keep off for feature requests */
+#bugFormBugOnlyFields[hidden],
+#bugFormEmailWrap[hidden]{
+  display: none !important;
+}
 #profileForm input:focus{
   border-color: rgba(37, 99, 235, 0.62) !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
@@ -1748,6 +1753,22 @@ textarea{ resize: vertical; }
 .bug-report-card{
   padding: 14px 16px;
   text-align: left;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+.bug-report-card-closed{
+  opacity: 0.48;
+  filter: grayscale(0.25);
+}
+.bug-report-card.panel.bug-report-card-closed{
+  background: rgba(11, 18, 32, 0.08) !important;
+  border-color: rgba(11, 18, 32, 0.12) !important;
+}
+.bug-report-card-closed .bug-report-title{
+  color: rgba(11, 18, 32, 0.52);
+}
+.bug-report-card-closed .bug-report-pre,
+.bug-report-card-closed .bug-report-line{
+  color: rgba(11, 18, 32, 0.55);
 }
 .bug-report-card-head{
   display: flex;
@@ -1783,6 +1804,14 @@ textarea{ resize: vertical; }
   background: rgba(37, 99, 235, 0.12);
   color: #1d4ed8;
 }
+.bug-report-type-badge .bug-report-ref{
+  display: inline-block;
+  margin-left: 0.45em;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  opacity: 0.92;
+}
 .bug-report-title{
   margin: 0;
   font-size: 16px;
@@ -1791,13 +1820,27 @@ textarea{ resize: vertical; }
   flex: 1;
   min-width: 0;
 }
+.bug-report-head-right{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
 .bug-report-meta{
   font-size: 12px;
   color: rgba(11, 18, 32, 0.55);
   white-space: nowrap;
+  text-align: right;
 }
 .bug-report-status{
   text-transform: capitalize;
+}
+.bug-report-close-btn,
+.bug-report-reopen-btn{
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 10px;
 }
 .bug-report-line{
   margin: 0 0 10px;

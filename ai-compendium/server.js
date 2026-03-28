@@ -765,7 +765,6 @@ app.post('/api/bug-reports', async (req, res) => {
     const area = String(req.body?.area || '').trim();
     const expected = String(req.body?.expected || '').trim();
     const actual = String(req.body?.actual || '').trim();
-    const email = normalizeEmail(req.body?.email || '');
     const kindRaw = String(req.body?.kind || 'bug').trim().toLowerCase();
     const kind = kindRaw === 'feature' ? 'feature' : 'bug';
 
@@ -778,30 +777,37 @@ app.post('/api/bug-reports', async (req, res) => {
       });
     }
 
+    const reportId = crypto.randomUUID();
     const createdAt = new Date().toISOString();
-    const report = {
-      id: crypto.randomUUID(),
-      kind,
-      title,
-      steps,
-      area: area || null,
-      expected: expected || null,
-      actual: actual || null,
-      email: email || null,
-      status: 'open',
-      createdAt,
-      meta: {
-        userAgent: String(req.headers['user-agent'] || ''),
-      },
-    };
+    const userAgent = String(req.headers['user-agent'] || '');
 
     await enqueueWrite(async () => {
       const db = await readDB();
+      sweepExpiredSessions(db);
+      const user = getAuthUserFromDB(req, db);
+      const bodyEmail = normalizeEmail(req.body?.email || '');
+      const email =
+        user && user.email ? normalizeEmail(user.email) : bodyEmail;
+      const report = {
+        id: reportId,
+        kind,
+        title,
+        steps,
+        area: area || null,
+        expected: expected || null,
+        actual: actual || null,
+        email: email || null,
+        status: 'open',
+        createdAt,
+        meta: {
+          userAgent,
+        },
+      };
       db.bugReports.push(report);
       await writeDB(db);
     });
 
-    res.status(201).json({ ok: true, reportId: report.id });
+    res.status(201).json({ ok: true, reportId });
   } catch (e) {
     res.status(500).json({ error: String(e?.message || e) });
   }
@@ -1073,6 +1079,44 @@ app.get('/api/admin/bug-reports', async (req, res) => {
     res.json({ bugReports });
   } catch (e) {
     res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
+app.patch('/api/admin/bug-reports/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id || '').trim();
+    const statusRaw = String(req.body?.status || '').trim().toLowerCase();
+    if (!id) return res.status(400).json({ error: 'Missing report id' });
+    if (statusRaw !== 'open' && statusRaw !== 'closed') {
+      return res.status(400).json({ error: 'status must be "open" or "closed"' });
+    }
+
+    let errOut = null;
+    await enqueueWrite(async () => {
+      const db = await readDB();
+      sweepExpiredSessions(db);
+      const user = getAuthUserFromDB(req, db);
+      if (!user) {
+        errOut = { code: 401, message: 'Authentication required' };
+        return;
+      }
+      if (!isAdminUser(user)) {
+        errOut = { code: 403, message: 'Admin access required' };
+        return;
+      }
+      const rep = (db.bugReports || []).find((r) => r.id === id);
+      if (!rep) {
+        errOut = { code: 404, message: 'Report not found' };
+        return;
+      }
+      rep.status = statusRaw;
+      await writeDB(db);
+    });
+
+    if (errOut) return res.status(errOut.code).json({ error: errOut.message });
+    return res.json({ ok: true, status: statusRaw });
+  } catch (e) {
+    return res.status(500).json({ error: String(e?.message || e) });
   }
 });
 
