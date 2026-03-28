@@ -1581,6 +1581,7 @@ async function submitAuth(e) {
   const submittedMode = state.authMode;
   setAuthToken(data.token || '');
   state.currentUser = data.user || null;
+  await fetchAdminUsers();
   updateAuthUI();
   closeAuthModal();
   await refreshAll();
