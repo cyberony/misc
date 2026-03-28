@@ -22,15 +22,12 @@ function showGate(configured) {
   errEl.hidden = true;
   errEl.textContent = '';
   if (form) form.hidden = false;
-  if (submit) submit.disabled = false;
   if (pwd) pwd.disabled = false;
+  if (submit) submit.disabled = !configured;
   if (!configured) {
     errEl.hidden = false;
     errEl.textContent =
-      'This destination is not enabled yet. Set MAGIC_PAGE_PASSWORD on the server (see .env.example).';
-    if (form) form.hidden = true;
-    if (submit) submit.disabled = true;
-    if (pwd) pwd.disabled = true;
+      'Set MAGIC_PAGE_PASSWORD in ai-compendium/.env (non-empty), save, restart the server, then use Unlock.';
   }
 }
 
