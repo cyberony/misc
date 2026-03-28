@@ -1183,6 +1183,164 @@ app.patch('/api/admin/users/:id/role', async (req, res) => {
   }
 });
 
+const MAGIC_PAGE_COOKIE = 'msai_magic_page';
+const MAGIC_UNLOCK_WINDOW_MS = 15 * 60 * 1000;
+const MAGIC_UNLOCK_MAX_FAILS = 12;
+/** @type {Map<string, { failed: number; resetAt: number }>} */
+const magicUnlockByIp = new Map();
+
+function clientIpForRateLimit(req) {
+  const xf = req.headers['x-forwarded-for'];
+  if (typeof xf === 'string' && xf.trim()) {
+    return xf.split(',')[0].trim().slice(0, 80);
+  }
+  const ra = req.socket?.remoteAddress || req.ip;
+  return ra ? String(ra).slice(0, 80) : 'unknown';
+}
+
+function sweepMagicUnlockMap() {
+  const now = Date.now();
+  for (const [k, v] of magicUnlockByIp) {
+    if (v.resetAt <= now) magicUnlockByIp.delete(k);
+  }
+}
+
+function magicUnlockRateBlocked(ip) {
+  sweepMagicUnlockMap();
+  const entry = magicUnlockByIp.get(ip);
+  if (!entry || entry.resetAt <= Date.now()) return { blocked: false, retryAfterSec: 0 };
+  if (entry.failed >= MAGIC_UNLOCK_MAX_FAILS) {
+    return { blocked: true, retryAfterSec: Math.max(1, Math.ceil((entry.resetAt - Date.now()) / 1000)) };
+  }
+  return { blocked: false, retryAfterSec: 0 };
+}
+
+function magicUnlockRecordFailure(ip) {
+  const now = Date.now();
+  let entry = magicUnlockByIp.get(ip);
+  if (!entry || entry.resetAt <= now) {
+    entry = { failed: 0, resetAt: now + MAGIC_UNLOCK_WINDOW_MS };
+  }
+  entry.failed += 1;
+  magicUnlockByIp.set(ip, entry);
+}
+
+function magicUnlockClearFailures(ip) {
+  magicUnlockByIp.delete(ip);
+}
+
+const magicUnlockSweepTimer = setInterval(sweepMagicUnlockMap, 60 * 1000);
+if (typeof magicUnlockSweepTimer.unref === 'function') magicUnlockSweepTimer.unref();
+
+function parseCookieHeader(header) {
+  const out = {};
+  if (!header || typeof header !== 'string') return out;
+  for (const part of header.split(';')) {
+    const i = part.indexOf('=');
+    if (i < 0) continue;
+    const k = part.slice(0, i).trim();
+    const v = part.slice(i + 1).trim();
+    try {
+      out[k] = decodeURIComponent(v);
+    } catch {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
+function magicPageSigningSecret() {
+  const cookieSecret = String(process.env.MAGIC_PAGE_COOKIE_SECRET || '').trim();
+  const pwd = String(process.env.MAGIC_PAGE_PASSWORD || '').trim();
+  return cookieSecret || pwd || '';
+}
+
+function makeMagicPageToken() {
+  const exp = Date.now() + 30 * 24 * 60 * 60 * 1000;
+  const payload = String(exp);
+  const sig = crypto.createHmac('sha256', magicPageSigningSecret()).update(payload).digest('base64url');
+  return `${payload}.${sig}`;
+}
+
+function verifyMagicPageToken(token) {
+  const secret = magicPageSigningSecret();
+  if (!secret) return false;
+  const s = String(token || '').trim();
+  const dot = s.lastIndexOf('.');
+  if (dot < 1) return false;
+  const exp = s.slice(0, dot);
+  const sig = s.slice(dot + 1);
+  if (!/^\d+$/.test(exp)) return false;
+  const expectedSig = crypto.createHmac('sha256', secret).update(exp).digest('base64url');
+  let ok = false;
+  try {
+    const a = Buffer.from(sig, 'utf8');
+    const b = Buffer.from(expectedSig, 'utf8');
+    ok = a.length === b.length && crypto.timingSafeEqual(a, b);
+  } catch {
+    ok = false;
+  }
+  if (!ok) return false;
+  if (Number(exp) <= Date.now()) return false;
+  return true;
+}
+
+app.get('/api/magic-page/status', (req, res) => {
+  const cookies = parseCookieHeader(req.headers.cookie);
+  const configured = Boolean(String(process.env.MAGIC_PAGE_PASSWORD || '').trim());
+  const unlocked = configured && verifyMagicPageToken(cookies[MAGIC_PAGE_COOKIE]);
+  res.json({ unlocked, configured });
+});
+
+app.post('/api/magic-page/unlock', (req, res) => {
+  const expectedPwd = String(process.env.MAGIC_PAGE_PASSWORD || '').trim();
+  if (!expectedPwd) {
+    return res
+      .status(503)
+      .json({ error: 'This page is not configured yet (set MAGIC_PAGE_PASSWORD in the server environment).' });
+  }
+  const ip = clientIpForRateLimit(req);
+  const rate = magicUnlockRateBlocked(ip);
+  if (rate.blocked) {
+    res.setHeader('Retry-After', String(rate.retryAfterSec));
+    return res.status(429).json({ error: 'Too many attempts. Try again later.' });
+  }
+
+  const bodyPwd = String(req.body?.password ?? '');
+  const a = Buffer.from(expectedPwd, 'utf8');
+  const b = Buffer.from(bodyPwd, 'utf8');
+  if (a.length !== b.length) {
+    try {
+      crypto.timingSafeEqual(a, a);
+    } catch {
+      /* ignore */
+    }
+    magicUnlockRecordFailure(ip);
+    return res.status(401).json({ error: 'Wrong password.' });
+  }
+  let match = false;
+  try {
+    match = crypto.timingSafeEqual(a, b);
+  } catch {
+    match = false;
+  }
+  if (!match) {
+    magicUnlockRecordFailure(ip);
+    return res.status(401).json({ error: 'Wrong password.' });
+  }
+
+  magicUnlockClearFailures(ip);
+  const token = makeMagicPageToken();
+  const maxAge = 30 * 24 * 60 * 60;
+  const secure =
+    String(process.env.MAGIC_PAGE_COOKIE_SECURE || '').toLowerCase() === 'true' ? '; Secure' : '';
+  res.setHeader(
+    'Set-Cookie',
+    `${MAGIC_PAGE_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secure}`,
+  );
+  res.json({ ok: true });
+});
+
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 app.listen(PORT, () => {
   console.log(`AI compendium running on http://localhost:${PORT}`);

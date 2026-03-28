@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MSAI · CAT — Magic word</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" type="image/png" href="/assets/cat.png" />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+    <header class="topbar bug-reports-topbar">
+      <div class="brand">
+        <img class="logo" src="/assets/cat.png" alt="CAT logo" />
+        <div>
+          <h1 class="bug-reports-page-heading">
+            <span class="brand-kicker">MSAI · CAT</span>
+            <span class="bug-reports-heading-sep" aria-hidden="true">|</span>
+            <span class="bug-reports-heading-page">Magic word</span>
+          </h1>
+        </div>
+      </div>
+      <div class="auth-strip">
+        <a class="auth-link auth-link-with-icon" href="/">
+          <span class="auth-link-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
+          </span>
+          <span>Home</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="magic-word-shell">
+      <p id="magicWordGateError" class="magic-word-error" hidden aria-live="polite"></p>
+
+      <section id="magicWordGate" class="magic-word-crt" aria-label="Unlock with password">
+        <div class="magic-word-crt-case">
+          <div class="magic-word-crt-top">
+            <span class="magic-word-crt-led" aria-hidden="true"></span>
+            <span class="magic-word-crt-model" aria-hidden="true">MSAI-CRT / 01</span>
+          </div>
+          <div class="magic-word-crt-bezel">
+            <div class="magic-word-crt-screen-surface">
+              <div class="magic-word-figure">
+                <div class="magic-word-video-wrap">
+                  <iframe
+                    class="magic-word-video"
+                    src="https://www.youtube.com/embed/QDySGUFAom0?start=18&amp;autoplay=1&amp;mute=1&amp;playsinline=1&amp;loop=1&amp;playlist=QDySGUFAom0"
+                    title="YouTube: magic word scene"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    loading="lazy"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                  ></iframe>
+                </div>
+              </div>
+              <span class="magic-word-crt-scanlines" aria-hidden="true"></span>
+              <span class="magic-word-crt-phosphor" aria-hidden="true"></span>
+              <span class="magic-word-crt-vignette" aria-hidden="true"></span>
+            </div>
+          </div>
+          <div class="magic-word-crt-deck">
+            <form id="magicWordForm" class="magic-word-form magic-word-crt-form" autocomplete="off">
+              <label class="magic-word-label" for="magicWordPassword">Password</label>
+              <input
+                id="magicWordPassword"
+                class="magic-word-input"
+                type="password"
+                name="password"
+                autocomplete="current-password"
+                required
+              />
+              <button type="submit" class="btn magic-word-submit magic-word-crt-btn" id="magicWordSubmit">Unlock</button>
+            </form>
+          </div>
+          <div class="magic-word-crt-stand" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section id="magicWordContent" class="magic-word-content" hidden aria-label="Protected content">
+        <p class="muted magic-word-placeholder">Nothing here yet.</p>
+      </section>
+    </main>
+
+    <script src="/magic-word.js"></script>
+  </body>
+</html>

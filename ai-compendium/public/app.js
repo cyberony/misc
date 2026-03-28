@@ -1706,6 +1706,30 @@ function syncHowItWorksPanel() {
   d.open = wide;
 }
 
+const BRAND_INTERPUNCT_TRIPLE_MS = 650;
+
+function wireBrandInterpunctEasterEgg() {
+  const el = $('#brandInterpunct');
+  if (!el) return;
+  let count = 0;
+  let resetTimer = null;
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    count += 1;
+    if (resetTimer) clearTimeout(resetTimer);
+    resetTimer = setTimeout(() => {
+      count = 0;
+      resetTimer = null;
+    }, BRAND_INTERPUNCT_TRIPLE_MS);
+    if (count >= 3) {
+      count = 0;
+      if (resetTimer) clearTimeout(resetTimer);
+      resetTimer = null;
+      window.location.href = '/magic-word.html';
+    }
+  });
+}
+
 function wireUI() {
   const howItWorks = document.getElementById('howItWorks');
   if (howItWorks) {
@@ -1896,6 +1920,8 @@ function wireUI() {
       if (e.target === existingCardModal) closeExistingCardModal();
     });
   }
+
+  wireBrandInterpunctEasterEgg();
 }
 
 wireUI();

@@ -1305,7 +1305,8 @@ html{ background:#ffffff !important; }
 #bugForm input:not([type="radio"]):not([type="checkbox"]),
 #bugForm textarea,
 #profileForm input,
-#resetForm input{
+#resetForm input,
+#magicWordForm .magic-word-input{
   background: rgba(37, 99, 235, 0.08) !important;
   border-color: rgba(37, 99, 235, 0.38) !important;
 }
@@ -1733,6 +1734,15 @@ textarea{ resize: vertical; }
   margin: 0 auto;
   padding: 16px 18px 48px;
 }
+.bug-reports-toolbar{
+  margin-bottom: 32px;
+}
+.bug-reports-toolbar .content-search{
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
 .bug-reports-gate{
   margin: 0;
   font-size: 14px;
@@ -1750,6 +1760,212 @@ textarea{ resize: vertical; }
 .bug-reports-empty{
   margin: 0;
 }
+
+/* Triple-click target on home (MSAI · CAT); no visual change */
+.brand-interpunct{
+  cursor: default;
+  user-select: none;
+}
+
+/* --- Magic word page: CRT + embedded video --- */
+.magic-word-shell{
+  max-width: min(92vw, 800px);
+  margin: 0 auto;
+  padding: 16px 18px 48px;
+}
+.magic-word-error{
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #b42318;
+  font-weight: 600;
+}
+.magic-word-crt{
+  margin: 0 auto;
+  max-width: 100%;
+}
+.magic-word-crt-case{
+  border-radius: 14px 14px 10px 10px;
+  background:
+    linear-gradient(165deg, #3a3d42 0%, #25262b 38%, #1c1d21 100%);
+  box-shadow:
+    0 4px 0 #121316,
+    0 12px 28px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  padding: 12px 14px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.45);
+}
+.magic-word-crt-top{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+  margin-bottom: 10px;
+}
+.magic-word-crt-led{
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #7f7, #0a3);
+  box-shadow: 0 0 6px rgba(80, 255, 120, 0.65);
+}
+.magic-word-crt-model{
+  font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+}
+.magic-word-crt-bezel{
+  padding: 10px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #0d0d0f 0%, #141418 100%);
+  box-shadow:
+    inset 0 2px 12px rgba(0, 0, 0, 0.85),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.magic-word-crt-screen-surface{
+  position: relative;
+  border-radius: 3px 3px 5px 5px / 3px 3px 8px 8px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 2px #050506,
+    inset 0 0 48px rgba(0, 0, 0, 0.65);
+  background: #000;
+}
+.magic-word-figure{
+  margin: 0;
+  text-align: center;
+}
+.magic-word-video-wrap{
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  max-width: 100%;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border: none;
+  background: #000;
+}
+.magic-word-video{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  filter: contrast(1.04) saturate(0.92) brightness(1.02);
+}
+.magic-word-crt-scanlines{
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(0, 0, 0, 0.11) 2px,
+    rgba(0, 0, 0, 0.11) 3px
+  );
+}
+.magic-word-crt-phosphor{
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(0, 255, 140, 0.045);
+  mix-blend-mode: overlay;
+}
+.magic-word-crt-vignette{
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.5);
+}
+.magic-word-crt-deck{
+  margin-top: 12px;
+  padding: 14px 12px 12px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #1e1f24 0%, #16171c 100%);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.magic-word-crt-stand{
+  height: 10px;
+  margin: 10px -6px -6px;
+  border-radius: 0 0 8px 8px;
+  background: linear-gradient(180deg, #22232a, #14151a);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+.magic-word-crt-form label.magic-word-label{
+  margin-bottom: 0;
+}
+.magic-word-form{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+  margin: 0;
+}
+.magic-word-crt .magic-word-label{
+  font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(130, 255, 180, 0.55);
+}
+.magic-word-crt #magicWordForm .magic-word-input{
+  background: rgba(0, 24, 14, 0.92) !important;
+  border-color: rgba(72, 200, 130, 0.4) !important;
+  color: #b8ffc8;
+  font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, monospace;
+  border-radius: 4px;
+  box-shadow: inset 0 0 20px rgba(0, 80, 40, 0.15);
+}
+.magic-word-crt #magicWordForm .magic-word-input:focus{
+  border-color: rgba(120, 255, 170, 0.65) !important;
+  box-shadow:
+    inset 0 0 20px rgba(0, 80, 40, 0.2),
+    0 0 0 2px rgba(80, 200, 120, 0.2) !important;
+  outline: none;
+}
+.magic-word-crt-btn{
+  align-self: flex-start;
+  margin-top: 4px;
+  font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #2a4a38, #1a3028) !important;
+  border: 1px solid rgba(100, 220, 150, 0.35) !important;
+  color: #c8ffd8 !important;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+.magic-word-crt-btn:hover{
+  filter: brightness(1.08);
+}
+.magic-word-input{
+  width: 100%;
+  box-sizing: border-box;
+}
+.magic-word-submit{
+  align-self: flex-start;
+  margin-top: 4px;
+}
+.magic-word-content{
+  padding: 24px 8px;
+  min-height: 120px;
+}
+.magic-word-placeholder{
+  margin: 0;
+  font-size: 15px;
+}
+
 .bug-report-card{
   padding: 14px 16px;
   text-align: left;
@@ -1811,6 +2027,9 @@ textarea{ resize: vertical; }
   letter-spacing: 0.04em;
   text-transform: none;
   opacity: 0.92;
+}
+.bug-report-card-closed .bug-report-type-badge .bug-report-ref{
+  opacity: 0.78;
 }
 .bug-report-title{
   margin: 0;
