@@ -1767,6 +1767,26 @@ textarea{ resize: vertical; }
   user-select: none;
 }
 
+/* Full-screen magic-word iframe: address bar stays on home URL */
+.magic-word-overlay[hidden]{
+  display: none !important;
+}
+.magic-word-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.magic-word-overlay-frame{
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  border: 0;
+}
+
 /* --- Magic word page: CRT + embedded video --- */
 .magic-word-shell{
   max-width: min(92vw, 800px);

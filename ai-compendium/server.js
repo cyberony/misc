@@ -15,6 +15,35 @@ const DATA_DIR = path.join(PROJECT_ROOT, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'resources.json');
 
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
+const MAGIC_WORD_HTML = path.join(PUBLIC_DIR, 'magic-word.html');
+
+function normalizeMagicPagePath(raw) {
+  const s = raw == null ? '' : String(raw).trim();
+  if (!s) return '/magic-word.html';
+  let p = s.startsWith('/') ? s : `/${s}`;
+  if (p.includes('..') || p.includes('//') || p.includes('\\') || p.includes('\0')) return '/magic-word.html';
+  return p;
+}
+
+const MAGIC_PAGE_PATH = normalizeMagicPagePath(process.env.MAGIC_PAGE_PATH);
+
+function sendMagicWordHtml(res) {
+  res.sendFile(MAGIC_WORD_HTML);
+}
+
+app.get(MAGIC_PAGE_PATH, (req, res) => sendMagicWordHtml(res));
+
+if (MAGIC_PAGE_PATH !== '/magic-word.html') {
+  app.get('/magic-word.html', (req, res) => {
+    res.status(404).type('txt').send('Not found');
+  });
+}
+
+app.get('/api/magic-page/redirect', (req, res) => {
+  const q = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+  res.redirect(302, MAGIC_PAGE_PATH + q);
+});
+
 app.use(express.static(PUBLIC_DIR));
 
 let writeQueue = Promise.resolve();

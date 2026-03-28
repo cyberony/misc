@@ -1708,6 +1708,19 @@ function syncHowItWorksPanel() {
 
 const BRAND_INTERPUNCT_TRIPLE_MS = 650;
 
+function openMagicWordOverlay() {
+  const ov = $('#magicWordOverlay');
+  const fr = $('#magicWordOverlayFrame');
+  if (!ov || !fr) {
+    window.location.href = `/api/magic-page/redirect?_=${Date.now()}`;
+    return;
+  }
+  fr.src = `/api/magic-page/redirect?_=${Date.now()}`;
+  ov.hidden = false;
+  ov.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
 function wireBrandInterpunctEasterEgg() {
   const el = $('#brandInterpunct');
   if (!el) return;
@@ -1725,7 +1738,7 @@ function wireBrandInterpunctEasterEgg() {
       count = 0;
       if (resetTimer) clearTimeout(resetTimer);
       resetTimer = null;
-      window.location.href = `/magic-word.html?_=${Date.now()}`;
+      openMagicWordOverlay();
     }
   });
 }
