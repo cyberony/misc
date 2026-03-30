@@ -1,5 +1,12 @@
 const $ = (sel) => document.querySelector(sel);
 
+const ADMIN_VIEW_MODES = ['admin', 'superuser', 'user'];
+
+function normalizeAdminViewMode(raw) {
+  const s = String(raw || '').trim();
+  return ADMIN_VIEW_MODES.includes(s) ? s : 'admin';
+}
+
 const state = {
   allResources: [],
   /** @type {Set<string>} lowercase tag strings; AND filter */
@@ -12,7 +19,7 @@ const state = {
   authMode: 'login',
   recoverLinkSent: false,
   pendingAction: null,
-  adminViewMode: localStorage.getItem('msai_admin_view_mode') || 'admin',
+  adminViewMode: normalizeAdminViewMode(localStorage.getItem('msai_admin_view_mode')),
   adminUsers: [],
   /** Lowercase tags for the add-resource form (chips + hidden field). */
   addFormTags: [],
@@ -474,6 +481,23 @@ function syncBugFormEmailField() {
   if (wrap) wrap.hidden = Boolean(state.currentUser);
 }
 
+/** Top-bar Tools icon: only admin/superuser accounts; respect admin “View as” mode. */
+function canSeeSuperuserToolsSidebar() {
+  if (!state.currentUser) return false;
+  const r = String(state.currentUser.role || '')
+    .trim()
+    .toLowerCase();
+  if (r !== 'admin' && r !== 'superuser') return false;
+  const eff = getEffectiveRole();
+  return eff === 'admin' || eff === 'superuser';
+}
+
+function updateSuperuserToolsIcon() {
+  const link = $('#toolsIconLink');
+  if (!link) return;
+  link.hidden = !canSeeSuperuserToolsSidebar();
+}
+
 function updateAuthUI() {
   const logoutLink = $('#logoutLink');
   const authLinkText = $('#authLinkText');
@@ -490,10 +514,11 @@ function updateAuthUI() {
   }
   const adminBugReportsLink = $('#adminBugReportsLink');
   if (adminBugReportsLink) adminBugReportsLink.hidden = !isAdminModeActive();
+  updateSuperuserToolsIcon();
   syncBugFormEmailField();
   if (state.currentUser?.role === 'admin') {
     if (adminModeWrap) adminModeWrap.hidden = false;
-    if (adminModeSelect) adminModeSelect.value = state.adminViewMode === 'user' ? 'user' : 'admin';
+    if (adminModeSelect) adminModeSelect.value = normalizeAdminViewMode(state.adminViewMode);
   } else {
     state.adminViewMode = 'admin';
     localStorage.setItem('msai_admin_view_mode', state.adminViewMode);
@@ -503,8 +528,11 @@ function updateAuthUI() {
 }
 
 function getEffectiveRole() {
-  if (state.currentUser?.role !== 'admin') return 'user';
-  return state.adminViewMode === 'user' ? 'user' : 'admin';
+  if (state.currentUser?.role === 'admin') {
+    return normalizeAdminViewMode(state.adminViewMode);
+  }
+  if (state.currentUser?.role === 'superuser') return 'superuser';
+  return 'user';
 }
 
 function isAdminModeActive() {
@@ -563,6 +591,7 @@ function renderAdminAccountsPanel() {
           <span class="admin-role-label">Role</span>
           <select data-admin-user-role="${escapeAttr(u.id)}">
             <option value="user"${u.role === 'user' ? ' selected' : ''}>User</option>
+            <option value="superuser"${u.role === 'superuser' ? ' selected' : ''}>Superuser</option>
             <option value="admin"${u.role === 'admin' ? ' selected' : ''}>Admin</option>
           </select>
         </label>
@@ -574,8 +603,8 @@ function renderAdminAccountsPanel() {
     sel.addEventListener('change', async (e) => {
       const target = e.currentTarget;
       const userId = target.getAttribute('data-admin-user-role');
-      const role = target.value === 'admin' ? 'admin' : 'user';
-      if (!userId) return;
+      const role = target.value;
+      if (!userId || !['user', 'superuser', 'admin'].includes(role)) return;
       const prev = state.adminUsers.find((u) => u.id === userId)?.role || 'user';
       target.disabled = true;
       const res = await apiFetch(`/api/admin/users/${encodeURIComponent(userId)}/role`, {
@@ -1173,13 +1202,19 @@ function renderGrid() {
             ${detailsBodyHtml}
           </div>
         </details>
-        <div class="vote"${state.currentUser ? '' : ' style="display:none"'}>
+        ${
+          state.currentUser
+            ? `<div class="vote">
           <button class="vote-icon-btn" type="button" data-vote="${escapeHTML(r.id)}" data-delta="1" aria-label="Vote up">${VOTE_ICON_UP}</button>
           <button class="vote-icon-btn" type="button" data-vote="${escapeHTML(r.id)}" data-delta="-1" aria-label="Vote down">${VOTE_ICON_DOWN}</button>
-          ${getEffectiveRole() === 'admin'
-            ? `<button class="vote-icon-btn vote-icon-btn-danger" type="button" data-delete-resource="${escapeHTML(r.id)}" aria-label="Delete resource" title="Delete resource">${TRASH_ICON}</button>`
-            : ''}
-        </div>
+          ${
+            getEffectiveRole() === 'admin'
+              ? `<button class="vote-icon-btn vote-icon-btn-danger" type="button" data-delete-resource="${escapeHTML(r.id)}" aria-label="Delete resource" title="Delete resource">${TRASH_ICON}</button>`
+              : ''
+          }
+        </div>`
+            : `<span class="card-vote-hint" data-tooltip="Log in to vote." tabindex="0" aria-label="Vote. Log in to vote.">Vote</span>`
+        }
       </div>
     `;
 
@@ -1654,12 +1689,8 @@ async function submitProfile(e) {
 
   state.currentUser = data.user || state.currentUser;
   updateAuthUI();
-  if (errEl) {
-    errEl.hidden = false;
-    errEl.classList.add('auth-success');
-    errEl.textContent = 'Profile updated';
-  }
   await refreshAll();
+  closeProfileModal();
 }
 
 async function submitBugReport(e) {
@@ -1852,7 +1883,8 @@ function wireUI() {
   const adminModeSelect = $('#adminViewMode');
   if (adminModeSelect) {
     adminModeSelect.addEventListener('change', async (e) => {
-      const next = e.target.value === 'user' ? 'user' : 'admin';
+      const next = e.target.value;
+      if (!ADMIN_VIEW_MODES.includes(next)) return;
       state.adminViewMode = next;
       localStorage.setItem('msai_admin_view_mode', next);
       if (next === 'admin') await fetchAdminUsers();
@@ -1932,6 +1964,13 @@ function wireUI() {
     if (existingClose) existingClose.addEventListener('click', closeExistingCardModal);
     existingCardModal.addEventListener('click', (e) => {
       if (e.target === existingCardModal) closeExistingCardModal();
+    });
+  }
+
+  const toolsIconLink = $('#toolsIconLink');
+  if (toolsIconLink) {
+    toolsIconLink.addEventListener('click', (e) => {
+      e.preventDefault();
     });
   }
 

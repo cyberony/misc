@@ -8,11 +8,15 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "chrono-node": "^2.9.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "nodemailer": "^6.9.16"
+    "node-cron": "^4.2.1",
+    "nodemailer": "^6.9.16",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "import-alumni": "node scripts/import-alumni.js"
   }
 }

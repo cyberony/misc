@@ -122,15 +122,17 @@
       "name": "",
       "passwordHash": "bddfde261472e7657427aa1274c87789:c67e8c6053f84758966bb7244262f7e40298840175cd9fe620ace92b896c76fae80d212c7736df612c0ccb91447be840515cd334ef470d66ebd0880c2b0a45e6",
       "createdAt": "2026-03-27T15:22:59.640Z",
-      "role": "admin"
+      "role": "superuser",
+      "updatedAt": "2026-03-30T06:50:23.249Z"
     },
     {
       "id": "8f85509d-a9f9-4095-96f6-6779571ec596",
       "email": "mohammed.alam@northwestern.edu",
-      "name": "",
-      "role": "user",
+      "name": "Mohammed Alam",
+      "role": "admin",
       "passwordHash": "fd8adf2570033af0ebd435738a522f41:2485755521bc6eae8c27bc06203b6a9afd0dba44234d1d94cc9e10a9bec8eaf0e7bf50ae09ce57c0a7da833dfae52fab9b23151344d7a202a2635d4cf60515eb",
-      "createdAt": "2026-03-27T15:37:00.318Z"
+      "createdAt": "2026-03-27T15:37:00.318Z",
+      "updatedAt": "2026-03-29T03:22:40.938Z"
     }
   ],
   "sessions": {
@@ -148,6 +150,11 @@
       "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
       "createdAt": "2026-03-27T15:51:50.193Z",
       "expiresAt": 1775836310193
+    },
+    "bbc1eb5d94913566bf5514d27558fa5b30ef58cb73b74b5299c1183d596fc215": {
+      "userId": "8f85509d-a9f9-4095-96f6-6779571ec596",
+      "createdAt": "2026-03-30T07:05:11.561Z",
+      "expiresAt": 1776063911562
     }
   },
   "votesByUser": {

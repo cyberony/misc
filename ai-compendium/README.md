@@ -35,3 +35,11 @@ Each resource has:
 - `POST /api/resources` (create)
 - `POST /api/resources/:id/vote` with `{ delta: 1 | -1 }`
 
+## Alumni directory (LinkedIn snapshot)
+
+The marketing alumni spreadsheet can be imported into `data/alumni.json`, shown at **`/alumni.html`** to **admins and superusers** (via the **Tools** sidebar on the home page), and optionally checked daily against public LinkedIn page metadata with email alerts. See **[docs/ALUMNI.md](docs/ALUMNI.md)** for files, env vars, import steps, and operational caveats.
+
+## Reminders (superuser / admin)
+
+Natural-language reminders (email at due time) via the same **Tools** sidebar. See **[docs/REMINDERS.md](docs/REMINDERS.md)**.
+

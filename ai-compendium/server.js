@@ -6,6 +6,9 @@ const fs = require('fs/promises');
 const crypto = require('crypto');
 const { promisify } = require('util');
 const nodemailer = require('nodemailer');
+const cron = require('node-cron');
+const alumniLib = require('./lib/alumni');
+const remindersLib = require('./lib/reminders');
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -13,6 +16,9 @@ app.use(express.json({ limit: '1mb' }));
 const PROJECT_ROOT = __dirname;
 const DATA_DIR = path.join(PROJECT_ROOT, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'resources.json');
+const ALUMNI_JSON = path.join(DATA_DIR, 'alumni.json');
+const ALUMNI_SNAPSHOT = path.join(DATA_DIR, 'alumni-linkedin-snapshot.json');
+const REMINDERS_FILE = path.join(DATA_DIR, 'reminders.json');
 
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
 const MAGIC_WORD_HTML = path.join(PUBLIC_DIR, 'magic-word.html');
@@ -79,6 +85,27 @@ async function readDB() {
 async function writeDB(db) {
   await ensureDataFile();
   await fs.writeFile(DATA_FILE, JSON.stringify(db, null, 2), 'utf8');
+}
+
+async function ensureRemindersFile() {
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  try {
+    await fs.access(REMINDERS_FILE);
+  } catch {
+    await fs.writeFile(REMINDERS_FILE, JSON.stringify({ reminders: [] }, null, 2), 'utf8');
+  }
+}
+
+async function readRemindersDB() {
+  await ensureRemindersFile();
+  const txt = await fs.readFile(REMINDERS_FILE, 'utf8');
+  const parsed = JSON.parse(txt || '{}');
+  return { reminders: Array.isArray(parsed.reminders) ? parsed.reminders : [] };
+}
+
+async function writeRemindersDB(db) {
+  await ensureRemindersFile();
+  await fs.writeFile(REMINDERS_FILE, JSON.stringify(db, null, 2), 'utf8');
 }
 
 function normalizeTags(tagsInput) {
@@ -347,18 +374,48 @@ async function verifyPassword(password, storedHash) {
   return crypto.timingSafeEqual(key, candidate);
 }
 
+function normalizePublicRole(role) {
+  const r = String(role || '').trim().toLowerCase();
+  if (r === 'admin') return 'admin';
+  if (r === 'superuser') return 'superuser';
+  return 'user';
+}
+
 function publicUser(user) {
   return {
     id: user.id,
     email: user.email,
     name: user.name || '',
-    role: user.role === 'admin' ? 'admin' : 'user',
+    role: normalizePublicRole(user.role),
     createdAt: user.createdAt,
   };
 }
 
 function isAdminUser(user) {
   return Boolean(user && user.role === 'admin');
+}
+
+function isAdminOrSuperuserRole(user) {
+  const r = String(user?.role || '')
+    .trim()
+    .toLowerCase();
+  return r === 'admin' || r === 'superuser';
+}
+
+function canAccessAlumniDirectory(user) {
+  return isAdminOrSuperuserRole(user);
+}
+
+function getAlumniNotifyEmail() {
+  return String(process.env.ALUMNI_NOTIFY_EMAIL || process.env.ALUMNI_ADMIN_EMAIL || '').trim();
+}
+
+function escapeHtmlText(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 function getBearerToken(req) {
@@ -464,6 +521,151 @@ function escapeHtmlAttr(u) {
     .replaceAll('"', '&quot;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;');
+}
+
+async function sendAlumniJobChangeEmail(changes) {
+  const to = getAlumniNotifyEmail();
+  if (!to || !changes.length) return;
+  const transport = getMailTransport();
+  const from = String(process.env.SMTP_FROM || 'AI Compendium <noreply@localhost>').trim();
+  const subject = `[MSAI CAT] Alumni LinkedIn updates (${changes.length})`;
+  const text = [
+    'Public LinkedIn metadata changed for one or more alumni (company/title line in og tags).',
+    '',
+    ...changes.map((c) =>
+      [
+        `${c.name}`,
+        `  ${c.linkedinUrl}`,
+        `  Previous: ${c.previous}`,
+        `  Current:  ${c.current}`,
+        '',
+      ].join('\n'),
+    ),
+  ].join('\n');
+  const html = `<p>Public LinkedIn metadata changed (headline / Experience line):</p><ul>${changes
+    .map(
+      (c) =>
+        `<li><strong>${escapeHtmlText(c.name)}</strong> — <a href="${escapeHtmlAttr(c.linkedinUrl)}">LinkedIn</a><br>Previous: ${escapeHtmlText(c.previous)}<br>Current: ${escapeHtmlText(c.current)}</li>`,
+    )
+    .join('')}</ul>`;
+  await transport.sendMail({ from, to, subject, text, html });
+}
+
+function delayAlumni(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function runAlumniLinkedInDailyCheck() {
+  if (String(process.env.ALUMNI_CHECK_ENABLED || '').toLowerCase() === 'false') return;
+  let alumniData;
+  try {
+    alumniData = await alumniLib.readAlumniPayload(ALUMNI_JSON);
+  } catch (e) {
+    console.warn('[alumni] skip check — missing or invalid data/alumni.json:', e.message);
+    return;
+  }
+  const snap = await alumniLib.readSnapshot(ALUMNI_SNAPSHOT);
+  snap.meta = snap.meta || {};
+  snap.byKey = snap.byKey || {};
+
+  const changes = [];
+  const rows = alumniData.rows || [];
+  const msBetween = Math.max(500, Number(process.env.ALUMNI_FETCH_GAP_MS || 1500));
+
+  for (const row of rows) {
+    const url = row.linkedinUrl;
+    const key = alumniLib.linkedinKey(url);
+    if (!key) continue;
+
+    await delayAlumni(msBetween);
+
+    let html;
+    try {
+      html = await alumniLib.fetchLinkedInHtml(url);
+    } catch (e) {
+      console.warn('[alumni] fetch failed', key, e.message);
+      continue;
+    }
+    if (!html) continue;
+
+    const meta = alumniLib.parseLinkedInPublicMeta(html);
+    const fp = alumniLib.jobFingerprint(meta);
+    const prev = snap.byKey[key];
+
+    if (prev && prev.fingerprint && fp && prev.fingerprint !== fp) {
+      const name = [row.first, row.last].filter(Boolean).join(' ').trim() || row.personalEmail || key;
+      changes.push({
+        name,
+        linkedinUrl: url,
+        previous: prev.fingerprint,
+        current: fp,
+      });
+    }
+
+    snap.byKey[key] = {
+      fingerprint: fp || prev?.fingerprint || '',
+      ogTitle: meta.ogTitle || prev?.ogTitle || '',
+      companyFromTitle: meta.companyFromTitle || prev?.companyFromTitle || '',
+      experienceCompany: meta.experienceCompany || prev?.experienceCompany || '',
+      checkedAt: new Date().toISOString(),
+    };
+  }
+
+  snap.meta.lastRunAt = new Date().toISOString();
+  await alumniLib.writeSnapshot(ALUMNI_SNAPSHOT, snap);
+
+  if (!changes.length) return;
+  try {
+    await sendAlumniJobChangeEmail(changes);
+  } catch (e) {
+    console.error('[alumni] notify email failed', e);
+  }
+}
+
+async function sendReminderDueEmail(to, reminder) {
+  const from = String(process.env.SMTP_FROM || 'AI Compendium <noreply@localhost>').trim();
+  const transport = getMailTransport();
+  const due = new Date(reminder.dueAt);
+  const dueStr = due.toLocaleString('en-US', {
+    timeZone: process.env.REMINDER_DISPLAY_TZ || 'America/Chicago',
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+  const subject = `[MSAI CAT] Reminder: ${reminder.title}`;
+  const text = `${reminder.title}\n\nWhen: ${dueStr}\n\nOriginal:\n${reminder.rawText}`;
+  const html = `<p><strong>${escapeHtmlText(reminder.title)}</strong></p><p>When: ${escapeHtmlText(
+    dueStr,
+  )}</p><p style="white-space:pre-wrap">${escapeHtmlText(reminder.rawText)}</p>`;
+  await transport.sendMail({ from, to, subject, text, html });
+}
+
+async function runDueReminders() {
+  if (String(process.env.REMINDER_EMAIL_ENABLED || 'true').toLowerCase() === 'false') return;
+  const now = Date.now();
+  const pending = [];
+  await enqueueWrite(async () => {
+    const rdb = await readRemindersDB();
+    for (const r of rdb.reminders) {
+      if (r.sentAt) continue;
+      if (new Date(r.dueAt).getTime() > now) continue;
+      pending.push({ ...r });
+    }
+  });
+  for (const r of pending) {
+    try {
+      await sendReminderDueEmail(r.email, r);
+      await enqueueWrite(async () => {
+        const rdb = await readRemindersDB();
+        const x = rdb.reminders.find((y) => y.id === r.id);
+        if (x && !x.sentAt) {
+          x.sentAt = new Date().toISOString();
+          await writeRemindersDB(rdb);
+        }
+      });
+    } catch (e) {
+      console.error('[reminders] send failed', r.id, e.message);
+    }
+  }
 }
 
 function getAuthUserFromDB(req, db) {
@@ -1161,7 +1363,7 @@ app.get('/api/admin/users', async (req, res) => {
       id: u.id,
       email: u.email,
       name: u.name || '',
-      role: u.role === 'admin' ? 'admin' : 'user',
+      role: normalizePublicRole(u.role),
       createdAt: u.createdAt,
     }));
     res.json({ users });
@@ -1175,7 +1377,9 @@ app.patch('/api/admin/users/:id/role', async (req, res) => {
     const targetId = String(req.params.id || '').trim();
     const role = String(req.body?.role || '').trim().toLowerCase();
     if (!targetId) return res.status(400).json({ error: 'Missing user id' });
-    if (!['admin', 'user'].includes(role)) return res.status(400).json({ error: 'role must be admin or user' });
+    if (!['admin', 'user', 'superuser'].includes(role)) {
+      return res.status(400).json({ error: 'role must be admin, superuser, or user' });
+    }
 
     let updated = null;
     await enqueueWrite(async () => {
@@ -1208,6 +1412,141 @@ app.patch('/api/admin/users/:id/role', async (req, res) => {
     if (e && typeof e === 'object' && e.statusCode) {
       return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
     }
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
+app.get('/api/alumni', async (req, res) => {
+  try {
+    const db = await readDB();
+    const user = getAuthUserFromDB(req, db);
+    if (!user) return res.status(401).json({ error: 'Authentication required' });
+    if (!canAccessAlumniDirectory(user)) {
+      return res.status(403).json({ error: 'Admin or superuser access required' });
+    }
+    const data = await alumniLib.readAlumniPayload(ALUMNI_JSON);
+    const snap = await alumniLib.readSnapshot(ALUMNI_SNAPSHOT);
+    res.json({
+      importedAt: data.importedAt,
+      sourceSheet: data.sourceSheet,
+      rowCount: data.rowCount,
+      rows: data.rows,
+      lastLinkedInCheckAt: snap.meta?.lastRunAt || null,
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Alumni directory unavailable' });
+  }
+});
+
+app.get('/api/reminders', async (req, res) => {
+  try {
+    const db = await readDB();
+    const user = getAuthUserFromDB(req, db);
+    if (!user) return res.status(401).json({ error: 'Authentication required' });
+    if (!isAdminOrSuperuserRole(user)) {
+      return res.status(403).json({ error: 'Admin or superuser access required' });
+    }
+    const rdb = await readRemindersDB();
+    const mine = rdb.reminders
+      .filter((r) => r.userId === user.id)
+      .sort((a, b) => String(a.dueAt).localeCompare(String(b.dueAt)));
+    res.json({ reminders: mine });
+  } catch (e) {
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
+app.post('/api/reminders', async (req, res) => {
+  try {
+    const text = String(req.body?.text || '').trim();
+    const parsed = remindersLib.parseReminderNaturalLanguage(text);
+    if (parsed.error) return res.status(400).json({ error: parsed.error });
+
+    let created = null;
+    await enqueueWrite(async () => {
+      const db = await readDB();
+      sweepExpiredSessions(db);
+      const user = getAuthUserFromDB(req, db);
+      if (!user) {
+        const err = new Error('Authentication required');
+        err.statusCode = 401;
+        throw err;
+      }
+      if (!isAdminOrSuperuserRole(user)) {
+        const err = new Error('Admin or superuser access required');
+        err.statusCode = 403;
+        throw err;
+      }
+      const rdb = await readRemindersDB();
+      const rec = {
+        id: crypto.randomUUID(),
+        userId: user.id,
+        email: normalizeEmail(user.email),
+        title: parsed.title,
+        dueAt: parsed.dueAt,
+        rawText: parsed.rawText,
+        createdAt: new Date().toISOString(),
+        sentAt: null,
+      };
+      rdb.reminders.push(rec);
+      await writeRemindersDB(rdb);
+      created = rec;
+    });
+    res.json({ reminder: created });
+  } catch (e) {
+    if (e && typeof e === 'object' && e.statusCode) {
+      return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
+    }
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
+app.delete('/api/reminders/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id || '').trim();
+    if (!id) return res.status(400).json({ error: 'Missing id' });
+    await enqueueWrite(async () => {
+      const db = await readDB();
+      sweepExpiredSessions(db);
+      const user = getAuthUserFromDB(req, db);
+      if (!user) {
+        const err = new Error('Authentication required');
+        err.statusCode = 401;
+        throw err;
+      }
+      if (!isAdminOrSuperuserRole(user)) {
+        const err = new Error('Admin or superuser access required');
+        err.statusCode = 403;
+        throw err;
+      }
+      const rdb = await readRemindersDB();
+      const idx = rdb.reminders.findIndex((r) => r.id === id && r.userId === user.id);
+      if (idx === -1) {
+        const err = new Error('Not found');
+        err.statusCode = 404;
+        throw err;
+      }
+      rdb.reminders.splice(idx, 1);
+      await writeRemindersDB(rdb);
+    });
+    res.json({ ok: true });
+  } catch (e) {
+    if (e && typeof e === 'object' && e.statusCode) {
+      return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
+    }
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
+app.post('/api/admin/alumni/check-now', async (req, res) => {
+  try {
+    const db = await readDB();
+    const user = getAuthUserFromDB(req, db);
+    if (!user) return res.status(401).json({ error: 'Authentication required' });
+    if (!isAdminUser(user)) return res.status(403).json({ error: 'Admin access required' });
+    await runAlumniLinkedInDailyCheck();
+    res.json({ ok: true });
+  } catch (e) {
     res.status(500).json({ error: String(e?.message || e) });
   }
 });
@@ -1383,5 +1722,33 @@ app.post('/api/magic-page/logout', (req, res) => {
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 app.listen(PORT, () => {
   console.log(`AI compendium running on http://localhost:${PORT}`);
+  try {
+    const expr = String(process.env.ALUMNI_CRON || '0 8 * * *').trim();
+    const tz = String(process.env.ALUMNI_TZ || 'America/Chicago').trim();
+    cron.schedule(
+      expr,
+      () => {
+        runAlumniLinkedInDailyCheck().catch((e) => console.error('[alumni] scheduled check failed', e));
+      },
+      { timezone: tz },
+    );
+    console.log(`[alumni] LinkedIn snapshot check scheduled (${expr} ${tz})`);
+  } catch (e) {
+    console.warn('[alumni] cron schedule failed:', e.message);
+  }
+  try {
+    const reminderExpr = String(process.env.REMINDER_CRON || '*/15 * * * *').trim();
+    const reminderTz = String(process.env.REMINDER_TZ || 'America/Chicago').trim();
+    cron.schedule(
+      reminderExpr,
+      () => {
+        runDueReminders().catch((e) => console.error('[reminders] scheduled run failed', e));
+      },
+      { timezone: reminderTz },
+    );
+    console.log(`[reminders] due-email check scheduled (${reminderExpr} ${reminderTz})`);
+  } catch (e) {
+    console.warn('[reminders] cron schedule failed:', e.message);
+  }
 });
 

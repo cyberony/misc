@@ -2,3 +2,7 @@ node_modules
 .DS_Store
 .env
 
+# Runtime LinkedIn snapshot (regenerated daily; optional to ignore in git)
+data/alumni-linkedin-snapshot.json
+data/reminders.json
+
