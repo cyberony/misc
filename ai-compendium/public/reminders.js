@@ -74,6 +74,7 @@ function buildReminderCardHtml(r) {
   const headLine = formatChicagoDateTime(r.dueAt) || 'Reminder';
   const isArchived = !!(r.archivedAt || r.sentAt);
   const sent = isArchived ? ' · Archived' : '';
+  const recurrenceLine = r.recurrenceDisplay || '';
   const rid = r.id ? String(r.id) : '';
   const editBtn = isArchived
     ? ''
@@ -91,6 +92,13 @@ function buildReminderCardHtml(r) {
           <div class="reminder-card-label">Original request</div>
           <pre class="reminder-card-pre">${escapeHTML(r.rawText || '')}</pre>
         </div>
+        ${
+          recurrenceLine
+            ? `<div class="reminder-card-block"><div class="reminder-card-label">Recurrence</div><div class="reminder-card-meta">${escapeHTML(
+                recurrenceLine,
+              )}</div></div>`
+            : ''
+        }
       </article>
     `;
 }
@@ -259,7 +267,10 @@ async function runReminderPreview() {
   out.hidden = false;
   const src =
     data.source === 'openai' ? ' · AI' : data.source === 'chrono' ? ' · rules' : '';
-  out.textContent = `Will send at: ${data.dueDisplayChicago}${src}`;
+  const rec = String(data.recurrenceDisplay || '').trim();
+  out.textContent = rec
+    ? `Will send at: ${data.dueDisplayChicago}${src} · ${rec}`
+    : `Will send at: ${data.dueDisplayChicago}${src}`;
 }
 
 async function submitReminderNl() {
@@ -378,6 +389,17 @@ async function load() {
   }
 
   allRemindersCache = Array.isArray(data.reminders) ? data.reminders : [];
+  allRemindersCache = allRemindersCache.map((r) => {
+    if (r && typeof r === 'object' && r.recurrence && !r.recurrenceDisplay) {
+      const freq = String(r.recurrence.frequency || '').trim();
+      const interval = Number(r.recurrence.interval || 1);
+      if (freq === 'daily' || freq === 'weekly' || freq === 'monthly') {
+        const noun = freq === 'daily' ? 'day' : freq === 'weekly' ? 'week' : 'month';
+        r.recurrenceDisplay = interval === 1 ? `Every ${noun}` : `Every ${interval} ${noun}s`;
+      }
+    }
+    return r;
+  });
   gate.hidden = true;
   layout.hidden = false;
   wireRemindersSearch();

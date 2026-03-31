@@ -2731,6 +2731,12 @@ main.bug-reports-shell.reminders-shell{
   word-break: break-word;
   color: rgba(11, 18, 32, 0.82);
 }
+.reminder-card-meta{
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(11, 18, 32, 0.82);
+}
 /* Alumni directory (superuser / admin) — full width (overrides .bug-reports-shell 880px) */
 main.bug-reports-shell.alumni-shell {
   max-width: none;

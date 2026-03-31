@@ -141,6 +141,120 @@ function mergeDateOnlyWithTimeOnly(dateHit, timeHit) {
   return utcInstantForWallClock(y, m, day, hour, minute, tz);
 }
 
+function dateTimePartsInTimeZone(utcDate, timeZone) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(utcDate);
+  const y = Number(parts.find((p) => p.type === 'year')?.value);
+  const m = Number(parts.find((p) => p.type === 'month')?.value);
+  const day = Number(parts.find((p) => p.type === 'day')?.value);
+  const hour = Number(parts.find((p) => p.type === 'hour')?.value);
+  const minute = Number(parts.find((p) => p.type === 'minute')?.value);
+  return { y, m, day, hour, minute };
+}
+
+function addDaysYmd(y, m, day, n) {
+  const d = new Date(Date.UTC(y, m - 1, day + n, 12, 0, 0));
+  return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, day: d.getUTCDate() };
+}
+
+function addMonthsYmd(y, m, day, n) {
+  const first = new Date(Date.UTC(y, m - 1, 1, 12, 0, 0));
+  first.setUTCMonth(first.getUTCMonth() + n);
+  const yy = first.getUTCFullYear();
+  const mm = first.getUTCMonth() + 1;
+  const daysInTargetMonth = new Date(Date.UTC(yy, mm, 0)).getUTCDate();
+  const dd = Math.min(day, daysInTargetMonth);
+  return { y: yy, m: mm, day: dd };
+}
+
+function parseRecurrenceIntent(rawText, dueAtIso) {
+  const raw = String(rawText || '').trim();
+  const lower = raw.toLowerCase();
+  const due = new Date(dueAtIso);
+  if (!raw || Number.isNaN(due.getTime())) return { dueAt: dueAtIso, recurrence: null };
+
+  let frequency = null;
+  if (/\b(daily|every day|each day)\b/.test(lower)) frequency = 'daily';
+  else if (/\b(weekly|every week|each week)\b/.test(lower)) frequency = 'weekly';
+  else if (/\b(monthly|every month|each month)\b/.test(lower)) frequency = 'monthly';
+  if (!frequency) return { dueAt: dueAtIso, recurrence: null };
+
+  let interval = 1;
+  if (/\bevery other (day|week|month)\b/.test(lower)) interval = 2;
+  const everyN = lower.match(/\bevery\s+(\d+)\s+(day|days|week|weeks|month|months)\b/);
+  if (everyN) {
+    const parsed = Number(everyN[1]);
+    if (Number.isFinite(parsed) && parsed > 0) interval = parsed;
+  }
+
+  const recurrence = { frequency, interval };
+  let firstDueIso = due.toISOString();
+
+  // "daily next week at 11 am" => first fire at start of next week, stop end of next week.
+  if (frequency === 'daily' && /\bnext week\b/.test(lower)) {
+    const tz = reminderWallClockTimeZone();
+    const now = new Date();
+    const nowParts = dateTimePartsInTimeZone(now, tz);
+    if (nowParts.y && nowParts.m && nowParts.day) {
+      const todayNoonUtc = new Date(Date.UTC(nowParts.y, nowParts.m - 1, nowParts.day, 12, 0, 0));
+      const jsDow = todayNoonUtc.getUTCDay(); // 0..6, Sun..Sat
+      const mondayBased = jsDow === 0 ? 7 : jsDow; // 1..7
+      const daysUntilNextMonday = 8 - mondayBased;
+      const start = addDaysYmd(nowParts.y, nowParts.m, nowParts.day, daysUntilNextMonday);
+      const end = addDaysYmd(start.y, start.m, start.day, 6);
+      const dueParts = dateTimePartsInTimeZone(due, tz);
+      const hh = Number.isFinite(dueParts.hour) ? dueParts.hour : 9;
+      const mi = Number.isFinite(dueParts.minute) ? dueParts.minute : 0;
+      const startAt = utcInstantForWallClock(start.y, start.m, start.day, hh, mi, tz);
+      const endAt = utcInstantForWallClock(end.y, end.m, end.day, hh, mi, tz);
+      firstDueIso = startAt.toISOString();
+      recurrence.until = endAt.toISOString();
+    }
+  }
+
+  return { dueAt: firstDueIso, recurrence };
+}
+
+function getNextReminderDueAt(reminder) {
+  const rec = reminder && typeof reminder.recurrence === 'object' ? reminder.recurrence : null;
+  if (!rec) return null;
+  const current = new Date(reminder.dueAt);
+  if (Number.isNaN(current.getTime())) return null;
+  const tz = reminderWallClockTimeZone();
+  const parts = dateTimePartsInTimeZone(current, tz);
+  if (!parts.y || !parts.m || !parts.day) return null;
+  const interval = Number.isFinite(Number(rec.interval)) && Number(rec.interval) > 0 ? Number(rec.interval) : 1;
+  let nextYmd = null;
+  if (rec.frequency === 'daily') nextYmd = addDaysYmd(parts.y, parts.m, parts.day, interval);
+  else if (rec.frequency === 'weekly') nextYmd = addDaysYmd(parts.y, parts.m, parts.day, interval * 7);
+  else if (rec.frequency === 'monthly') nextYmd = addMonthsYmd(parts.y, parts.m, parts.day, interval);
+  else return null;
+  const next = utcInstantForWallClock(nextYmd.y, nextYmd.m, nextYmd.day, parts.hour, parts.minute, tz);
+  if (Number.isNaN(next.getTime())) return null;
+  if (rec.until) {
+    const until = new Date(rec.until);
+    if (!Number.isNaN(until.getTime()) && next.getTime() > until.getTime()) return null;
+  }
+  return next.toISOString();
+}
+
+function formatRecurrence(rec) {
+  if (!rec || typeof rec !== 'object') return '';
+  const interval = Number.isFinite(Number(rec.interval)) && Number(rec.interval) > 0 ? Number(rec.interval) : 1;
+  const noun =
+    rec.frequency === 'daily' ? 'day' : rec.frequency === 'weekly' ? 'week' : rec.frequency === 'monthly' ? 'month' : '';
+  if (!noun) return '';
+  if (interval === 1) return `Every ${noun}`;
+  return `Every ${interval} ${noun}s`;
+}
+
 function formatReminderDueDisplay(dueAtIso) {
   const due = new Date(dueAtIso);
   if (!dueAtIso || Number.isNaN(due.getTime())) return 'Reminder';
@@ -298,12 +412,24 @@ async function parseReminderNaturalLanguage(text) {
 
   const oai = await parseReminderDueDateWithOpenAI(raw);
   if (oai.dueAt) {
-    return { dueAt: oai.dueAt, rawText: raw, source: oai.source || 'openai' };
+    const withRecurrence = parseRecurrenceIntent(raw, oai.dueAt);
+    return {
+      dueAt: withRecurrence.dueAt,
+      rawText: raw,
+      source: oai.source || 'openai',
+      recurrence: withRecurrence.recurrence,
+    };
   }
 
   const fallback = parseReminderNaturalLanguageWithChrono(raw);
   if (fallback.error) return fallback;
-  return { ...fallback, source: 'chrono' };
+  const withRecurrence = parseRecurrenceIntent(raw, fallback.dueAt);
+  return {
+    dueAt: withRecurrence.dueAt,
+    rawText: raw,
+    source: 'chrono',
+    recurrence: withRecurrence.recurrence,
+  };
 }
 
 /**
@@ -318,4 +444,6 @@ module.exports = {
   parseReminderNaturalLanguageWithChrono,
   getReminderDisplayTitle,
   formatReminderDueDisplay,
+  getNextReminderDueAt,
+  formatRecurrence,
 };

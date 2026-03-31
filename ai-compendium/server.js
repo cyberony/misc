@@ -651,17 +651,28 @@ async function runDueReminders() {
   for (const r of pending) {
     try {
       await sendReminderDueEmail(r.email, r);
+      let didReschedule = false;
       await enqueueWrite(async () => {
         const rdb = await readRemindersDB();
         const x = rdb.reminders.find((y) => y.id === r.id);
         if (x && !x.sentAt) {
           const nowIso = new Date().toISOString();
-          x.sentAt = nowIso;
-          x.archivedAt = nowIso;
+          const nextDueAt = remindersLib.getNextReminderDueAt(x);
+          if (nextDueAt) {
+            x.lastSentAt = nowIso;
+            x.dueAt = nextDueAt;
+            x.sentAt = null;
+            x.archivedAt = null;
+            didReschedule = true;
+          } else {
+            x.sentAt = nowIso;
+            x.archivedAt = nowIso;
+          }
           await writeRemindersDB(rdb);
+          if (nextDueAt) scheduleReminderTimer(x);
         }
       });
-      clearReminderTimer(r.id);
+      if (!didReschedule) clearReminderTimer(r.id);
     } catch (e) {
       console.error('[reminders] send failed', r.id, e.message);
     }
@@ -1554,7 +1565,10 @@ app.get('/api/reminders', async (req, res) => {
       .sort((a, b) => String(a.dueAt).localeCompare(String(b.dueAt)))
       .map((r) => {
         const { title: _drop, ...rest } = r;
-        return rest;
+        return {
+          ...rest,
+          recurrenceDisplay: remindersLib.formatRecurrence(rest.recurrence || null),
+        };
       });
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.json({ reminders: mine });
@@ -1580,6 +1594,8 @@ app.post('/api/reminders/preview', async (req, res) => {
       dueAt: parsed.dueAt,
       rawText: parsed.rawText,
       dueDisplayChicago: remindersLib.formatReminderDueDisplay(parsed.dueAt),
+      recurrence: parsed.recurrence || null,
+      recurrenceDisplay: remindersLib.formatRecurrence(parsed.recurrence || null),
       source: parsed.source,
     });
   } catch (e) {
@@ -1615,6 +1631,7 @@ app.post('/api/reminders', async (req, res) => {
         email: normalizeEmail(user.email),
         dueAt: parsed.dueAt,
         rawText: parsed.rawText,
+        recurrence: parsed.recurrence || null,
         createdAt: new Date().toISOString(),
         sentAt: null,
         archivedAt: null,
@@ -1677,6 +1694,7 @@ async function handleReminderUpdate(req, res) {
         ...prev,
         rawText: parsed.rawText,
         dueAt: parsed.dueAt,
+        recurrence: parsed.recurrence || null,
         sentAt,
         archivedAt,
       };
