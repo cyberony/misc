@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MSAI · CAT — Apps</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" type="image/png" href="/assets/cat.png" />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <a class="brand-logo-link" href="/" aria-label="Home">
+          <img class="logo" src="/assets/cat.png" alt="CAT logo" />
+        </a>
+        <div>
+          <h1 class="brand-kicker" aria-label="MSAI · CAT">MSAI<span class="brand-interpunct" aria-hidden="true"> · </span>CAT</h1>
+          <p class="subtitle"><strong>Apps</strong> for internal use</p>
+        </div>
+      </div>
+      <div class="auth-strip">
+        <a class="auth-link auth-link-with-icon" href="/">
+          <span class="auth-link-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
+          </span>
+          <span>Home</span>
+        </a>
+      </div>
+    </header>
+
+    <div class="layout tools-hub-layout">
+      <aside class="sidebar tools-hub-sidebar">
+        <button
+          type="button"
+          class="panel tools-hub-card tools-hub-card-with-icon"
+          id="toolsHubAccountsCard"
+          data-tool="accounts"
+          hidden
+        >
+          <span class="tools-hub-card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </span>
+          <span class="tools-hub-card-body">
+            <h2>Account roles</h2>
+          </span>
+        </button>
+        <button type="button" class="panel tools-hub-card tools-hub-card-with-icon" data-tool="alumni">
+          <span class="tools-hub-card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="3" y1="15" x2="21" y2="15"></line>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <line x1="15" y1="3" x2="15" y2="21"></line>
+            </svg>
+          </span>
+          <span class="tools-hub-card-body">
+            <h2>Alumni</h2>
+          </span>
+        </button>
+        <button type="button" class="panel tools-hub-card tools-hub-card-with-icon" data-tool="reminders">
+          <span class="tools-hub-card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+          </span>
+          <span class="tools-hub-card-body">
+            <h2>Reminders</h2>
+          </span>
+        </button>
+      </aside>
+
+      <main class="content tools-hub-main">
+        <p id="toolsHubGate" class="bug-reports-gate muted" aria-live="polite">Checking access…</p>
+        <div id="toolsHubWorkspace" class="tools-hub-workspace" hidden>
+          <div id="toolsHubEmpty" class="tools-hub-empty" role="region" aria-label="Apps hub">
+            <p class="tools-hub-empty-heading">Choose an app from the left.</p>
+            <!-- Only visible on the empty hub (hidden with #toolsHubEmpty when an app iframe is open). -->
+            <div class="tools-hub-cat-wrap" aria-hidden="true">
+              <div class="tools-hub-cat-scene">
+                <div class="tools-hub-cat-lane">
+                  <div class="tools-hub-cat-mover">
+                    <img class="tools-hub-cat-img" src="/assets/cat.png" alt="" width="80" height="80" decoding="async" draggable="false" />
+                  </div>
+                  <canvas
+                    class="tools-hub-cat-draw"
+                    width="400"
+                    height="200"
+                    role="img"
+                    aria-label="Blue lasso: loop around the cat without crossing it to stop; click to release"
+                  ></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <iframe id="toolsHubFrame" class="tools-hub-frame" title="Tool" hidden></iframe>
+        </div>
+      </main>
+    </div>
+
+    <script src="/tools.js"></script>
+  </body>
+</html>

@@ -7,7 +7,7 @@ Admins and superusers can add reminders from the **Tools** panel on the home pag
 1. User enters free text, e.g. `Remind me April 12 that I need to email Jordan about the practicum`.
 2. The server uses **[chrono-node](https://github.com/wanasit/chrono)** to find the **first** date/time expression in the text and treats the rest as the **title**.
 3. If no date can be parsed, the API returns `400` with a short hint.
-4. A background job runs on a **cron schedule** (default: every **15 minutes**, `America/Chicago`) and sends email for any reminder where `dueAt <= now` and `sentAt` is still empty.
+4. The server schedules an in-memory **timer** per reminder and sends email when `dueAt` is reached (or immediately on startup if a due reminder was missed while offline).
 
 ## Data
 
@@ -20,6 +20,7 @@ Admins and superusers can add reminders from the **Tools** panel on the home pag
 |--------|------|--------|
 | `GET` | `/api/reminders` | Lists the current user’s reminders only. |
 | `POST` | `/api/reminders` | Body: `{ "text": "..." }`. Requires admin or superuser. |
+| `PUT` or `PATCH` | `/api/reminders/:id` | Body: `{ "text": "..." }`. Re-parses date; clears `sentAt` if `dueAt` changed so a new due time can email again. |
 | `DELETE` | `/api/reminders/:id` | Removes own reminder. |
 
 ## Environment

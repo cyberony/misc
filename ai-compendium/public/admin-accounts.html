@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MSAI · CAT — Feedback</title>
+    <title>MSAI · CAT — Account roles</title>
     <link rel="stylesheet" href="/styles.css" />
     <link rel="icon" type="image/png" href="/assets/cat.png" />
   </head>
@@ -18,9 +18,9 @@
           <h1 class="bug-reports-page-heading">
             <span class="brand-kicker">MSAI · CAT</span>
             <span class="bug-reports-heading-sep" aria-hidden="true">|</span>
-            <span class="bug-reports-heading-page">Feedback</span>
+            <span class="bug-reports-heading-page">Account roles</span>
           </h1>
-          <p class="subtitle">Bug reports and feature requests from the compendium</p>
+          <p class="subtitle">Set user, superuser, and admin roles</p>
         </div>
       </div>
       <div class="auth-strip">
@@ -35,9 +35,9 @@
       </div>
     </header>
 
-    <main class="bug-reports-shell">
-      <p id="bugReportsGate" class="bug-reports-gate muted" aria-live="polite">Checking access…</p>
-      <div id="bugReportsToolbar" class="bug-reports-toolbar" hidden>
+    <main class="bug-reports-shell admin-accounts-shell">
+      <p id="adminAccountsGate" class="bug-reports-gate muted" aria-live="polite">Checking access…</p>
+      <div id="adminAccountsToolbar" class="bug-reports-toolbar" hidden>
         <div class="content-search">
           <div class="search">
             <span class="search-icon" aria-hidden="true">
@@ -47,18 +47,20 @@
               </svg>
             </span>
             <input
-              id="bugReportsSearch"
+              id="adminUserSearch"
               type="search"
-              placeholder="Search title, description, area, contact, ref (B1, F2)…"
-              aria-label="Search feedback"
+              placeholder="Search email or name…"
+              aria-label="Search accounts"
               autocomplete="off"
             />
           </div>
         </div>
       </div>
-      <div id="bugReportsList" class="bug-reports-list" hidden></div>
+      <section id="adminAccountsSection" class="admin-accounts-section" hidden>
+        <div id="adminUserList" class="admin-user-list bug-reports-list"></div>
+      </section>
     </main>
 
-    <script src="/bug-reports.js"></script>
+    <script src="/admin-accounts.js"></script>
   </body>
 </html>

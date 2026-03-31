@@ -9,6 +9,7 @@ const nodemailer = require('nodemailer');
 const cron = require('node-cron');
 const alumniLib = require('./lib/alumni');
 const remindersLib = require('./lib/reminders');
+const XLSX = require('xlsx');
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -625,17 +626,12 @@ async function runAlumniLinkedInDailyCheck() {
 async function sendReminderDueEmail(to, reminder) {
   const from = String(process.env.SMTP_FROM || 'AI Compendium <noreply@localhost>').trim();
   const transport = getMailTransport();
-  const due = new Date(reminder.dueAt);
-  const dueStr = due.toLocaleString('en-US', {
-    timeZone: process.env.REMINDER_DISPLAY_TZ || 'America/Chicago',
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-  const subject = `[MSAI CAT] Reminder: ${reminder.title}`;
-  const text = `${reminder.title}\n\nWhen: ${dueStr}\n\nOriginal:\n${reminder.rawText}`;
-  const html = `<p><strong>${escapeHtmlText(reminder.title)}</strong></p><p>When: ${escapeHtmlText(
-    dueStr,
-  )}</p><p style="white-space:pre-wrap">${escapeHtmlText(reminder.rawText)}</p>`;
+  const title = remindersLib.getReminderDisplayTitle(reminder);
+  const subject = `[MSAI CAT] Reminder: ${title}`;
+  const text = `${title}\n\nOriginal:\n${reminder.rawText}`;
+  const html = `<p><strong>${escapeHtmlText(title)}</strong></p><p style="white-space:pre-wrap">${escapeHtmlText(
+    reminder.rawText,
+  )}</p>`;
   await transport.sendMail({ from, to, subject, text, html });
 }
 
@@ -647,6 +643,7 @@ async function runDueReminders() {
     const rdb = await readRemindersDB();
     for (const r of rdb.reminders) {
       if (r.sentAt) continue;
+      if (r.archivedAt) continue;
       if (new Date(r.dueAt).getTime() > now) continue;
       pending.push({ ...r });
     }
@@ -658,13 +655,67 @@ async function runDueReminders() {
         const rdb = await readRemindersDB();
         const x = rdb.reminders.find((y) => y.id === r.id);
         if (x && !x.sentAt) {
-          x.sentAt = new Date().toISOString();
+          const nowIso = new Date().toISOString();
+          x.sentAt = nowIso;
+          x.archivedAt = nowIso;
           await writeRemindersDB(rdb);
         }
       });
+      clearReminderTimer(r.id);
     } catch (e) {
       console.error('[reminders] send failed', r.id, e.message);
     }
+  }
+}
+
+const reminderTimers = new Map();
+const MAX_TIMEOUT_MS = 2147483647;
+
+function clearReminderTimer(reminderId) {
+  const id = reminderId == null ? '' : String(reminderId);
+  if (!id) return;
+  const t = reminderTimers.get(id);
+  if (t) clearTimeout(t);
+  reminderTimers.delete(id);
+}
+
+function scheduleReminderTimer(reminder) {
+  const id = reminder?.id == null ? '' : String(reminder.id);
+  if (!id) return;
+  clearReminderTimer(id);
+  if (reminder.sentAt || reminder.archivedAt) return;
+  const dueMs = new Date(reminder.dueAt).getTime();
+  if (!Number.isFinite(dueMs)) return;
+  const delay = dueMs - Date.now();
+  if (delay <= 0) {
+    runDueReminders().catch((e) => console.error('[reminders] immediate timer run failed', e));
+    return;
+  }
+  const waitMs = Math.min(delay, MAX_TIMEOUT_MS);
+  const timeout = setTimeout(async () => {
+    reminderTimers.delete(id);
+    if (waitMs < delay) {
+      try {
+        const rdb = await readRemindersDB();
+        const latest = rdb.reminders.find((r) => String(r.id) === id);
+        if (latest) scheduleReminderTimer(latest);
+      } catch (e) {
+        console.error('[reminders] long-delay reschedule failed', e.message);
+      }
+      return;
+    }
+    runDueReminders().catch((e) => console.error('[reminders] timer run failed', e));
+  }, waitMs);
+  reminderTimers.set(id, timeout);
+}
+
+async function hydrateReminderTimersFromDB() {
+  try {
+    const rdb = await readRemindersDB();
+    for (const r of rdb.reminders) scheduleReminderTimer(r);
+    console.log(`[reminders] timer scheduler hydrated (${rdb.reminders.length} reminders)`);
+  } catch (e) {
+    console.warn('[reminders] timer hydration failed:', e.message);
   }
 }
 
@@ -1438,6 +1489,51 @@ app.get('/api/alumni', async (req, res) => {
   }
 });
 
+function alumniRowToXlsxRecord(row) {
+  const s = (v) => (v == null ? '' : String(v));
+  return {
+    'Graduation Term': s(row.graduationTerm),
+    Last: s(row.last),
+    First: s(row.first),
+    Company: s(row.company),
+    Title: s(row.title),
+    Industry: s(row.industry),
+    'Personal Email': s(row.personalEmail),
+    'LinkedIn Profile': s(row.linkedinUrl),
+    'Date of Last Contact': s(row.dateOfLastContact),
+    Notes: s(row.notes),
+    'Story Published Date': s(row.storyPublishedDate),
+    Capstone: s(row.capstone),
+    Internship: s(row.internship),
+    Practicum: s(row.practicum),
+  };
+}
+
+app.get('/api/alumni/export.xlsx', async (req, res) => {
+  try {
+    const db = await readDB();
+    const user = getAuthUserFromDB(req, db);
+    if (!user) return res.status(401).json({ error: 'Authentication required' });
+    if (!canAccessAlumniDirectory(user)) {
+      return res.status(403).json({ error: 'Admin or superuser access required' });
+    }
+    const data = await alumniLib.readAlumniPayload(ALUMNI_JSON);
+    const rows = Array.isArray(data.rows) ? data.rows : [];
+    const sheetRows = rows.map(alumniRowToXlsxRecord);
+    const sheetName = (data.sourceSheet && String(data.sourceSheet).slice(0, 31)) || 'Alumni';
+    const ws = XLSX.utils.json_to_sheet(sheetRows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+    const filename = 'MSAI_Alumni_Directory.xlsx';
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(buf);
+  } catch (e) {
+    res.status(500).json({ error: 'Export failed' });
+  }
+});
+
 app.get('/api/reminders', async (req, res) => {
   try {
     const db = await readDB();
@@ -1447,10 +1543,45 @@ app.get('/api/reminders', async (req, res) => {
       return res.status(403).json({ error: 'Admin or superuser access required' });
     }
     const rdb = await readRemindersDB();
+    const wantArchived = String(req.query?.archived || '').trim() === '1';
+    const uid = (u) => (u == null ? '' : String(u));
     const mine = rdb.reminders
-      .filter((r) => r.userId === user.id)
-      .sort((a, b) => String(a.dueAt).localeCompare(String(b.dueAt)));
+      .filter((r) => {
+        if (uid(r.userId) !== uid(user.id)) return false;
+        const isArchived = !!(r.archivedAt || r.sentAt);
+        return wantArchived ? isArchived : !isArchived;
+      })
+      .sort((a, b) => String(a.dueAt).localeCompare(String(b.dueAt)))
+      .map((r) => {
+        const { title: _drop, ...rest } = r;
+        return rest;
+      });
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.json({ reminders: mine });
+  } catch (e) {
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+});
+
+/** Parse-only: same rules as create/update so you can see the resolved due time before saving. */
+app.post('/api/reminders/preview', async (req, res) => {
+  try {
+    const db = await readDB();
+    const user = getAuthUserFromDB(req, db);
+    if (!user) return res.status(401).json({ error: 'Authentication required' });
+    if (!isAdminOrSuperuserRole(user)) {
+      return res.status(403).json({ error: 'Admin or superuser access required' });
+    }
+    const text = String(req.body?.text || '').trim();
+    const parsed = await remindersLib.parseReminderNaturalLanguage(text);
+    if (parsed.error) return res.status(400).json({ error: parsed.error });
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({
+      dueAt: parsed.dueAt,
+      rawText: parsed.rawText,
+      dueDisplayChicago: remindersLib.formatReminderDueDisplay(parsed.dueAt),
+      source: parsed.source,
+    });
   } catch (e) {
     res.status(500).json({ error: String(e?.message || e) });
   }
@@ -1459,7 +1590,7 @@ app.get('/api/reminders', async (req, res) => {
 app.post('/api/reminders', async (req, res) => {
   try {
     const text = String(req.body?.text || '').trim();
-    const parsed = remindersLib.parseReminderNaturalLanguage(text);
+    const parsed = await remindersLib.parseReminderNaturalLanguage(text);
     if (parsed.error) return res.status(400).json({ error: parsed.error });
 
     let created = null;
@@ -1482,17 +1613,18 @@ app.post('/api/reminders', async (req, res) => {
         id: crypto.randomUUID(),
         userId: user.id,
         email: normalizeEmail(user.email),
-        title: parsed.title,
         dueAt: parsed.dueAt,
         rawText: parsed.rawText,
         createdAt: new Date().toISOString(),
         sentAt: null,
+        archivedAt: null,
       };
       rdb.reminders.push(rec);
       await writeRemindersDB(rdb);
       created = rec;
     });
     res.json({ reminder: created });
+    if (created) scheduleReminderTimer(created);
   } catch (e) {
     if (e && typeof e === 'object' && e.statusCode) {
       return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
@@ -1501,9 +1633,75 @@ app.post('/api/reminders', async (req, res) => {
   }
 });
 
+async function handleReminderUpdate(req, res) {
+  try {
+    const id = decodeURIComponent(String(req.params.id || '').trim());
+    if (!id) return res.status(400).json({ error: 'Missing id' });
+    const text = String(req.body?.text || '').trim();
+    const parsed = await remindersLib.parseReminderNaturalLanguage(text);
+    if (parsed.error) return res.status(400).json({ error: parsed.error });
+
+    const uid = (u) => (u == null ? '' : String(u));
+    let updated = null;
+    await enqueueWrite(async () => {
+      const db = await readDB();
+      sweepExpiredSessions(db);
+      const user = getAuthUserFromDB(req, db);
+      if (!user) {
+        const err = new Error('Authentication required');
+        err.statusCode = 401;
+        throw err;
+      }
+      if (!isAdminOrSuperuserRole(user)) {
+        const err = new Error('Admin or superuser access required');
+        err.statusCode = 403;
+        throw err;
+      }
+      const rdb = await readRemindersDB();
+      const idx = rdb.reminders.findIndex(
+        (r) => uid(r.id) === id && uid(r.userId) === uid(user.id),
+      );
+      if (idx === -1) {
+        const err = new Error('Not found');
+        err.statusCode = 404;
+        throw err;
+      }
+      const prev = rdb.reminders[idx];
+      let sentAt = prev.sentAt;
+      let archivedAt = prev.archivedAt || null;
+      if (parsed.dueAt !== prev.dueAt) {
+        sentAt = null;
+        archivedAt = null;
+      }
+      rdb.reminders[idx] = {
+        ...prev,
+        rawText: parsed.rawText,
+        dueAt: parsed.dueAt,
+        sentAt,
+        archivedAt,
+      };
+      await writeRemindersDB(rdb);
+      updated = rdb.reminders[idx];
+    });
+    res.json({ reminder: updated });
+    if (updated) scheduleReminderTimer(updated);
+  } catch (e) {
+    if (e && typeof e === 'object' && e.statusCode) {
+      return res.status(e.statusCode).json({ error: String(e.message || 'Request failed') });
+    }
+    res.status(500).json({ error: String(e?.message || e) });
+  }
+}
+
+/* PUT + PATCH: some proxies only forward GET/POST; PUT is more common than PATCH. */
+app.put('/api/reminders/:id', handleReminderUpdate);
+app.patch('/api/reminders/:id', handleReminderUpdate);
+/* POST alias for environments that block PUT. */
+app.post('/api/reminders/:id/update', handleReminderUpdate);
+
 app.delete('/api/reminders/:id', async (req, res) => {
   try {
-    const id = String(req.params.id || '').trim();
+    const id = decodeURIComponent(String(req.params.id || '').trim());
     if (!id) return res.status(400).json({ error: 'Missing id' });
     await enqueueWrite(async () => {
       const db = await readDB();
@@ -1520,14 +1718,19 @@ app.delete('/api/reminders/:id', async (req, res) => {
         throw err;
       }
       const rdb = await readRemindersDB();
-      const idx = rdb.reminders.findIndex((r) => r.id === id && r.userId === user.id);
+      const uid = (u) => (u == null ? '' : String(u));
+      const idx = rdb.reminders.findIndex(
+        (r) => uid(r.id) === id && uid(r.userId) === uid(user.id),
+      );
       if (idx === -1) {
         const err = new Error('Not found');
         err.statusCode = 404;
         throw err;
       }
+      const removed = rdb.reminders[idx];
       rdb.reminders.splice(idx, 1);
       await writeRemindersDB(rdb);
+      clearReminderTimer(removed?.id);
     });
     res.json({ ok: true });
   } catch (e) {
@@ -1737,18 +1940,10 @@ app.listen(PORT, () => {
     console.warn('[alumni] cron schedule failed:', e.message);
   }
   try {
-    const reminderExpr = String(process.env.REMINDER_CRON || '*/15 * * * *').trim();
-    const reminderTz = String(process.env.REMINDER_TZ || 'America/Chicago').trim();
-    cron.schedule(
-      reminderExpr,
-      () => {
-        runDueReminders().catch((e) => console.error('[reminders] scheduled run failed', e));
-      },
-      { timezone: reminderTz },
-    );
-    console.log(`[reminders] due-email check scheduled (${reminderExpr} ${reminderTz})`);
+    hydrateReminderTimersFromDB().catch(() => {});
+    runDueReminders().catch((e) => console.error('[reminders] startup run failed', e));
   } catch (e) {
-    console.warn('[reminders] cron schedule failed:', e.message);
+    console.warn('[reminders] timer schedule failed:', e.message);
   }
 });
 

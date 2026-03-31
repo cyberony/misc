@@ -11,7 +11,9 @@
     <div class="bg" aria-hidden="true"></div>
     <header class="topbar bug-reports-topbar">
       <div class="brand">
-        <img class="logo" src="/assets/cat.png" alt="CAT logo" />
+        <a class="brand-logo-link" href="/" aria-label="Home">
+          <img class="logo" src="/assets/cat.png" alt="CAT logo" />
+        </a>
         <div>
           <h1 class="bug-reports-page-heading">
             <span class="brand-kicker">MSAI · CAT</span>
@@ -37,13 +39,21 @@
       <p id="alumniGate" class="bug-reports-gate muted" aria-live="polite">Checking access…</p>
       <div id="alumniMetaBlock" class="alumni-meta-block muted" hidden>
         <span id="alumniMeta" class="alumni-header-meta" role="status"></span>
+        <button type="button" id="alumniDownloadXlsx" class="alumni-download-xlsx">
+          Download .xlsx
+        </button>
       </div>
       <div id="alumniTableWrap" class="alumni-table-wrap" hidden>
         <table class="alumni-table" id="alumniTable">
           <thead>
             <tr>
               <th scope="col">
-                <button type="button" class="alumni-th-btn" data-sort-key="graduationTerm">Term<span class="alumni-sort-ind" aria-hidden="true"></span></button>
+                <button
+                  type="button"
+                  class="alumni-th-btn"
+                  data-sort-key="graduationTerm"
+                  aria-label="Sort by grad term"
+                >Grad term<span class="alumni-sort-ind" aria-hidden="true"></span></button>
               </th>
               <th scope="col">
                 <button type="button" class="alumni-th-btn" data-sort-key="name">Name<span class="alumni-sort-ind" aria-hidden="true"></span></button>
@@ -59,9 +69,6 @@
               </th>
               <th scope="col">
                 <button type="button" class="alumni-th-btn" data-sort-key="personalEmail">Email<span class="alumni-sort-ind" aria-hidden="true"></span></button>
-              </th>
-              <th scope="col">
-                <button type="button" class="alumni-th-btn" data-sort-key="linkedinUrl">LinkedIn<span class="alumni-sort-ind" aria-hidden="true"></span></button>
               </th>
               <th scope="col">
                 <button type="button" class="alumni-th-btn" data-sort-key="capstone">Capstone<span class="alumni-sort-ind" aria-hidden="true"></span></button>

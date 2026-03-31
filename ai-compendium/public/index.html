@@ -12,7 +12,9 @@
 
     <header class="topbar">
       <div class="brand">
-        <img class="logo" src="/assets/cat.png" alt="CAT logo" />
+        <a class="brand-logo-link" href="/" aria-label="Home">
+          <img class="logo" src="/assets/cat.png" alt="CAT logo" />
+        </a>
         <div>
           <h1 class="brand-kicker" aria-label="MSAI · CAT acronym">MSAI<span class="brand-interpunct" id="brandInterpunct" aria-hidden="true"> · </span>CAT</h1>
           <p class="subtitle"><strong>Compendium of AI Tools</strong> to make videos, audio, text-to-speech, NLP, and more</p>
@@ -70,21 +72,6 @@
           </span>
           <span>Feedback</span>
         </a>
-        <a id="toolsIconLink" class="auth-link tools-icon-link" href="#" hidden aria-label="Tools" title="Tools">
-          <span class="auth-link-icon" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="4" y1="21" x2="4" y2="14"></line>
-              <line x1="4" y1="10" x2="4" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12" y2="3"></line>
-              <line x1="20" y1="21" x2="20" y2="16"></line>
-              <line x1="20" y1="12" x2="20" y2="3"></line>
-              <line x1="1" y1="14" x2="7" y2="14"></line>
-              <line x1="9" y1="8" x2="15" y2="8"></line>
-              <line x1="17" y1="16" x2="23" y2="16"></line>
-            </svg>
-          </span>
-        </a>
       </div>
     </header>
 
@@ -111,11 +98,38 @@
           <div id="tagList" class="chips"></div>
         </section>
 
-        <section id="adminAccountsPanel" class="panel admin-accounts-panel" hidden>
-          <h2>Account Roles</h2>
-          <input id="adminUserSearch" type="search" placeholder="Search accounts..." aria-label="Search accounts" />
-          <div id="adminUserList" class="admin-user-list"></div>
-        </section>
+        <!--
+          Apps: label first, then small tool icons (add more in .sidebar-apps-tool-icons).
+          Revert: restore a single .sidebar-apps-icon with the 4-square grid SVG before .sidebar-apps-label; remove .sidebar-apps-tool-icons.
+        -->
+        <a id="sidebarAppsLink" class="panel sidebar-apps-box" href="/tools.html" hidden aria-label="Apps" title="Apps">
+          <span class="sidebar-apps-label">Apps</span>
+          <span class="sidebar-apps-tool-icons" aria-hidden="true">
+            <span id="sidebarAppsAccountsIcon" class="sidebar-apps-tool-icon" title="Account roles" hidden>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </span>
+            <span class="sidebar-apps-tool-icon" title="Alumni table">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="3" y1="15" x2="21" y2="15"></line>
+                <line x1="9" y1="3" x2="9" y2="21"></line>
+                <line x1="15" y1="3" x2="15" y2="21"></line>
+              </svg>
+            </span>
+            <span class="sidebar-apps-tool-icon" title="Reminders">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+              </svg>
+            </span>
+          </span>
+        </a>
       </aside>
 
       <main class="content">
