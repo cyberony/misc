@@ -199,6 +199,24 @@ body{
   max-width: 520px;
 }
 
+/* Tight widths: stack top-right actions so they don't crowd the header. */
+@media (max-width: 860px){
+  .topbar{
+    align-items: flex-start;
+  }
+  .auth-strip{
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .admin-view-mode{
+    justify-content: flex-end;
+  }
+  .auth-link-with-icon{
+    justify-content: flex-end;
+  }
+}
+
 /* + and search share one row in main content */
 .content-plus-row{
   display: flex;
@@ -250,6 +268,7 @@ body{
   min-width: 0;
   box-sizing: border-box;
 }
+
 .add-resource-hint{
   margin: 0;
   font-size: 14px;
@@ -704,6 +723,16 @@ button.selected-label-chip:hover .selected-label-remove{
     /* Room for .grid card hover scale so edges aren’t clipped by the scroll box */
     padding: 12px 14px 22px 14px;
     scrollbar-gutter: stable;
+  }
+  /* Same horizontal inset as .content-grid-scroll so + / sort / labels line up with cards */
+  main.content > .content-plus-row{
+    padding: 2px 14px 8px;
+  }
+  main.content > .content-sort-row{
+    padding: 4px 14px 10px;
+  }
+  main.content > .content-selected-labels-row{
+    padding: 0 14px 12px;
   }
   #resourceGrid{
     min-height: 0;
@@ -2411,6 +2440,7 @@ textarea{ resize: vertical; }
   overflow: hidden;
 }
 /* `hidden` must win over component display rules, or empty state stays visible behind the iframe */
+.tools-hub-card[hidden],
 .tools-hub-empty[hidden],
 .tools-hub-frame[hidden]{
   display: none !important;

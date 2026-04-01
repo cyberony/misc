@@ -497,10 +497,8 @@ function updateSuperuserAppsLink() {
   link.hidden = !canSeeSuperuserAppsSidebar();
   const accountsIcon = $('#sidebarAppsAccountsIcon');
   if (accountsIcon) {
-    const r = String(state.currentUser?.role || '')
-      .trim()
-      .toLowerCase();
-    accountsIcon.hidden = r !== 'admin';
+    /* Roles app: real admins in admin view only — not superusers, not admin “view as” superuser/user */
+    accountsIcon.hidden = !isAdminModeActive();
   }
 }
 

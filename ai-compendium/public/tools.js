@@ -1,5 +1,24 @@
 const $ = (sel) => document.querySelector(sel);
 
+const ADMIN_VIEW_MODES = ['admin', 'superuser', 'user'];
+
+function normalizeAdminViewMode(raw) {
+  const s = String(raw || '').trim();
+  return ADMIN_VIEW_MODES.includes(s) ? s : 'admin';
+}
+
+/** Match home page: admin view-as mode from localStorage; only used when user.role is admin */
+function effectiveRoleFromMeUser(user) {
+  const r = String(user?.role || '')
+    .trim()
+    .toLowerCase();
+  if (r === 'admin') {
+    return normalizeAdminViewMode(localStorage.getItem('msai_admin_view_mode'));
+  }
+  if (r === 'superuser') return 'superuser';
+  return 'user';
+}
+
 const TOOL_SRC = {
   alumni: '/alumni-table.html?embed=1',
   reminders: '/reminders.html?embed=1',
@@ -426,7 +445,9 @@ async function init() {
   }
 
   const accountsCard = $('#toolsHubAccountsCard');
-  if (accountsCard) accountsCard.hidden = role !== 'admin';
+  if (accountsCard) {
+    accountsCard.hidden = effectiveRoleFromMeUser(data.user) !== 'admin';
+  }
 
   gate.hidden = true;
   workspace.hidden = false;

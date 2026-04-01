@@ -245,7 +245,12 @@ async function load() {
   const check = data.lastLinkedInCheckAt
     ? new Date(data.lastLinkedInCheckAt).toLocaleString()
     : 'never';
-  meta.textContent = `${data.rowCount || 0} rows · imported ${imported} · last LinkedIn snapshot run: ${check}`;
+  const synced = data.linkedInSyncedAt
+    ? new Date(data.linkedInSyncedAt).toLocaleString()
+    : '';
+  meta.textContent = `${data.rowCount || 0} rows · imported ${imported} · last LinkedIn snapshot run: ${check}${
+    synced ? ` · spreadsheet synced: ${synced}` : ''
+  }`;
 
   alumniRows = Array.isArray(data.rows) ? data.rows : [];
   wireSortHeader();

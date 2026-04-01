@@ -19,6 +19,8 @@ const DATA_DIR = path.join(PROJECT_ROOT, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'resources.json');
 const ALUMNI_JSON = path.join(DATA_DIR, 'alumni.json');
 const ALUMNI_SNAPSHOT = path.join(DATA_DIR, 'alumni-linkedin-snapshot.json');
+/** Same path as `scripts/import-alumni.js` — overwritten when LinkedIn merge or export refreshes Company/Title. */
+const ALUMNI_XLSX = path.join(DATA_DIR, 'alumni', 'MSAI_Alumni_Database.xlsx');
 const REMINDERS_FILE = path.join(DATA_DIR, 'reminders.json');
 
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
@@ -612,8 +614,25 @@ async function runAlumniLinkedInDailyCheck() {
     };
   }
 
-  snap.meta.lastRunAt = new Date().toISOString();
+  const runAt = new Date().toISOString();
+  snap.meta.lastRunAt = runAt;
   await alumniLib.writeSnapshot(ALUMNI_SNAPSHOT, snap);
+  try {
+    const nextAlumni = {
+      ...alumniData,
+      lastLinkedInCheckAt: runAt,
+    };
+    await fs.writeFile(ALUMNI_JSON, JSON.stringify(nextAlumni, null, 2), 'utf8');
+    alumniData = nextAlumni;
+  } catch (e) {
+    console.warn('[alumni] could not persist lastLinkedInCheckAt to alumni.json:', e.message);
+  }
+
+  try {
+    await persistAlumniWorkbookAfterSnapshotMerge(alumniData, snap);
+  } catch (e) {
+    console.error('[alumni] persist merged json/xlsx failed', e.message);
+  }
 
   if (!changes.length) return;
   try {
@@ -1488,12 +1507,15 @@ app.get('/api/alumni', async (req, res) => {
     }
     const data = await alumniLib.readAlumniPayload(ALUMNI_JSON);
     const snap = await alumniLib.readSnapshot(ALUMNI_SNAPSHOT);
+    const rows = Array.isArray(data.rows) ? data.rows : [];
+    const merged = alumniLib.mergeAlumniRowsWithSnapshot(rows, snap);
     res.json({
       importedAt: data.importedAt,
       sourceSheet: data.sourceSheet,
       rowCount: data.rowCount,
-      rows: data.rows,
-      lastLinkedInCheckAt: snap.meta?.lastRunAt || null,
+      rows: merged,
+      lastLinkedInCheckAt: data.lastLinkedInCheckAt || snap.meta?.lastRunAt || null,
+      linkedInSyncedAt: data.linkedInSyncedAt || null,
     });
   } catch (e) {
     res.status(500).json({ error: 'Alumni directory unavailable' });
@@ -1520,6 +1542,37 @@ function alumniRowToXlsxRecord(row) {
   };
 }
 
+function buildAlumniXlsxBuffer(mergedRows, sourceSheet) {
+  const sheetRows = mergedRows.map(alumniRowToXlsxRecord);
+  const sheetName = (sourceSheet && String(sourceSheet).slice(0, 31)) || 'Alumni';
+  const ws = XLSX.utils.json_to_sheet(sheetRows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+}
+
+/** Merge LinkedIn snapshot into rows; if Company/Title change, write alumni.json + source .xlsx (import column layout). */
+async function persistAlumniWorkbookAfterSnapshotMerge(alumniPayload, snap) {
+  const rows = Array.isArray(alumniPayload.rows) ? alumniPayload.rows : [];
+  const merged = alumniLib.mergeAlumniRowsWithSnapshot(rows, snap);
+  if (JSON.stringify(merged) === JSON.stringify(rows)) return;
+  const next = {
+    ...alumniPayload,
+    rows: merged,
+    linkedInSyncedAt: new Date().toISOString(),
+  };
+  await fs.writeFile(ALUMNI_JSON, JSON.stringify(next, null, 2), 'utf8');
+  const buf = buildAlumniXlsxBuffer(merged, next.sourceSheet);
+  await fs.mkdir(path.dirname(ALUMNI_XLSX), { recursive: true });
+  await fs.writeFile(ALUMNI_XLSX, buf);
+}
+
+async function writeAlumniSourceXlsxFromMergedRows(mergedRows, sourceSheet) {
+  const buf = buildAlumniXlsxBuffer(mergedRows, sourceSheet);
+  await fs.mkdir(path.dirname(ALUMNI_XLSX), { recursive: true });
+  await fs.writeFile(ALUMNI_XLSX, buf);
+}
+
 app.get('/api/alumni/export.xlsx', async (req, res) => {
   try {
     const db = await readDB();
@@ -1529,13 +1582,23 @@ app.get('/api/alumni/export.xlsx', async (req, res) => {
       return res.status(403).json({ error: 'Admin or superuser access required' });
     }
     const data = await alumniLib.readAlumniPayload(ALUMNI_JSON);
+    const snap = await alumniLib.readSnapshot(ALUMNI_SNAPSHOT);
     const rows = Array.isArray(data.rows) ? data.rows : [];
-    const sheetRows = rows.map(alumniRowToXlsxRecord);
-    const sheetName = (data.sourceSheet && String(data.sourceSheet).slice(0, 31)) || 'Alumni';
-    const ws = XLSX.utils.json_to_sheet(sheetRows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-    const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+    const merged = alumniLib.mergeAlumniRowsWithSnapshot(rows, snap);
+    const buf = buildAlumniXlsxBuffer(merged, data.sourceSheet);
+    try {
+      await writeAlumniSourceXlsxFromMergedRows(merged, data.sourceSheet);
+      const nextPayload = {
+        ...data,
+        rows: merged,
+        linkedInSyncedAt: new Date().toISOString(),
+      };
+      if (JSON.stringify(data.rows) !== JSON.stringify(merged)) {
+        await fs.writeFile(ALUMNI_JSON, JSON.stringify(nextPayload, null, 2), 'utf8');
+      }
+    } catch (e) {
+      console.warn('[alumni] export could not update source xlsx/json', e.message);
+    }
     const filename = 'MSAI_Alumni_Directory.xlsx';
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

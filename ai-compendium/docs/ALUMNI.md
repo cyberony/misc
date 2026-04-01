@@ -13,8 +13,8 @@ Related: **[REMINDERS.md](REMINDERS.md)** (same sidebar **Tools** panel).
 
 | File | Purpose |
 |------|---------|
-| `data/alumni/MSAI_Alumni_Database.xlsx` | **Source of truth** for the marketing spreadsheet. Replace this file when the spreadsheet is updated, then re-import (below). |
-| `data/alumni.json` | **Generated** JSON consumed by the server and API. **Do not edit by hand**; regenerate with `npm run import-alumni`. |
+| `data/alumni/MSAI_Alumni_Database.xlsx` | **Source spreadsheet** (same column headers as import). After a LinkedIn snapshot run or **Download .xlsx**, the server refreshes **Company** and **Title** from public LinkedIn meta (when available) and **rewrites this file** using the same columns as [`import-alumni.js`](../scripts/import-alumni.js) — no extra columns. |
+| `data/alumni.json` | JSON consumed by the server and API. Normally regenerated with `npm run import-alumni` after you replace the `.xlsx`. The server may also update **`Company` / `Title`** from the LinkedIn snapshot and set `linkedInSyncedAt` when it persists those merges. |
 | `data/alumni-linkedin-snapshot.json` | **Runtime** cache of the last LinkedIn “fingerprint” per profile URL, plus `meta.lastRunAt`. Listed in `.gitignore` so it is not committed by default (each deployment builds its own baseline). |
 
 ### Re-importing after spreadsheet changes
@@ -36,6 +36,11 @@ The server **does not** use the official LinkedIn API. It performs an **HTTP GET
 - **Schedule:** [node-cron](https://www.npmjs.com/package/node-cron) runs [`runAlumniLinkedInDailyCheck()`](../server.js) on a cron expression (default **`0 8 * * *`** at **`America/Chicago`**).
 - **First run** for a key: records a snapshot **without** emailing (no previous fingerprint to compare).
 - **Later runs:** if the fingerprint **differs** from the stored one, the change is collected and **one email** is sent listing all alumni with changes in that run.
+- After each run, the server **merges** the latest snapshot into **`Company` / `Title`** in `alumni.json` (when derivable) and **rewrites** `data/alumni/MSAI_Alumni_Database.xlsx` with the **same headers** as import.
+
+### Download .xlsx
+
+The alumni page download uses the same merge. The response file matches **`data/alumni/MSAI_Alumni_Database.xlsx`**, which is updated on download (and `alumni.json` is updated if merged rows differ from what was on disk).
 
 ### Limitations (important for operators)
 
