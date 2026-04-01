@@ -1872,7 +1872,60 @@ function wireUI() {
   wireBrandInterpunctEasterEgg();
 }
 
+/**
+ * Debug helper (opt-in): add ?widthProbe=1 on home to see live viewport width.
+ * Click the badge to "capture" the current width as your recommended min-width.
+ */
+function wireViewportWidthProbe() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('widthProbe') !== '1') return;
+
+  const badge = document.createElement('button');
+  badge.type = 'button';
+  badge.setAttribute('aria-live', 'polite');
+  badge.title = 'Click to capture current width';
+  badge.style.position = 'fixed';
+  badge.style.right = '12px';
+  badge.style.bottom = '12px';
+  badge.style.zIndex = '9999';
+  badge.style.border = '1px solid rgba(11, 18, 32, 0.2)';
+  badge.style.background = 'rgba(255, 255, 255, 0.96)';
+  badge.style.color = 'rgba(11, 18, 32, 0.88)';
+  badge.style.borderRadius = '10px';
+  badge.style.padding = '7px 10px';
+  badge.style.font = '600 12px/1.2 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+  badge.style.boxShadow = '0 6px 18px rgba(0, 0, 0, 0.12)';
+  badge.style.cursor = 'pointer';
+
+  let captured = null;
+  const update = () => {
+    const w = Math.round(window.innerWidth || 0);
+    const h = Math.round(window.innerHeight || 0);
+    badge.textContent = captured
+      ? `Viewport ${w}x${h} (captured: ${captured}px)`
+      : `Viewport ${w}x${h} (click to capture)`;
+  };
+
+  badge.addEventListener('click', async () => {
+    captured = Math.round(window.innerWidth || 0);
+    update();
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(String(captured));
+      }
+    } catch {
+      /* non-fatal */
+    }
+    console.log(`[widthProbe] captured min-width candidate: ${captured}px`);
+  });
+
+  window.addEventListener('resize', update);
+  document.body.appendChild(badge);
+  update();
+}
+
 wireUI();
+wireViewportWidthProbe();
 (async () => {
   try {
     await hydrateSession();
