@@ -53,17 +53,20 @@ main.reset-password-shell{
   filter: blur(0px);
 }
 
+/* Version stamp: same size/color/weight as plain text in .subtitle (the part outside <strong>). */
 .app-version-stamp{
   position: fixed;
   left: 10px;
   bottom: 8px;
+  margin: 0;
   font-size: 10px;
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.45);
-  letter-spacing: 0.02em;
+  line-height: normal;
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: normal;
   pointer-events: none;
   user-select: none;
-  z-index: 3;
+  z-index: 9999;
 }
 
 .topbar{
