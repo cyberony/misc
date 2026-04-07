@@ -107,6 +107,22 @@ function mergeCommentsPreservingNonEmpty(existingMap, incomingMap) {
   return { merged, preservedFromExisting };
 }
 
+/** One in-flight read-merge-write per file so concurrent POSTs cannot interleave. */
+const commentSaveChains = new Map();
+
+async function withSerializedCommentSave(outPath, fn) {
+  const prev = commentSaveChains.get(outPath) || Promise.resolve();
+  const next = prev.catch(() => {}).then(() => fn());
+  commentSaveChains.set(outPath, next);
+  try {
+    return await next;
+  } finally {
+    if (commentSaveChains.get(outPath) === next) {
+      commentSaveChains.delete(outPath);
+    }
+  }
+}
+
 function readAssignmentsManifest(assignmentsManifestPath) {
   try {
     const raw = fs.readFileSync(assignmentsManifestPath, 'utf8');
@@ -304,7 +320,7 @@ function mountInstructorReview(app, opts) {
     }
   });
 
-  app.post('/api/instructor-review/save-comments', requireMagic, json5mb, (req, res) => {
+  app.post('/api/instructor-review/save-comments', requireMagic, json5mb, async (req, res) => {
     const c = req.body?.comments;
     if (!c || typeof c !== 'object' || Array.isArray(c)) {
       return res.status(400).json({ error: 'Body must include a "comments" object' });
@@ -316,20 +332,25 @@ function mountInstructorReview(app, opts) {
     }
     if (!outPath) outPath = legacyComments;
     try {
-      fs.mkdirSync(path.dirname(outPath), { recursive: true });
-      const existing = readCommentsFileMap(outPath);
-      const { merged, preservedFromExisting } = mergeCommentsPreservingNonEmpty(existing, c);
-      const payload = {
-        comments: merged,
-        updatedAt: new Date().toISOString(),
-        note: COMMENTS_NOTE,
-      };
-      fs.writeFileSync(outPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+      const result = await withSerializedCommentSave(outPath, async () => {
+        fs.mkdirSync(path.dirname(outPath), { recursive: true });
+        const existing = readCommentsFileMap(outPath);
+        const { merged, preservedFromExisting } = mergeCommentsPreservingNonEmpty(existing, c);
+        const payload = {
+          comments: merged,
+          updatedAt: new Date().toISOString(),
+          note: COMMENTS_NOTE,
+        };
+        fs.writeFileSync(outPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+        return {
+          updatedAt: payload.updatedAt,
+          entriesWithText: countEntriesWithText(merged),
+          preservedFromExisting,
+        };
+      });
       return res.json({
         ok: true,
-        updatedAt: payload.updatedAt,
-        entriesWithText: countEntriesWithText(merged),
-        preservedFromExisting,
+        ...result,
       });
     } catch (e) {
       return res.status(500).json({ error: String(e.message || e) });

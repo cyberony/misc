@@ -263,7 +263,9 @@ async function loadAssignmentBundle(id) {
   }
   flushCommentToMap();
   await persistQueue;
-  currentAssignmentId = id;
+  /* Keep currentAssignmentId on the old assignment until comments are replaced.
+     Otherwise a save during the fetch below uses the NEW id with the OLD in-memory
+     map and can corrupt the wrong comments.json (e.g. wipe another assignment). */
   try {
     localStorage.setItem(LS_LAST_ASSIGNMENT, id);
   } catch (_) {
@@ -281,6 +283,7 @@ async function loadAssignmentBundle(id) {
     const comFile = await comRes.json();
     mergeCommentsFromFile(comFile);
   }
+  currentAssignmentId = id;
   renderStudents();
   if (bundle.students?.length) {
     selectStudent(bundle.students[0].id);
