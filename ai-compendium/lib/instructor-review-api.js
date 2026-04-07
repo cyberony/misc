@@ -47,6 +47,66 @@ const COMMENTS_NOTE =
 
 const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
 
+function normalizeCommentEntry(raw) {
+  const obj = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  const transcribe = typeof obj.transcribe === 'string' ? obj.transcribe : '';
+  const polish = typeof obj.polish === 'string' ? obj.polish : '';
+  const endRaw = Number(obj.polishTranscribeEnd);
+  const polishTranscribeEnd = Number.isFinite(endRaw) && endRaw >= 0 ? Math.floor(endRaw) : 0;
+  return { transcribe, polish, polishTranscribeEnd };
+}
+
+function entryHasText(entry) {
+  return Boolean(String(entry?.transcribe || '').trim() || String(entry?.polish || '').trim());
+}
+
+function normalizeCommentsObject(raw) {
+  const src = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  const out = {};
+  for (const [id, value] of Object.entries(src)) {
+    out[String(id)] = normalizeCommentEntry(value);
+  }
+  return out;
+}
+
+function countEntriesWithText(map) {
+  let n = 0;
+  for (const entry of Object.values(map || {})) {
+    if (entryHasText(entry)) n += 1;
+  }
+  return n;
+}
+
+function readCommentsFileMap(filePath) {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const parsed = JSON.parse(raw || '{}');
+    return normalizeCommentsObject(parsed?.comments);
+  } catch {
+    return {};
+  }
+}
+
+function mergeCommentsPreservingNonEmpty(existingMap, incomingMap) {
+  const existing = normalizeCommentsObject(existingMap);
+  const incoming = normalizeCommentsObject(incomingMap);
+  const allIds = new Set([...Object.keys(existing), ...Object.keys(incoming)]);
+  const merged = {};
+  let preservedFromExisting = 0;
+
+  for (const id of allIds) {
+    const ex = normalizeCommentEntry(existing[id]);
+    const inc = normalizeCommentEntry(incoming[id]);
+    if (!entryHasText(inc) && entryHasText(ex)) {
+      merged[id] = ex;
+      preservedFromExisting += 1;
+      continue;
+    }
+    merged[id] = inc;
+  }
+  return { merged, preservedFromExisting };
+}
+
 function readAssignmentsManifest(assignmentsManifestPath) {
   try {
     const raw = fs.readFileSync(assignmentsManifestPath, 'utf8');
@@ -255,15 +315,22 @@ function mountInstructorReview(app, opts) {
       return res.status(400).json({ error: 'Unknown assignmentId' });
     }
     if (!outPath) outPath = legacyComments;
-    const payload = {
-      comments: c,
-      updatedAt: new Date().toISOString(),
-      note: COMMENTS_NOTE,
-    };
     try {
       fs.mkdirSync(path.dirname(outPath), { recursive: true });
+      const existing = readCommentsFileMap(outPath);
+      const { merged, preservedFromExisting } = mergeCommentsPreservingNonEmpty(existing, c);
+      const payload = {
+        comments: merged,
+        updatedAt: new Date().toISOString(),
+        note: COMMENTS_NOTE,
+      };
       fs.writeFileSync(outPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
-      return res.json({ ok: true, updatedAt: payload.updatedAt });
+      return res.json({
+        ok: true,
+        updatedAt: payload.updatedAt,
+        entriesWithText: countEntriesWithText(merged),
+        preservedFromExisting,
+      });
     } catch (e) {
       return res.status(500).json({ error: String(e.message || e) });
     }
