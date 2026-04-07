@@ -1,5 +1,7 @@
 const LS_COMMENTS_STORE = "aiPerspectives2026.v2.commentsByAssignment";
 const LS_KEY_LEGACY = "aiPerspectives2026.v1.comments";
+/** Set after one-time migration of legacy local comment cache into server files. */
+const LS_COMMENTS_MIGRATED_TO_FILE = "aiPerspectives2026.v1.commentsMigratedToFile";
 const LS_LAST_ASSIGNMENT = "aiPerspectives2026.v1.lastAssignmentId";
 /** Override base URL only if polish is on another host (optional). */
 const LS_POLISH_URL = "aiPerspectives2026.v1.polishProxy";
@@ -126,9 +128,8 @@ let comments = {};
 let assignmentManifest = [];
 let currentAssignmentId = null;
 let selectedId = null;
-let saveTimer = null;
-let serverSaveTimer = null;
-const SERVER_SAVE_DEBOUNCE_MS = 1200;
+/** Serialize server writes so each text change persists in order. */
+let persistQueue = Promise.resolve();
 let _polishBusy = false;
 /** While MediaRecorder runs: how this capture will be used after transcribe. */
 let activeRecordingKind = null; // null | "plain" | "raw" | "polish"
@@ -177,44 +178,80 @@ function formatMetaLine() {
   return `${title} · ${n} students · ${src}`;
 }
 
-function loadCommentsStoreFromLocalStorage() {
+/**
+ * One-time: old builds cached comments in localStorage. Push any non-empty data to server files, then drop the cache.
+ * Source of truth after this is `data/.../comments.json` only.
+ */
+async function migrateLegacyLocalCommentsToServerOnce() {
+  try {
+    if (localStorage.getItem(LS_COMMENTS_MIGRATED_TO_FILE) === "1") return;
+  } catch {
+    return;
+  }
+  let store = null;
   try {
     const raw = localStorage.getItem(LS_COMMENTS_STORE);
     if (raw) {
       const o = JSON.parse(raw);
-      if (o && typeof o === "object" && !Array.isArray(o)) {
-        const out = {};
-        for (const k of Object.keys(o)) {
-          const v = o[k];
-          if (v && typeof v === "object" && !Array.isArray(v)) {
-            out[k] = normalizeCommentsObject(v);
-          }
-        }
-        return out;
-      }
+      if (o && typeof o === "object" && !Array.isArray(o)) store = o;
     }
-    const leg = localStorage.getItem(LS_KEY_LEGACY);
-    if (leg) {
-      const o = JSON.parse(leg);
-      const flat = normalizeCommentsObject(o && typeof o === "object" ? o : {});
-      const migrated = { "thoughts-on-ai": flat };
-      localStorage.setItem(LS_COMMENTS_STORE, JSON.stringify(migrated));
-      return migrated;
+    if (!store) {
+      const leg = localStorage.getItem(LS_KEY_LEGACY);
+      if (leg) {
+        const o = JSON.parse(leg);
+        const flat = normalizeCommentsObject(o && typeof o === "object" ? o : {});
+        store = { "thoughts-on-ai": flat };
+      }
     }
   } catch (e) {
     console.warn(e);
   }
-  return {};
-}
+  if (!store || typeof store !== "object") {
+    try {
+      localStorage.setItem(LS_COMMENTS_MIGRATED_TO_FILE, "1");
+    } catch {
+      /* ignore */
+    }
+    return;
+  }
 
-function writeCurrentAssignmentIntoStore() {
-  if (!currentAssignmentId) return;
-  const store = loadCommentsStoreFromLocalStorage();
-  store[currentAssignmentId] = normalizeCommentsObject(comments);
+  let failed = 0;
+  for (const assignmentId of Object.keys(store)) {
+    const rawMap = store[assignmentId];
+    if (!rawMap || typeof rawMap !== "object" || Array.isArray(rawMap)) continue;
+    const c = normalizeCommentsObject(rawMap);
+    let hasText = false;
+    for (const v of Object.values(c)) {
+      if (v && (String(v.transcribe || "").trim() || String(v.polish || "").trim())) {
+        hasText = true;
+        break;
+      }
+    }
+    if (!hasText) continue;
+    try {
+      const res = await fetch(`${REVIEW_API_PREFIX}/save-comments`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assignmentId, comments: c }),
+      });
+      if (!res.ok) {
+        failed += 1;
+        console.warn("migrate comments failed for", assignmentId, res.status);
+      }
+    } catch (e) {
+      failed += 1;
+      console.warn("migrate comments", assignmentId, e);
+    }
+  }
   try {
-    localStorage.setItem(LS_COMMENTS_STORE, JSON.stringify(store));
-  } catch (e) {
-    console.warn("localStorage save failed:", e);
+    if (failed === 0) {
+      localStorage.removeItem(LS_COMMENTS_STORE);
+      localStorage.removeItem(LS_KEY_LEGACY);
+      localStorage.setItem(LS_COMMENTS_MIGRATED_TO_FILE, "1");
+    }
+  } catch {
+    /* ignore */
   }
 }
 
@@ -225,7 +262,7 @@ async function loadAssignmentBundle(id) {
     return;
   }
   flushCommentToMap();
-  writeCurrentAssignmentIntoStore();
+  await persistQueue;
   currentAssignmentId = id;
   try {
     localStorage.setItem(LS_LAST_ASSIGNMENT, id);
@@ -244,10 +281,6 @@ async function loadAssignmentBundle(id) {
     const comFile = await comRes.json();
     mergeCommentsFromFile(comFile);
   }
-  const store = loadCommentsStoreFromLocalStorage();
-  const fromStore = store[id] && typeof store[id] === "object" ? store[id] : {};
-  comments = normalizeCommentsObject({ ...comments, ...fromStore });
-  saveCommentsToLocalStorage();
   renderStudents();
   if (bundle.students?.length) {
     selectStudent(bundle.students[0].id);
@@ -295,7 +328,7 @@ function persistCommentsFromDom() {
     polish: pl.value,
     polishTranscribeEnd: cur.polishTranscribeEnd,
   };
-  saveCommentsToLocalStorage();
+  schedulePersistCommentsToFile();
 }
 
 /** MediaRecorder dictation (OpenAI Whisper via server — no Google speech API). */
@@ -403,10 +436,6 @@ function wireAssignmentSelect() {
   sel.onchange = async () => {
     const next = sel.value;
     if (next === currentAssignmentId) return;
-    flushCommentToMap();
-    writeCurrentAssignmentIntoStore();
-    clearTimeout(serverSaveTimer);
-    serverSaveTimer = null;
     try {
       await loadAssignmentBundle(next);
     } catch (err) {
@@ -414,17 +443,6 @@ function wireAssignmentSelect() {
       toast("Could not load assignment");
     }
   };
-}
-
-function removeAssignmentFromLocalStore(id) {
-  if (!id) return;
-  try {
-    const store = loadCommentsStoreFromLocalStorage();
-    delete store[id];
-    localStorage.setItem(LS_COMMENTS_STORE, JSON.stringify(store));
-  } catch (e) {
-    console.warn(e);
-  }
 }
 
 function closeUploadModal() {
@@ -556,7 +574,6 @@ function wireDeleteAssignment() {
         toast(data.error || `Delete failed (${res.status})`);
         return;
       }
-      removeAssignmentFromLocalStore(id);
       applyServerAssignmentsList(data.assignments);
       if (data.assignments.length === 0) {
         abortRecording();
@@ -618,33 +635,30 @@ function wireReviewHomeLogout() {
   });
 }
 
-function saveCommentsToLocalStorage() {
-  writeCurrentAssignmentIntoStore();
-  scheduleCommentsServerSave();
+/** Persist comments to server files under data/instructor-review/assignments/.../comments.json. */
+function schedulePersistCommentsToFile() {
+  const assignmentId = currentAssignmentId;
+  const commentsSnapshot = normalizeCommentsObject(comments);
+  persistQueue = persistQueue
+    .then(() => pushCommentsToServer(assignmentId, commentsSnapshot))
+    .catch(() => false);
 }
 
-function scheduleCommentsServerSave() {
-  clearTimeout(serverSaveTimer);
-  serverSaveTimer = setTimeout(() => {
-    serverSaveTimer = null;
-    void pushCommentsToServer();
-  }, SERVER_SAVE_DEBOUNCE_MS);
-}
-
-async function pushCommentsToServer() {
-  if (!currentAssignmentId) return;
+async function pushCommentsToServer(assignmentId = currentAssignmentId, commentsPayload = comments) {
+  if (!assignmentId) return false;
   try {
     const res = await fetch(`${REVIEW_API_PREFIX}/save-comments`, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        assignmentId: currentAssignmentId,
-        comments: normalizeCommentsObject(comments),
+        assignmentId,
+        comments: normalizeCommentsObject(commentsPayload),
       }),
     });
-    if (!res.ok) return;
+    return res.ok;
   } catch {
-    /* static file server, offline, or wrong host */
+    return false;
   }
 }
 
@@ -660,6 +674,7 @@ function beaconSaveCommentsToServer() {
     if (navigator.sendBeacon?.(`${REVIEW_API_PREFIX}/save-comments`, blob)) return;
     void fetch(`${REVIEW_API_PREFIX}/save-comments`, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body,
       keepalive: true,
@@ -670,12 +685,7 @@ function beaconSaveCommentsToServer() {
 }
 
 function flushPersistenceOnPageExit() {
-  clearTimeout(saveTimer);
-  saveTimer = null;
-  clearTimeout(serverSaveTimer);
-  serverSaveTimer = null;
   flushCommentToMap();
-  writeCurrentAssignmentIntoStore();
   beaconSaveCommentsToServer();
 }
 
@@ -1233,7 +1243,7 @@ function onImportFile(e) {
         };
         renderStudents();
       }
-      saveCommentsToLocalStorage();
+      schedulePersistCommentsToFile();
       void pushCommentsToServer();
       if (selectedId) {
         const ent = normalizeCommentEntry(comments[selectedId]);
@@ -1289,10 +1299,7 @@ function wireCommentBox() {
     if (tr && c && c.polishTranscribeEnd > tr.value.length) {
       c.polishTranscribeEnd = tr.value.length;
     }
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      persistCommentsFromDom();
-    }, 400);
+    persistCommentsFromDom();
     updateCommentTools();
   };
   const onPolishInput = () => {
@@ -1302,10 +1309,7 @@ function wireCommentBox() {
     if (pl && !pl.value.trim()) {
       comments[selectedId].polishTranscribeEnd = 0;
     }
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      persistCommentsFromDom();
-    }, 400);
+    persistCommentsFromDom();
     updateCommentTools();
   };
   const tr = getTranscribeBox();
@@ -1343,6 +1347,7 @@ async function init() {
       ? man.assignments.filter((a) => a && a.id && a.dir)
       : [];
     fillAssignmentDropdown();
+    await migrateLegacyLocalCommentsToServerOnce();
 
     if (!assignmentManifest.length) {
       document.getElementById("studentList").innerHTML =

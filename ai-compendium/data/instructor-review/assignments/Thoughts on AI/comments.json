@@ -11,9 +11,9 @@
       "polishTranscribeEnd": 0
     },
     "212119": {
-      "transcribe": "",
-      "polish": "",
-      "polishTranscribeEnd": 0
+      "transcribe": "So, the stochastic parrots argument has been brought up by others as well. It used to be much more commonly stated than it is nowadays. But it is still a notion that a lot of people put forth. That said, if you actually think about the design of an LLM, by design they cannot remember their inputs. So, they cannot quite have the memory that being a stochastic parrot would require. However, it's something definitely worth discussing. Also, it's interesting that your definition of thinking includes the requirement that unique observation has to come out. Something that did not exist in the world before. As far as whether AI models have gone beyond human control in labs, I don't know if that exact scenario where something wrong has happened in a lab situation has occurred. But definitely AI has gone beyond human expectations slash intent in certain circumstances, including in my own experience. There are instances, people and I have observed where AI has done something without having been asked to do it. And I unfortunately agree with your comparison of AI with the nuclear bomb in terms of the amount of harm that AI can bring. So, we are definitely working with lightning in a jar.",
+      "polish": "The stochastic parrots argument has been raised by others and was more commonly discussed in the past, yet it remains a notion that many still present. When considering the design of a large language model (LLM), it's clear that these models, by design, cannot remember their inputs. This limitation means they lack the memory required to be considered stochastic parrots. Nonetheless, this topic is certainly worth discussing.\n\nI find it intriguing that your definition of thinking includes the necessity for unique observations that did not previously exist in the world. Regarding whether AI models have exceeded human control in laboratory settings, I'm not aware that something wrong has happened in a lab setting per se, but Yes, AI has gone beyond user expectations in terms of not following intent. I have personally had such experiences as well, where AI has performed actions without being explicitly instructed to do so.\n\nI also resonate with your comparison of AI to a nuclear bomb in terms of the potential harm it can cause. We are indeed working with something as unpredictable as \"lightning in a jar.\"",
+      "polishTranscribeEnd": 1195
     },
     "213248": {
       "transcribe": "",
@@ -31,9 +31,9 @@
       "polishTranscribeEnd": 0
     },
     "241621": {
-      "transcribe": "",
-      "polish": "",
-      "polishTranscribeEnd": 0
+      "transcribe": "Aha, you're bringing up consciousness as a requirement for thinking. That's interesting. There's no way to refute that with any proof. Of course, we don't know exactly what consciousness is and what its role is in intelligence or in thinking. But of course, there are counter arguments that can be given for thinking and consciousness. But yeah, definitely an interesting point. Yep. Simple innovation is definitely something we can expect from AI in 5, 10, and 100 years. I don't know if it's going to take a hundred years to conquer cancer. My hope is it'll take much less time than that. Let's hope in the next 5 to 10 years. Programmers, 5 to 10 years. I don't know. It seems like programming is going to go away. Programming is going to go away or should go away in the next two years. But yeah, maybe you're right because programmers will stick around because there's so much code already written, legacy code that needs to be maintained. Yeah, good question about what's stopping AI from developing self-consciousness. Thank you.",
+      "polish": "You raised an interesting point about consciousness as a requirement for thinking. While we cannot definitively prove its role in intelligence or thought processes, it is certainly a topic that invites various arguments and counterarguments. \n\nI agree that we can expect significant innovations from AI in the next 5, 10, and even 100 years. However, I am hopeful that advancements in areas like cancer research will occur much sooner than a century. Ideally, we could see progress within the next 5 to 10 years.\n\nRegarding programming, I believe it may evolve significantly in the near future. While some aspects of programming might diminish, especially with the rise of AI, legacy code will still require maintenance, which suggests that programmers will continue to play a vital roles, so I agree with the 5 in your \"5-10 years\" prediction, not so much with the 10 :)\n\nYour question about what might prevent AI from developing self-consciousness is thought-provoking. Thank you for bringing it up.",
+      "polishTranscribeEnd": 1036
     },
     "265703": {
       "transcribe": "",
@@ -51,9 +51,9 @@
       "polishTranscribeEnd": 0
     },
     "287745": {
-      "transcribe": "",
-      "polish": "",
-      "polishTranscribeEnd": 0
+      "transcribe": "You make an interesting point about thinking requiring intuition and inner feeling and native thought. These three aspects are all intriguing and definitely worth exploring. I encourage you to bring this up when Kris talks in class, you know, in our class. I don't know exactly what he's going to say this time around, but I think there will be opportunities to ask about these three things, intuition, inner feeling, and native thought. And I encourage you to bring those up if you have a chance in class.",
+      "polish": "You made an interesting point about thinking requiring intuition, inner feeling, and native thought. These three aspects are intriguing and definitely worth exploring further. I encourage you to bring this up during our class discussions, especially when Kris speaks. While I don't know  exactly what he will say this time around, I believe there will be opportunities to ask about intuition, inner feeling, and native thought. Please take the chance to raise these topics if you can.",
+      "polishTranscribeEnd": 506
     },
     "287797": {
       "transcribe": "",
@@ -91,6 +91,6 @@
       "polishTranscribeEnd": 0
     }
   },
-  "updatedAt": "2026-04-07T17:37:59.064Z",
+  "updatedAt": "2026-04-07T18:44:57.494Z",
   "note": "comments[id]: { transcribe, polish, polishTranscribeEnd }. Wand polishes only new raw after End; + then mic = assistant. exportVersion 5."
 }

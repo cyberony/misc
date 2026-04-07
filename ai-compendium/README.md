@@ -43,3 +43,7 @@ The marketing alumni spreadsheet can be imported into `data/alumni.json`, shown 
 
 Natural-language reminders (email at due time) via the same **Tools** sidebar. See **[docs/REMINDERS.md](docs/REMINDERS.md)**.
 
+## Instructor review (grading UI)
+
+The review app lives under **`/review/`** (magic-page gated). Grading notes are stored in **`data/instructor-review/assignments/<assignment>/comments.json`**. When you change code or finish a grading session, **commit and push those JSON files together with the app** so feedback is never stranded on one machine.
+

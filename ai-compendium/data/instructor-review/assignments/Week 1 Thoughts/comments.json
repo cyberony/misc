@@ -36,8 +36,8 @@
       "polishTranscribeEnd": 0
     },
     "241621": {
-      "transcribe": "",
-      "polish": "",
+      "transcribe": "Aha, you're bringing up consciousness as a requirement for thinking. That's interesting. There's no way to refute that with any proof. Of course, we don't know exactly what consciousness is and what its role is in intelligence or in thinking. But of course, there are counter arguments that can be given for thinking and consciousness. But yeah, definitely an interesting point. Yep. Simple innovation is definitely something we can expect from AI in 5, 10, and 100 years. I don't know if it's going to take a hundred years to conquer cancer. My hope is it'll take much less time than that. Let's hope in the next 5 to 10 years. Programmers, 5 to 10 years. I don't know. It seems like programming is going to go away. Programming is going to go away or should go away in the next two years. But yeah, maybe you're right because programmers will stick around because there's so much code already written, legacy code that needs to be maintained. Yeah, good question about what's stopping AI from developing self-consciousness. Thank you.",
+      "polish": "You raised an interesting point about consciousness as a requirement for thinking. While we cannot definitively prove its role in intelligence or thought processes, it is certainly a topic that invites various arguments and counterarguments. \n\nI agree that we can expect significant innovations from AI in the next 5, 10, and even 100 years. However, I am hopeful that advancements in areas like cancer research will occur much sooner than a century. Ideally, we could see progress within the next 5 to 10 years.\n\nRegarding programming, I believe it may evolve significantly in the near future. While some aspects of programming might diminish, especially with the rise of AI, legacy code will still require maintenance, which suggests that programmers will continue to play a vital roles, so I agree with the 5 in your \"5-10 years\" prediction, not so much with the 10 :)\n\nYour question about what might prevent AI from developing self-consciousness is thought-provoking. Thank you for bringing it up.",
       "polishTranscribeEnd": 0
     },
     "265703": {
@@ -96,6 +96,6 @@
       "polishTranscribeEnd": 0
     }
   },
-  "updatedAt": "2026-04-07T17:32:53.192Z",
+  "updatedAt": "2026-04-07T18:34:34.921Z",
   "note": "comments[id]: { transcribe, polish, polishTranscribeEnd }. Wand polishes only new raw after End; + then mic = assistant. exportVersion 5."
 }
