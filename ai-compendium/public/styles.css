@@ -53,6 +53,19 @@ main.reset-password-shell{
   filter: blur(0px);
 }
 
+.app-version-stamp{
+  position: fixed;
+  left: 10px;
+  bottom: 8px;
+  font-size: 10px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  user-select: none;
+  z-index: 3;
+}
+
 .topbar{
   position: sticky;
   top: 0;

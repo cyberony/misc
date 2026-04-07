@@ -91,6 +91,6 @@
       "polishTranscribeEnd": 0
     }
   },
-  "updatedAt": "2026-04-07T18:44:57.494Z",
+  "updatedAt": "2026-04-07T18:46:47.061Z",
   "note": "comments[id]: { transcribe, polish, polishTranscribeEnd }. Wand polishes only new raw after End; + then mic = assistant. exportVersion 5."
 }
