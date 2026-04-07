@@ -1645,17 +1645,10 @@ function syncHowItWorksPanel() {
 
 const BRAND_INTERPUNCT_TRIPLE_MS = 650;
 
-function openMagicWordOverlay() {
-  const ov = $('#magicWordOverlay');
-  const fr = $('#magicWordOverlayFrame');
-  if (!ov || !fr) {
-    window.location.href = `/api/magic-page/redirect?_=${Date.now()}`;
-    return;
-  }
-  fr.src = `/api/magic-page/redirect?_=${Date.now()}`;
-  ov.hidden = false;
-  ov.setAttribute('aria-hidden', 'false');
-  document.body.style.overflow = 'hidden';
+async function openMagicWordOverlay() {
+  if (!isAdminModeActive()) return;
+  await fetch('/api/magic-page/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+  window.location.href = `/api/magic-page/redirect?_=${Date.now()}`;
 }
 
 function wireBrandInterpunctEasterEgg() {
@@ -1665,6 +1658,7 @@ function wireBrandInterpunctEasterEgg() {
   let resetTimer = null;
   el.addEventListener('click', (e) => {
     e.preventDefault();
+    if (!isAdminModeActive()) return;
     count += 1;
     if (resetTimer) clearTimeout(resetTimer);
     resetTimer = setTimeout(() => {

@@ -1,0 +1,101 @@
+{
+  "comments": {
+    "204608": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "206187": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "212119": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "213686": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "214131": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "237058": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "238492": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "241621": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "265703": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "266826": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "267269": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "272611": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "287745": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "287757": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "287800": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "288357": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "290550": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "290812": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "296416": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    }
+  },
+  "updatedAt": "2026-04-07T17:32:53.192Z",
+  "note": "comments[id]: { transcribe, polish, polishTranscribeEnd }. Wand polishes only new raw after End; + then mic = assistant. exportVersion 5."
+}

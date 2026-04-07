@@ -1,0 +1,5 @@
+{
+  "comments": {},
+  "updatedAt": null,
+  "note": "Legacy path when assignmentId omitted. Prefer per-assignment files under assignments/<dir>/comments.json."
+}

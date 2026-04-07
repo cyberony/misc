@@ -1,0 +1,14 @@
+{
+  "assignments": [
+    {
+      "id": "thoughts-on-ai",
+      "title": "Thoughts on AI",
+      "dir": "Thoughts on AI"
+    },
+    {
+      "id": "week-1-thoughts",
+      "title": "Week 1 Thoughts",
+      "dir": "Week 1 Thoughts"
+    }
+  ]
+}

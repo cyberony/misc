@@ -1,5 +1,12 @@
 const $ = (sel) => document.querySelector(sel);
 
+function authHeadersJson() {
+  const t = localStorage.getItem('msai_auth_token') || '';
+  const h = { 'content-type': 'application/json' };
+  if (t) h.authorization = `Bearer ${t}`;
+  return h;
+}
+
 function stopMagicWordVideo() {
   const ifr = document.querySelector('.magic-word-video');
   if (!ifr) return;
@@ -7,27 +14,9 @@ function stopMagicWordVideo() {
   ifr.src = 'about:blank';
 }
 
-function magicPageLogoutOnLeave() {
-  stopMagicWordVideo();
-  fetch('/api/magic-page/logout', {
-    method: 'POST',
-    credentials: 'include',
-    keepalive: true,
-  });
-}
-
-window.addEventListener('pagehide', magicPageLogoutOnLeave);
-
 window.addEventListener('pageshow', (e) => {
   if (e.persisted) void init();
 });
-
-async function magicPageClearSession() {
-  await fetch('/api/magic-page/logout', {
-    method: 'POST',
-    credentials: 'include',
-  }).catch(() => {});
-}
 
 async function fetchStatus() {
   const res = await fetch('/api/magic-page/status', { credentials: 'include' });
@@ -41,13 +30,11 @@ async function fetchStatus() {
 
 function showGate(configured) {
   const gate = $('#magicWordGate');
-  const content = $('#magicWordContent');
   const errEl = $('#magicWordGateError');
   const form = $('#magicWordForm');
   const submit = $('#magicWordSubmit');
   const pwd = $('#magicWordPassword');
   gate.hidden = false;
-  content.hidden = true;
   errEl.textContent = '';
   if (form) form.hidden = false;
   if (pwd) pwd.disabled = false;
@@ -58,17 +45,19 @@ function showGate(configured) {
   }
 }
 
-function showContent() {
+/** Full-page grading app — same document as standalone (see ai_perspectives index.html). */
+function goToReviewApp() {
   stopMagicWordVideo();
-  $('#magicWordGate').hidden = true;
-  $('#magicWordContent').hidden = false;
-  $('#magicWordGateError').textContent = '';
+  window.location.replace('/review/');
 }
 
 async function init() {
-  await magicPageClearSession();
   try {
-    const { configured } = await fetchStatus();
+    const { configured, unlocked } = await fetchStatus();
+    if (unlocked) {
+      goToReviewApp();
+      return;
+    }
     showGate(configured);
   } catch {
     showGate(true);
@@ -82,11 +71,11 @@ $('#magicWordForm')?.addEventListener('submit', async (e) => {
   const errEl = $('#magicWordGateError');
   const pwd = $('#magicWordPassword');
   errEl.textContent = '';
-  const password = pwd?.value || '';
+  const password = String(pwd?.value || '').trim();
   const res = await fetch('/api/magic-page/unlock', {
     method: 'POST',
     credentials: 'include',
-    headers: { 'content-type': 'application/json' },
+    headers: authHeadersJson(),
     body: JSON.stringify({ password }),
   });
   const data = await res.json().catch(() => ({}));
@@ -94,7 +83,7 @@ $('#magicWordForm')?.addEventListener('submit', async (e) => {
     errEl.textContent = data.error || `Could not unlock (${res.status}).`;
     return;
   }
-  showContent();
+  goToReviewApp();
 });
 
 init();

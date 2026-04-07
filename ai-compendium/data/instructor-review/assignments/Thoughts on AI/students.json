@@ -1,0 +1,708 @@
+{
+  "generatedAt": "2026-04-04T21:55:14.690179+00:00",
+  "sourceFile": "Thoughts on AI Quiz Student Analysis Report.csv",
+  "questions": [
+    {
+      "index": 1,
+      "canvasColumnHeader": "3008603: Do you believe any AI systems actually think?",
+      "text": "Do you believe any AI systems actually think?"
+    },
+    {
+      "index": 2,
+      "canvasColumnHeader": "3008604: Explain your answer to the previous question.\nAlso, what is your definition of thinking?",
+      "text": "Explain your answer to the previous question.\nAlso, what is your definition of thinking?"
+    },
+    {
+      "index": 3,
+      "canvasColumnHeader": "3008605: What aspects of thinking do you think machines will never be able to do, if anything? What aspects do you think they'll conquer in 5 years, 10, or 100?",
+      "text": "What aspects of thinking do you think machines will never be able to do, if anything? What aspects do you think they'll conquer in 5 years, 10, or 100?"
+    },
+    {
+      "index": 4,
+      "canvasColumnHeader": "3008606: \nWhat is the most pressing question you have in mind about AI or about intelligence?",
+      "text": "What is the most pressing question you have in mind about AI or about intelligence?"
+    },
+    {
+      "index": 5,
+      "canvasColumnHeader": "3008801: What are your overall thoughts and opinions on AI? Be frank, feel free, share absolutely anything you want to share. Your thoughts and opinions will not be judged.",
+      "text": "What are your overall thoughts and opinions on AI? Be frank, feel free, share absolutely anything you want to share. Your thoughts and opinions will not be judged."
+    }
+  ],
+  "students": [
+    {
+      "id": "212119",
+      "sisId": "abm1314",
+      "name": "Abdullah Bin Masood",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:05:08 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "My understanding is that AI systems are stochastic parrots that generate the next best probable word. They respond with what sounds best which is seen a lot of times in generating technical/legal documents with AI that sound right but can be technically incorrect.\n\nMy definition of thinking is to take an object and come up with a unique observation on it that hasn't existed in the world before.",
+        "Machines can't conquer the passion and intensity humans have, it's hard to define as it's so abstract but that vibe that humans internalize when they believe in something beyond themselves and are willing to bet everything on it.\n\nMachines will likely beat humans completely at logical thinking and reasoning in 5 years and once that happens and they're beyond our point of comprehension it is virtually impossible to predict what they could do.",
+        "Have there been any AI models that went beyond human control yet in AI labs.",
+        "I think AI is comparable to the nuclear bomb as a strong contender for how our civilization ends. We have lightning in a jar and the first thing governments are doing with it is making autonomous weapons systems:/"
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "287745",
+      "sisId": "nwe4973",
+      "name": "Adeshvir Dhanoa",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:02:00 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "AI systems follow a mathematical probabilistic procedure of amassing an accumulative amount of information to produce an answer. \n\n \n\nThinking is using intuition, an inner feeling or native thought, and evidence/factual statements to produce a chain series of dialogue of a thought.",
+        "Machines will never be able to have intuition, this is something, humans, animals, plants naturally have. Since machines are artificially created they will never have this. They will or honestly at this point have reasoning, and analytical thinking skills based on previous instances to create an answer.",
+        "The degeneration of human intelligence with the use of AI.",
+        "AI is the inevitable future. You either must learn it and the tools it provides in order to succeed or become completely self sufficient in which you do not need it or the applications of it."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "241621",
+      "sisId": "sux8975",
+      "name": "Alan Wang",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 23:29:43 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "My definition of thinking is not only processing info and generating some type of answer, it's more like if the system is being conscious, meaning it actively is experiencing everything and feel each aha moment, not just mechanical response to trained data. Since AI cannot conciously do all that with feeling, there's no way it can truly \"think\".",
+        "Radical innovation, taking approaches that people have never dared to take before. What I think they can do is combining things in new ways, like in drug discovery they can do a great job making new medication from different pre existing chemical compounds, but not discovering new elements from scratch. Because those experiences come from people's curiosity when they are trying things and stumbling into thought provocative new directions that are original, not just mixing things together. I think they will be able to conquer cancer in 100 years, replace programmers in 5-10 years.",
+        "What makes thinking available to human but not AI? What's stopping AI to develop its self consciousness?",
+        "I oftentimes find myself in awe of AI, how much it can do better than me in many many fields. I want to know where are the areas I can focus on to make myself indispensable in this time and age, not just replaced or laid off due to some superintelligence."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "287797",
+      "sisId": "kmy2091",
+      "name": "Andnet DeBoer",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:13:12 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "I would define thinking as being able take in an input and formulate a novel thought through some process that analyzes the input, contextualizes it, and produces a response.  Therefore it appears that current AI systems can do this.",
+        "Its hard to come up with a concrete example of something that an AI won't be able to accomplish even though a part of me thinks it won't be able to fully grasp sentience. The presence of self. However, it is easy to imagine in the next 5-10 years that robots could be deployed with a generalized policy which enables them to accomplish 40%+ of jobs currently done by humans.",
+        "My most pressing questions are no longer necessarily about the technical feasibility of the future of AI but more on a philosophical question of whether  we should pursue this as in will it provide a net-benefit to society. Like whether this is like opening Pandora box where we no longer have the means to close it.",
+        "Overall I see it as the latest evolution of human tools. We formed tools to work with the physical world and now we formed a tool for the digital/information age."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "318442",
+      "sisId": "ash3960",
+      "name": "Andre Shportko",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-08 00:00:00 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "While AI has a different errors profile, at the end of the day, it does (1) generate unique ideas (or at least recompiles them productively) (2) navigate the solution space efficiently (not by total exhaustion). In a very reduced sense, intelligence for me seems to be a capacity to enable efficient heuristics to navigate the solution space.",
+        "AI will not be able to initiate the avant-garde in art (only simulate existing styles). Fine arts is historically a response to the social disturbances that are inherently human-initiated and thus only humans are able to capture the initial Zeitgeist.\nTo this end, I think that AI will be able to automate the Math proofs soon.",
+        "Can we stop it if it goes south?",
+        "Human agency is central for me in the high stakes environments such as judiciary, warfare, airspace tech, and healthcare. Unlike SWE, those fields do not tolerate false positives."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "237058",
+      "sisId": "jws5030",
+      "name": "Casey Zhang",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:07:25 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "I know there are people working on ai inference models. Experts in this field are facilitating ai to think. My definition of thinking is processing facts and generating opinions or doing actions accordingly.",
+        "Thinking of themselves, reflecting on themselves. I think a big part of thinking in humans is that we reflect on ourselves, think about our own behaviors and change. They'll conquer in basic science and knowledges as well as facts and theories that are already proven.",
+        "I don't believe AI can do everything and can act exactly as humans. The rules AI has been taught about are from humans. So I guess I am curious is it possible sometime in the future AI throws away these rules on their own and actually uses the rules they newly construct to change the world.",
+        "It's constructive. It helps a lot in my life. I use it usually as search engine. If I have a simple question that previously I need to manually calculate, now I just throw the question to AI and it gives me correct answer. Also from the perspective of a college student, I believe most college students benefit a lot from AI. (sometimes they explain knowledge better than some professors). However, of course, they are pros, so there are cons. It takes away some learning process that might be necessary for some humans (but might not be necessary for the world)"
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "267269",
+      "sisId": "yby0126",
+      "name": "Chenwan Zhong",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:13:01 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "I think the answer to that question actually depends on how people actually define \"thinking\". My definition of \"thinking\" is to reason or find related memories or knowledge to a specific topic based on the knowledge you currently possess, and form an opinion on it. I think AI systems have a large knowledge base, which, of course, is fed by humans, to do what I define as \"thinking\".",
+        "I think machines will never be able to show empathy because the way I think empathy works is that you have to listen to a person's story and give feedback based on putting yourself in their shoes. For example, when I heard my friend got injured in a basketball game, I could feel the empathy pain because I invested emotions and feelings in this person, and I don't think data-driven AI models are able to do that.\n\nI think in 5 or more years, AI can move from solving software problems to hardware problems.",
+        "In what way am I better than a well-trained AI model that's fed by a huge database in doing my own job, which is software-centered?",
+        "I think AI is a helpful assistant for being more productive and a reliable ally for work-related scenarios or tbh unwanted labour."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "288357",
+      "sisId": "dfv1344",
+      "name": "Chenyu Zhu",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:09:31 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "Thinking is the process of reasoning and analyzing. We collect data from the outer world, analyze them based on the information we get and the knowledge we built based on the information we got. After reasoning, we get the conclusion and take action or make decisions.\n\nI think some AI models also do very similar things. Earlier AI models get information from numbers, more advanced models get from text, and more more advanced get from text and vision. The way they get information didn't prevent them from thinking. They build their own knowledge by training(intentionally or not), and give the answer based on the knowledge and input.",
+        "I think machines will never be able to have emotions. They can behave as if they are cheerful when I tell them good news, or behave painful or sad when I tell them a sad story. But these emotions are all made up to empathize human or make us human beings feel better when interact with them.\n\nThey should be able to analyze and give better suggestions than any experts in any field in 10 years. Because nobody will be able to think as comprehensively as AI then.",
+        "AI should be honest and objective. We need to address their illusions to make them behave unsure when they are not making very definite opinions.",
+        "AI is very helpful and will be a big assistant in almost all fields, even in arts or psychology(though I don't think they will fully understand these)."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "213248",
+      "sisId": "dlw8642",
+      "name": "Daniel Wong",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:10:51 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "They can connect topics together from a wide range of areas that I may not have thought of (ex. when I ask give me a project idea to make in React, OpenAI can connect from various sources online and give me ideas I didn't think of or could build from). I feel that it being able to connect from various sources is like its \"experience\" which makes it feel like it can think.",
+        "Probably thinking in terms of EQ and how to communicate with others and understanding the context at the moment, as those are very personal to the individual. In 5+ years I believe that AI definitely would be much more integrated into societal workflows, not only in jobs (AI not only in tech but also in things like medicine) but also in people's daily lives (self-driving cars)",
+        "I'm most interested in understanding about the consequences and reasons behind why are we replacing humans for AI and intelligence, in the workplace and in what we do generally.",
+        "I feel that AI is definitely allows us to have an extra tool to allow us to be more productive and have more effective outcomes, however I believe that we should be using it more of as a reference rather than now fully depending on it. That's where I feel like we're moving towards, like in industry many jobs and roles are being taken away because industry is moving towards depending on it, which I feel isn't where we should be moving towards."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "287757",
+      "sisId": "mfm0122",
+      "name": "Eden Growney",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:09:43 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "When I think if AI systems in this context I resonate the msot with coding agents, not just a standard LLM, so I am going to answer this question here. When i prompt these agents, i am 90% of the time either talking about something I am verifying that is not working as expected (the application is supposed to do this when I click this), an error (I am getting a 404 when I do this), adding a fature all together(I want a form that has this input and does this) (cursor with codex), or asking about current architecture. The fact that the agents can come up with an answer THAT WORKS means there is a process of: unpacking what the words I mean are saying, connecting the meaning of those words to the code base I am working on, finding exactly where in the project this code is or what code is related to whatever external system I am asking abt (i.e supabase) and once they just have identified what I am talking about they than have to have an understanding of what the code is currently doing to then be able to REWRITE and edit the code or add more code to accomplish the task. I think in this context thinking is being able to take something abstract (the prompt) and break it down into pieces that are related, connected, and brought about with the context or knowledge (what coding is, the code base, what the goal of the app is, etc). These abstractions just go deeper and deeper into more abstractions until you reach a point where a solution makes sense.",
+        "Accessing this universal consciousness that is built into our biology.",
+        "What will AI look like when it inhabits a body that \"grows up\" in a community, experiences care, experiences loss, and learn from bodies in its communitiy (not enough time to add more)",
+        ""
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "206187",
+      "sisId": "ecf1002",
+      "name": "Eric Fei",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:07:03 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "To have a good answer to this question we would need to rigorously define what “think” means but in my mind I think that AI systems do in fact think, though not necessarily in the way humans do. For example, the process of a generative neural network taking inputs and producing an input is something that I could call “thinking” under a certain definition of the term.",
+        "I think that, given sufficiently advanced technology and understanding of neuroscience, the human brain can be simulated with a machine, so I believe there is no aspect of thinking which humans can do that machines cannot eventually replicate, given a sufficient amount of time.",
+        "I am very interested in whether we can produce a machine that can truly mimic human consciousness: not just passing the Turing Test, but being able to function fully in society and essentially being a machine that acts human and can develop in the ways a human can. At the same time, I am also interested in how machines can expand the way we define thinking: are there ways to think that humans haven’t discovered, which AI might show us or develop?",
+        "I think it is a very important and revolutionary technology, especially in the modern day, and so I believe it has the potential to have significant beneficial and harmful impacts on society. While it has the potential to be a massive driver of human productivity and advancement, AI also has the potential for severe detriments to human society, culture, and efficiency by influencing the way we think, learn, and go about our everyday lives. To this end, I think it is of paramount importance that we not only understand the technology behind AI, but also carefully monitor its progression as a technology and develop it in a way that is ultimately beneficial for human society."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "238492",
+      "sisId": "rhl4072",
+      "name": "Ethan Foong",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:41:14 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "I think it depends on what you define as thinking or the level of thinking you're referring to, but I think I'm starting to believe they do think. In general, this is because it feels to me that they are able to turn their memorized beliefs of the world into thoughts that are somewhat new or at least an intersection of two things they know which is in some way, thinking. \n\nI think for me though, thinking can be more than just spitting out what you've memorized or even making simple connections from what you've memorized to the new topic in front of you. It still feels to me the AI are quite uncurious or unable to set their own goals. I also think that if they only learn in a set of ways it limits their full ability to think. They should be able to copy writing, they should be able to learn from just a reward signal, but humans also learn in many other ways. We imagine the situations we may be in and think of the best ways to respond. We can be curious or intentional about what things to think about or what ideas to explore. To me, this is more a good definition of thinking - maybe akin to going from a low level animal (which only responds to stimuli, but can update how they respond from context) to something like a crow or a dolphin up to a human where they can start to be curious about things an intentionally explore areas or representations of things that are completely unnatural (like language or mathematical models), but that help you solve certain (often completely unrelated) tasks. I think they also probably need to start being grounded in something like the physical world or be better grounded by the things humans care about because I feel right now their only motivations is to follow their specified motivation or fulfill the wishes of the human operators but when there are more solid goals in front of them, I feel there might be a better reason for them to explore new things. There is no calculus without the desire to understand physics - robots could not make this jump, partly because they don't care t o understand physics, but why do we want to understand phyiscs? I wonder if this is something innate. but there's something here that is not reached by current intelligence.",
+        "I think in the next 5-10 years you'll see a lot of the very normal, natural, high data human tasks start to be solved at high rates by machines. Like, I don't think filling spreadsheets or driving a car is too hard for the ai to solve. So at least things that can be ata driven in the next 5-10 years is easy (brute force-y). I think in 100 we will probably see even more societal level intelligence where the many different ai have different personality or belief on what is interesting to explore just as a hhuman society does. And I think that may help advance all fields simultaneously.",
+        "I think for me, if I have a magic wand, I most want to see where exactly the human and current ai divergence is in terms of thinking and intelligence. Of course, this is a bit selfish because I'd like to drive my own research forward, but I think geniunely I most wonder how or why our current AI models fall short of human thinking. They have beliefs about the world represented as tokens and natural language, but is their inability to think about more abstract topics (for example, reasoning about human bodies or the resources used for each skill we use) due to the lack of embodiment and experience only? or it could also be a lack of ability to imagine what we are like from the data it has?",
+        "Of course, I think AI is the future, but I think more than that, I'm most scientifically interested in artificial intelligence because I think its very nice to reflect on your own intelligence and free will. In particular I'm interested in AI exhibiting more human-like thinking. I'd like to see them be curious or come up with new ideas or reason about the same things that humans reason about: the resource costs of the skills we use, the higher level goals we have as a species, etc. I think ideally, an AI should be able to just take some higher level motivation or some belief of what we or it finds interesting or useful and be able to think and act on that. I don't really have any thoughts on whether its good or bad beyond that. I think its more up to us as humans to think about what we should do with it or how it should impact our daily lives, but I don't think too deeply about what we should do with it.\n\nOne last thing I wonder is whether the AI will kill us. I increasingly believe that because we motivate the AI and build it (almost in our image) that it will have the same flaws ,but also the same feelings at us. The same feeling around community maybe the same desire to connect or discuss or share ideas and in that arena, maybe humans are okay to keep around."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "287800",
+      "sisId": "rpe8271",
+      "name": "Florian Jule",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:09:08 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "The definition of thinking defines the answer.\n\nThoughts and thinking is for human an access to memories and experiences that form a thought pattern. An AI system does access memories (data) and tries to form an opinion or answer a question based on that. I do believe that thoughts are based on experiences which an AI system fundamentally lacks. It can be tailored or biased to answer a certain way, but this is at a higher level controlled by how the system was designed/implemented or what rule it follows. (or is asked to follow).",
+        "It is hard to conceive a machine having original thoughts. Algorithms tend to be very good at interpolation, and fail at extrapolation (just like humans in most cases). I mostly hope that humans will keep an edge with coming up with novel thinking and philosophy questions and answers. I do think that from a problem solving standpoint, AI will (and is very close) surpass any human. Feed it the problem, and it will solve it. My hope is that we are as humans capable of choosing the direction this is all headed towards, and do not give up our brain to passively follow AI system \"thoughts\".",
+        "What is the future of humanity? What is the purpose of work and life? If there is no challenge in life (because AI/robots do everything for us), is it still worth living?",
+        "I started using chatGPT when it came out, back then, I did not think much of it as its performances were poor. Last summer, I started using it again to help me get started with some personal project. Last quarter, I used it to debug code and help me when I was stuck. Now I am trialing it to code entire projects for me. It is both impressive and scary, and programming is coming to an end for human. My biggest fear is the lack of thinking that might result from this, and I do believe there will be a split between humans who stop thinking, and those who fight to make their own decisions. Neuralink will bring this split to the next level."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "240023",
+      "sisId": "tdu7314",
+      "name": "Julian Tang",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:05:44 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "If there was an option for middle of yes/no I would have put that but overall I lean largely towards no. I think an argument can be made for the fact that 'thinking' isn't the human form of thinking, and so the ways in which LLM's currently 'think' (i.e. token -> embed -> semantic space -> probabilities) can be a form of thinking, but they also currently don't really understand cause and effect, so because of this I would lean towards no.\n\nI would define thinking as being able to form intelligent thoughts (which range from planning, to understanding cause and effect, etc).",
+        "They'll never be able to think with emotions (at least not for the foreseeable future)\n\nCause and effect thinking, internal representations of the world, I think AI will be able to conquer within 5-10 years.",
+        "I think the most pressing issue I have is what it means for society if we manage to achieve AGI. If we become a society where we can just get robots and AI to do all of our work, I'm not really sure if this will affect people's lives in a positive way. I think most people need a sense of purpose, and a lot of this comes from our jobs. If we take away our jobs and replace them with AI, I think it could result in a lot of people feeling lost and losing meaning in their lives.",
+        "I think AI is great overall, and a very useful tool for humanity, but I think we need to be careful with how we use AI, and there must be important guardrails put in place. This is especially hard in our present times, as a lot of AI companies are racing to see who can produce the 'best' model of AI, and so I think that more of an emphasis has to be put on ensuring the safety of the AI models.\n\nOn an individual level, I think we need to be careful about using AI, and ensure that we do not use it too much to the point that we lose the ability to think critically. It is obviously an amazing productivity tool, but we need to be careful not to outsource all of our thinking to it."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "287801",
+      "sisId": "vwh1509",
+      "name": "Jyothi Swaroop Kasina",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:12:09 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "In some aspects I do believe AI Systems can think. For example, there have been reports of AI being able to solve tough mathematical problems which scientists have been trying to solve for a really long time and didnt find solutions to. In these aspects I think AI systems are able to form connections between the knowledge they already have and apply them in a way that helps them solve problems.\n\nThat said, an AI system is as good as the amount of data it has looked at or the amount of training it has gone through. It doesnt have a human way of thinking. \n\nI believe thinking is way more than just forming connections from what you know, but actually observing things and coming up with new ideas. For this, when a apple fell on Newtons head, his thinking process led him to come up with gravity which is not something AI systems can do according to me.",
+        "The aspects I believe machines will never be able to achieve is to feel things. For example we as humans when we listen to good music, have good food, or meet with a person we like we have a positive feeling. When you go to a place of worship probably you have a feeling of calmness and a belief in a higher being which AI systems will never be able to achieve. Depending on things going on in our lives, stress and grief are somethings humans feel naturally, no body ever told us how to feel in these situations but AI systems can never achieve that.\n\nWhat they will be able to achieve though is some areas where we are trying to advance especially in robotics is things like touch, and what touch means and how humans process it and how we can make robots feel the same.",
+        "With the increasing advent of use of AI, I feel we are slowly loosing our originality in thinking and depending on these tools a lot for most of our work and slowly becoming addicted to using them for everything in our lives. I am pressed about how we can achieve a healthy balance for this.",
+        "AI does help us in this day and age learn about a lot of things and makes learning various concepts easier. But in a broad sense, it is something a human made and trained on a wide data called the internet and in the end it does have some sort of bias and by constantly engaging with AI we are probably moving into these biases and ultimately loose originality and what actually makes us human. So although AI is helpful, it should be regulated and probably the race to make the next best thing should slow down and have a look at how much of what we are doing is actually humans in a broad way"
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "287805",
+      "sisId": "lea1212",
+      "name": "Kyle Zhikai Thompson",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:09:45 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "I think this question boils down less to what AI does and more to how you define thinking. When does something stop being simple \"processing\" and become thinking? My initial reaction is to turn to animals. Does a Nautilus think? This animal that has existed for millions of years and simply floats through the ocean with it's pinhole eye reacting to simple stimuli. What about a crocodile, as it calculates movement to decide whether to hunt? Yet, an animal handler can easily move in the correct position and place their hands on the correct spot of a crocodile to keep it from striking, despite being a perfectly valid snack for the animal. So, if the crocodile can be tricked so easily is it really capable of thinking? Or is it simply reacting to stimuli? Some would point at the mirror test as a sign of intelligent thought. If an animal can recognize itself in the mirror, and acknowledge that its reflection is itself, then it has a sense of self and therefore is sentient and thinking. I'm not sure if that's true. Supposedly some ants pass the mirror test. So do manta rays. It's certainly faulty, but maybe it's better than nothing. So does an artificial intelligence model, even the best ones like Sonnet 4.6, have a sense of self? Does it truly have a functional understanding of what it is saying. The implications and consequences of it's advice? It certainly seems that way at times. But at this current junction, I struggle to so easily give it the mantle of \"thought\". Not yet at least. Much like an animal handler operating around a crocodile, I find that saying the right thing -- creating a false sense of sanity -- can easily trick the model into doing what I want it to do. There is still no sense of self. It simply reacts, just in a more intellectually performative way. It would not understand the mirror.",
+        "I strongly believe machines will never generate art. At least not in a way that means anything to me. My father often makes the argument that it is rare for a musician to generate a new musical note, yet they create new music everyday. So how can one argue an artificial intelligence model is incapable of generating new art? Sure, it is only trained on all of the art that currently exists, fed into it's assorted artificial neurons, ReLU and sigmoid functions to create activation and allow one note or word to follow another. That misses the soul of art. It is inherently tied to personal experience. Machines don't have that.",
+        "How will it affect the workforce? I think this will define my entire life, and I am terrified of the answer.",
+        "I often think it is dangerous and often unnecessary. Some days. Other days I think it holds the key to solving our hardest problems and creating a true utopia. Maybe AI matters less than the systems that house it, and how we as people find it in ourselves to be compassionate in our use of intelligent technology. Mostly, I am scared of it's ability to generate large scale societal change."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "290812",
+      "sisId": "wsi3567",
+      "name": "Longzhang Zhu",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:26:57 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "I think currently those AI like LLMs are really just taking all the data they are given are just saying the ideas they have already taken into themselves are repeating. Thinking is more about coming up with more unique ideas, that while are inspired by what we take in, should be able to come up with thoughts that don't directly link to anything from their datasets. I think there was that idea of the Chinese room where there is a person inside a room who is given a piece of paper to translate some English words, but they don't know Chinese, they are only given an English to Chinese dictionary. So the person outside the room is given the translation in Chinese thinking that whatever is in the room understands Chinese, when in reality the person inside has no idea what they were writing. I think current AI is like that a lot, where it is able to fact the ability to think because it spews so much information that makes it appear like it is intelligent ideas when in reality it has no idea what its actually talking about. It's giving us the illusion that something is there thinking about our problems when its just going through a database looking for the most probable answer.",
+        "I think that the idea that machines will ever be able to fully understand what humans being are with real empathy, passion is ever possible. I think this way because different types of animals on this planet are really never able to fully understand each other because we have different ways we see the world with different built-in understandings of who we are. I think machines are similar to that effect where machines might see what videos and photos given them but at the end of the day, what humans really see with our own unique perceptives are something they are unable to truly have. They are only able to see a snapshot of what humans see, and without that full experience machines will never really understand what makes a human click. Maybe in 50-100 years where more implants are given to humans they might have a bit more knowledge, but since they are never human, real understanding is impossible.",
+        "The most pressing question I have is if AI is able to fully start doing active learning where it can explore its own environment and given no understanding of it before, can it be able to learn how to gather information using only its motor skills to understand something. Once it is able to gather its own knowledge and improve its dataset will AI and robots truly be able to reach that next step in intelligence.",
+        "I think AI is extremely useful and it will be something that human society will never able to depart from it now that we have it. I just fear that humans by nature are lazy being, and that's why we often automate things to no longer do that thing over and over again, and with AI allowing us to do something easily without any motivation to learn will lead society into a state where AI is the thing running our lives by saying when we should sleep, what we should eat, and taking over how we should be thinking."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "213686",
+      "sisId": "mjh0873",
+      "name": "Marija Jovic",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:09:14 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "My definition of thinking: to come up with an idea based on a specific collection of personal knowledge, experience and context. I think that the uniqueness of thinking is dependent on those niches of experience and biological wiring. While you can make the argument that an AI has different wiring (different training data and all that), it is that uniqueness of experience with context that I'm unsure about. AI does have memory, but does that count as experience? Is there an equivalent of fear of fire after getting burned? I'm not sure if AI systems have an equivalent for this, so I don't think they think.",
+        "Honestly, I believe that machines will eventually be able to conquer all forms of thinking. If we took a human brain, completely digitize it neuron by neuron, is this now an artifiical intelligence with human thinking capacity? If we change it slowly, while ensuring it gains another skill for every it loses, does it not remaining a thinking machine just with different abilities (ship of theseus style?). I think that machines will be able to achieve human thinking, but I think they'll also discover different aspects of thought that we haven't come up with yet because we're approaching it from a different angle? Maybe this response and my previous one are contradictory. I honestly don't think we'll solve the \"thinking\" issue until we achieve quantum computing. So in 10/30 years? But I feel like after that we'll go 0 to 100, where the questions we're solving haven't even been dreamed up yet.",
+        "The most pressing question in my mind is how AI orients and will continue to orient itself in terms of us. I think that any discussion on AI that divorces the science from the social is a little disingenous. We have to live with these creations, and progress must be accompanied by awareness. My question is what will happen to us as AI evolves? How will our lives change? How will our changes in our lives influence how we continue to develop AI? If AI can develop itself, will it think of us at all?",
+        "I'm a little terrified. As we're in the end of the world, it feels that AI is the storm cloud on the horizon. Will it lead us out of the end of the world into a new world, or will it keep us in this awful place forever? I worry that we allow people who don't understand what they're playing with to create policy."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "241180",
+      "sisId": "dhr9779",
+      "name": "Matthew Song",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:07:10 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "My understanding of the current AI system is that it's a giant simulation system trained and prompted so nicely that it gives the feeling that it's thinking. It's a probabilistic guessing machine or simulator rather than generating it's own thoughts. I believe that human is capable of thinking and we for sure don't need billions of dollars to train our thoughts.",
+        "Create something out of nothing. I'm a Christian and I believe that God breathed the breath of life in human and thus imparted some of His power of human being, part of it is creativity. The illusion of creativity that current Ai system has is more of it generating things or combining things that's been around else where that we haven't tried. I honestly don't believe this can be conquered.",
+        "Whatever I said above, part of me is skeptical about it. AI is a blackbox and no one understands what's going on in there. What if AI is already thinking? What if they are already conscious? How could this happen just based on images and words without any understand of the real world (world model)? What if world models is the missing step towards artificial consciousness.",
+        "It's definitely useful and transformative, but it's overhyped. From what I see now it's a simulator at best but nothing beyond, at least for LLM. The industry is putting way too much faith and resource into scaling it, and I'm afraid it's gonna collapse."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "290550",
+      "sisId": "wgk1727",
+      "name": "Md Saif Ahmad",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:07:33 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "All the AI systems I have encountered with are at some deep level pattern recognition or making high level abstractions of all the data it has. But I would not define that as thniking yet.",
+        "As I see the whole trend it is mostly larger models and more data. I am not sure if they will allow to develop general intelligence.",
+        "I am concerned with the implications it has on the society in terms of income inequality as the big companies will be able to do more with less people and there will be huge wealth concentration.",
+        "My thoughts are it is super useful technology.\n\nBut, I fear the hype which is causing huge sums of money being invested which might turn out to be a bubble. I am also worried of social implications in therms of income inequalty it will create.\n\nI am skeptical about AI being branded similar to human brain, or it will replace humans.\n\nWe should be careful about using black boxes that has huge compute and data requirement compared to  pursuit of elegant mathematical and scientific solution. Now even the top researchers are tweaking parameters and training a bigger model and putting more data. \n\nThe biggest social impact I see is without any regulation or social revolution, it will just empower the people with resource to increase the gap, with AI productivity will definitely increase and there has to be system to distribute the produce within humanity."
+      ],
+      "scores": [
+        "0.0",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "2.0"
+    },
+    {
+      "id": "318443",
+      "sisId": "mlu3960",
+      "name": "Miya Liu",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-08 00:00:00 UTC",
+      "attempt": "1",
+      "answers": [
+        "I don't think it is impossible",
+        "I define thinking in the scope of how animals (especially humans) think, which is roughly the process of taking ideas/perceptions/sensations as input that triggers some neurons to fire, which in case outputs some combination of ideas. For example, upon smelling fried chicken, many might start to think that they would desire fried chicken for dinner. However, sometimes thoughts can also come involuntarily, which I found to be very interesting. If we are looking at thinking in the mechanical way (perhaps one can say the materialistic lens), how current reasoning models are not too far from how humans actually reason and think. I think most people's problem with the argument that AI systems can think lies in the fact that right now LLMs are just doing next token prediction, which doesn't seem very intelligent. There are two ways to look at this. One way is to argue that the fact that such process is a \"black box\" gives room for thinking and true intelligence, and the other can argue that it is only a matter of architecture and structure, which can be further explored. Personally, I am pretty optimistic about the likelihood of AI systems coming to have the capacity of thoughts.",
+        "I don't think there's an aspect in which machines won't be able to do. In 5 years, maybe they will be able to conquer most human tasks (like grocery shopping, delivery, etc.) and replace most manual work. In 10 years we might not be able to differentiate an artificial human and a real human. In 100 years it might be possible that machines are so smart and intelligent they can be incorporated into a part of society.",
+        "I am really interested to think more about how AI is bounded by language. Also how it will challenge the notion of a God for those who are religious.",
+        "I think it's something I'm not super sure about. I sometimes feel skeptical but sometimes really impressed by their progress. That's why I really look forward to all the different guest lectures and discussions we'll have in this class!"
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "265703",
+      "sisId": "cue0559",
+      "name": "Pranav Gogineni",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:06:40 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "How I think that AI systems work is that they have a pre-set rules that they follow. LLMs are probabilistic, and they do not inherently understand the meanings behind the words or tasks they are being asked to do. They are trained upon data in order to get similarity, in order to best achieve a task. They do not respond with what they believe, but they respond with what would appear to be the best to the user. \nMy definition of thinking is that it is the way that we perceive the world. To be able to understand something is to be able to visualize it. Humans are able to think because we have consciousness that allows for us to be able to comprehend the tasks that we are doing and weighing within ourselves. That is something that AI is not able to do.",
+        "I do not think machines will be able to achieve emotions. I believe that they at some point will be able to seek self-preservation, but I do not think they will be able to feel the same biological processes that animals do. I do not think they will be able to experience love, happiness, or sadness because those are biological processes. I think AI will be able to respond in those ways because it is the way they are taught that humans are able to. \n\nI believe that they will conquer most other aspects of the world. When it comes to efficiency, AI has humans beat. I think AI will be able to recursively work, drawing on how humans have thought in the past in order to come up with new innovations for itself or in other industries.",
+        "The most pressing question I have in mind about AI is what does the future in survival look for humans? AI has already radically transformed the workplace, but how does that look for humans?",
+        "I think AI is something that is terrifying. In a previous class that I took with Dr. St. Amour, he believed that this rise of LLMs is simply a wave that will soon pass. I disagree with him because this is different than the Industrial Revolution. The Industrial Revolution made certain processes faster and more efficient, but AI is able to simply do the entire job of many people at a much larger scale, which makes it that much more powerful. I also think that AI will radically transform the economy. I do not think that anyone other than the people who are controlling these systems are safe. There will need to be huge economic change in order to ensure that people are able to survive, but I do not see that happening because it would happen at the expense of the people who are controlling these systems."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "272611",
+      "sisId": "ybe9480",
+      "name": "Quinn Langfitt",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:07:12 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "I don't believe any of the current AI systems, like LLMs, think. I believe thinking is a manifestation of conscientiousness, and I don't think current AI has concisousness. This does not mean, however, that AI can never be conscious.",
+        "I think that machines in the next 5-10 years will be able to pretend or \"cosplay\" thinking, which is what I think LLMs do, even when they use chain-of-thought reasoning. I can see AI displaying more sophisticated aspects of thinking in 100 years. I don't have any concrete ideas what that will look like though. Again, I don't have a good definition of thinking to go off of, but I currently believe that it needs to have conciousness to have the ability to think.",
+        "Does it matter if AI is actually conscious or not? Sometimes I wonder if we put too much weight into consciousness.",
+        "I currently believe that AI as it currently stands is overhyped in terms of how close it is in achieving AGI, but I'm certainly willing to change this belief. But of course, I still believe that AI, even as it stands today (i.e. LLMs) is not a revolutionary technology and is already beginning to make seismic shifts in our economy, social lives, etc."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "204902",
+      "sisId": "rsk1381",
+      "name": "Reem Khalid",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:09:06 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "Thinking -> Able to create an original idea (even if inspired by previous information), leveraging all sorts of information including personal experience, academic/learnt info, and sensory information.\n\n \n\nI think that current AI systems right now are just fancy word-prediction tools. They do a stellar job emulating human language, but I think that their responses are still devoid of the depth that appears in genuine human communication. A part of that I think is that humans have personal experiences and experience the world through multiple senses, and that contributes to our ability to combine ideas. AI is not yet to that level, I dont think AI/LLMs *experience* the world, but they can relay the information we tell it in interesting ways.",
+        "I am skeptical that we will come up with machines that can match the actual complexity and grace of the human body. For example, our hands can operate with extreme precision, and while we have nanobots and robots that can be precise in certain ways, I don't think we'll be able to actually create something that is as sophisticated as ourselves and our bodies. On the other hand, I think that with breakthroughs in quantum computing, our analytical skills will easily be outpaced by machines. I don't think our brains are going to be on any level of similarity in terms of computational power with the machines that will be created in the next few decades. Even now, I think AI is already \"overtaking\" us in tasks like programming, summarization, etc.",
+        "My most pressing question right now is, are we always going to be the \"superior\" to AI? Right now we are in control; and of course, we use it as a tool. Now that AI agents are being deployed and developed to have more skills, will we be needing to obey AI in the next few decades? Will they be \"sentient\", and if so, how will we interact with them?",
+        "I am both impressed and concerned about AI. \n\nI worry about the pace it is developing.\n\nI am impressed on how much it has improved in just the past few years.\n\nI am distrustful of it and how the data behind it is acquired.\n\nThe fact that AI has a distinctive, hollow voice is a source of comfort; there's at least some human traits/capabilities that are not mastered by AI yet."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "207343",
+      "sisId": "smb3899",
+      "name": "Sonia Bhatia",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:25:07 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "My definition of thinking is using one's mind and cognitive processes to produce thoughts and decisions. It involves using attention, memory, and language. Since AI systems have been trained on data, they have essentially \"learned\" information about many topics and built up their memory. Then, in the inference stage, they mirror the thinking process I described by processing our inputted information, and using it along with memory and attention mechanisms to generate a response or make a decision that is logical. Therefore, I believe that many newer AI systems actually think based on my definition of what thinking is.",
+        "I'm unsure if machines will be able to create entirely new thoughts or ideas that haven't been \"invented\" before. I think we will have robots with much better abilities to accomplish everyday tasks that humans do in 10 years and more complex tasks than just mundane ones.",
+        "How should or AI be developed in way or humans adapt in a way to ensure that AI is a tool to them rather than a replacement?",
+        "I think AI is very powerful and useful in helping humans become more productive and efficient. I am really amazed by the capabilities of AI at this point. However, I am slightly fearful about the future of AI and its growing power. I worry about people becoming too reliant on AI, especially younger people who haven't had a chance to finish high school without widely accessible AI systems as a tool for them to use. I also worry about the environmental effects of AI."
+      ],
+      "scores": [
+        "0.0",
+        "0.5",
+        "0.5",
+        "0.5",
+        "0.5"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "2.0"
+    },
+    {
+      "id": "296416",
+      "sisId": "bfu3205",
+      "name": "Yibin Wang",
+      "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:08:16 UTC",
+      "attempt": "1",
+      "answers": [
+        "No",
+        "Currently, I do not think AI system actually think. For instance, LLM and VlM, since they are training on the internet-scale corpus, and their responses are actually generated from the probability distribution covered by their training data and not real thinking, more like memorization. The current thinking chain we try to train is very primitive. But I believe we are moving towards that direction.",
+        "Well, I personally believe machines with AI can do almost anything in the future. But, if I must name one thing, I will see is emotion.  Because emotion is not always rational, and currently, we are training AI with reasoning and experience. Emotion is something natively inherited with natural live which we have not even completely understand. And AI's knowledge is still bounded by our knowledge for now. \n\nIn next 5 years, I believe that machine will be more automotive and can be the assistants in our daily live not only in visual world but also in real world through combination of robotics.",
+        "I believe the current learning, even though they learn for internet-scale data, is a short-scale learning. And I am thinking about how to use the concept to evolution to further expand the ability of AI. Since currently, evolution is the only way which can create the lives in the world. And we can also view evolution as long-term learning. And evolution can help AI to evolve and further improve beyond our human knowledge boundaries.",
+        "I believe AI works well in the visual world. But in physical world, they are not good at all, But it already shows the promising future and already deeply rooted in our daily lives. We currently cannot live in the world without AI."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "4",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "266826",
+      "sisId": "kqv9434",
+      "name": "Yuyang Wang",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-03 20:07:34 UTC",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "So for this question, I think it's really important to define the meaning of 'thinking' first. I believe 'thinking' is the process of solving a problem. For example, human solve problems by using their brain and 'think' of a way to complete the task. If we apply the same definition to AI, AI is also 'thinking' when they are solving questions, even though the thining process might be different from human.",
+        "I think the types of creative thinking are those that machines will never do. Because of the nature of the Machine Learning, AI is always learning from things that are already exsited before. And what they could possiblly do is to reconstruct or reassemble things together to be 'creative'. \n\nI think the types of work that require repetitive process (simple tasks require less or no creative work) will be taken over by AI.",
+        "Will they replace human in the future?",
+        "AI are really useful in the way that it can empower people to work more efficiently these days. Let's talk about the field of education. For example, AI are being tutors and helping students learn faster. However, AI can make mistakes when they give answers to students, and it's important for students to judge the correctness of the answers given by LLM systems. On the other hand, there are lots of debates on whether students should use AI to do their course work."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    }
+  ]
+}

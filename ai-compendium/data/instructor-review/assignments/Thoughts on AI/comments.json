@@ -1,0 +1,96 @@
+{
+  "comments": {
+    "204902": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "207343": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "212119": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "213248": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "213686": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "241180": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "241621": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "265703": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "266826": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "272611": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "287745": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "287797": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "287805": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "290550": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "290812": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "296416": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "318442": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
+    "318443": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    }
+  },
+  "updatedAt": "2026-04-07T17:37:59.064Z",
+  "note": "comments[id]: { transcribe, polish, polishTranscribeEnd }. Wand polishes only new raw after End; + then mic = assistant. exportVersion 5."
+}

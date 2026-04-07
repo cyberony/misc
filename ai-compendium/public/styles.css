@@ -13,25 +13,33 @@
   --ok:#36d399;
   --radius: 18px;
   --search-placeholder-color: rgba(100, 116, 139, 0.9);
+  /* Same layout floor on every page; viewport can shrink further → horizontal scroll */
+  --app-min-width: 600px;
 }
 
 *{ box-sizing:border-box; }
 html, body { height: 100%; }
-html{ min-width: 650px; }
+html{
+  min-width: var(--app-min-width);
+  overflow-x: auto;
+}
 body{
   margin:0;
-  min-width: 650px;
+  min-width: var(--app-min-width);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
   color: var(--text);
   background: radial-gradient(1200px 500px at 20% -10%, rgba(124,92,255,.25), transparent 55%),
               radial-gradient(900px 420px at 85% 0%, rgba(53,215,255,.20), transparent 50%),
               linear-gradient(180deg, var(--bg0), var(--bg1));
 }
-/* Global shell floor so non-home pages keep the same minimum usable width. */
+/* Every standalone page shell shares the same minimum width (home, tools, bug reports, alumni, reminders, magic word, reset). */
 .topbar,
 .layout,
-main.bug-reports-shell{
-  min-width: 650px;
+main.content,
+main.bug-reports-shell,
+main.magic-word-shell,
+main.reset-password-shell{
+  min-width: var(--app-min-width);
 }
 
 .bg{
@@ -747,7 +755,12 @@ button.selected-label-chip:hover .selected-label-remove{
   }
 }
 
-@media (max-width: 720px){
+/*
+ * Home resource grid: 2 columns above 700px viewport; 1 column from 700px down.
+ * Between 700px and --app-min-width (600px), scale padding/type (uses 100vw). Below 600px clamps hold → fixed sizes + horizontal scroll on html.
+ * Card *width* cannot go below --app-min-width once the window is narrower than that (document floor), even though type/padding still key off vw.
+ */
+@media (max-width: 700px){
   .grid{ grid-template-columns: 1fr; }
   .content-search{
     flex: 1 1 100%;
@@ -757,6 +770,248 @@ button.selected-label-chip:hover .selected-label-remove{
   .content-grid-scroll{
     overflow: visible;
     padding: 0;
+  }
+
+  main.content{
+    padding:
+      clamp(10px, calc(12px + (100vw - 700px) * 0.02), 12px)
+      clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px);
+  }
+
+  main.content .add-resource-cluster{
+    gap: clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px);
+  }
+
+  main.content .add-resource-hint{
+    font-size: clamp(12.5px, calc(14px + (100vw - 700px) * 0.015), 14px);
+  }
+
+  main.content .fab-add{
+    width: clamp(48px, calc(56px + (100vw - 700px) * 0.08), 56px);
+    height: clamp(48px, calc(56px + (100vw - 700px) * 0.08), 56px);
+  }
+  /* ~2.1rem → ~1.75rem across 700–600px viewport */
+  main.content .fab-add-plus{
+    font-size: clamp(28px, calc(33.6px + (100vw - 700px) * 0.056), 33.6px);
+  }
+
+  main.content .search input{
+    padding:
+      clamp(9px, calc(11px + (100vw - 700px) * 0.02), 11px)
+      clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px);
+  }
+
+  main.content #resourceGrid{
+    gap: clamp(10px, calc(12px + (100vw - 700px) * 0.02), 12px);
+  }
+
+  main.content #resourceGrid > .card{
+    --card-pad: clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px);
+    padding: var(--card-pad);
+    gap: clamp(6px, calc(8px + (100vw - 700px) * 0.02), 8px);
+  }
+
+  main.content #resourceGrid > .card .card-title-band{
+    margin: calc(-1 * var(--card-pad)) calc(-1 * var(--card-pad)) 0 calc(-1 * var(--card-pad));
+    padding:
+      clamp(6px, calc(7px + (100vw - 700px) * 0.02), 7px)
+      var(--card-pad);
+  }
+
+  main.content #resourceGrid > .card .card-title-text{
+    /* Was 0.01 → only ~1px over 700–600; too subtle. */
+    font-size: clamp(12px, calc(14px + (100vw - 700px) * 0.02), 14px);
+  }
+
+  main.content #resourceGrid > .card .desc{
+    font-size: clamp(11.5px, calc(14px + (100vw - 700px) * 0.025), 14px);
+    min-height: clamp(32px, calc(38px + (100vw - 700px) * 0.06), 38px);
+  }
+}
+
+/* --- Other routes: same 700→600 viewport scaling as home (shells, lists, cards) --- */
+@media (max-width: 700px){
+  .topbar{
+    padding:
+      clamp(14px, calc(18px + (100vw - 700px) * 0.04), 18px)
+      clamp(14px, calc(22px + (100vw - 700px) * 0.08), 22px);
+  }
+
+  main.bug-reports-shell:not(.alumni-shell){
+    padding:
+      clamp(12px, calc(16px + (100vw - 700px) * 0.04), 16px)
+      clamp(12px, calc(18px + (100vw - 700px) * 0.06), 18px)
+      clamp(28px, calc(48px + (100vw - 700px) * 0.2), 48px);
+  }
+
+  main.bug-reports-shell.alumni-shell{
+    padding-top: clamp(14px, calc(22px + (100vw - 700px) * 0.08), 22px);
+    padding-bottom: clamp(28px, calc(40px + (100vw - 700px) * 0.12), 40px);
+    padding-left: clamp(12px, calc(16px + (100vw - 700px) * 0.04), 16px);
+    padding-right: clamp(12px, calc(16px + (100vw - 700px) * 0.04), 16px);
+  }
+
+  main.magic-word-shell{
+    padding:
+      clamp(12px, calc(16px + (100vw - 700px) * 0.04), 16px)
+      clamp(12px, calc(18px + (100vw - 700px) * 0.06), 18px)
+      clamp(28px, calc(48px + (100vw - 700px) * 0.2), 48px);
+  }
+  .magic-word-crt-case{
+    padding:
+      clamp(10px, calc(12px + (100vw - 700px) * 0.02), 12px)
+      clamp(12px, calc(14px + (100vw - 700px) * 0.02), 14px)
+      clamp(12px, calc(14px + (100vw - 700px) * 0.02), 14px);
+  }
+  .magic-word-placeholder{
+    font-size: clamp(13px, calc(15px + (100vw - 700px) * 0.02), 15px);
+  }
+
+  main.reset-password-shell{
+    padding:
+      clamp(16px, calc(24px + (100vw - 700px) * 0.08), 24px)
+      clamp(12px, calc(16px + (100vw - 700px) * 0.04), 16px);
+  }
+
+  .bug-reports-toolbar{
+    margin-bottom: clamp(20px, calc(32px + (100vw - 700px) * 0.12), 32px);
+  }
+  .bug-reports-gate{
+    font-size: clamp(13px, calc(14px + (100vw - 700px) * 0.01), 14px);
+  }
+  .bug-reports-list{
+    gap: clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px);
+  }
+  .bug-report-card{
+    padding:
+      clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px)
+      clamp(12px, calc(16px + (100vw - 700px) * 0.04), 16px);
+  }
+  .bug-report-title{
+    font-size: clamp(14px, calc(16px + (100vw - 700px) * 0.02), 16px);
+  }
+  .bug-report-line{
+    font-size: clamp(12px, calc(13px + (100vw - 700px) * 0.01), 13px);
+  }
+  .bug-report-pre{
+    padding:
+      clamp(8px, calc(10px + (100vw - 700px) * 0.02), 10px)
+      clamp(10px, calc(12px + (100vw - 700px) * 0.02), 12px);
+    font-size: clamp(12px, calc(13px + (100vw - 700px) * 0.01), 13px);
+  }
+
+  /*
+   * Reminders (≤700px): toolbar is a fixed column stack; list stays a column stack.
+   * Only cards + chrome scale down smoothly toward --app-min-width (600px).
+   */
+  .reminders-shell .reminders-layout{
+    gap: clamp(16px, calc(24px + (100vw - 700px) * 0.08), 24px);
+  }
+  .reminders-shell .reminders-plus-row{
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: clamp(12px, calc(16px + (100vw - 700px) * 0.04), 16px);
+  }
+  .reminders-shell .reminders-search-wrap{
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 100%;
+  }
+  .reminders-shell .reminders-search-wrap .search{
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+  .reminders-shell .bug-reports-list{
+    gap: clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px);
+  }
+  .reminders-shell .reminder-card{
+    --rc-pad-y: clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px);
+    --rc-pad-x: clamp(12px, calc(16px + (100vw - 700px) * 0.04), 16px);
+    padding: var(--rc-pad-y) var(--rc-pad-x);
+  }
+  .reminders-shell .reminder-card-title{
+    font-size: clamp(12px, calc(14px + (100vw - 700px) * 0.02), 14px);
+  }
+  .reminders-shell .reminder-card-label{
+    font-size: clamp(10px, calc(11px + (100vw - 700px) * 0.01), 11px);
+  }
+  .reminders-shell .reminder-card-pre,
+  .reminders-shell .reminder-card-meta{
+    font-size: clamp(11.5px, calc(13px + (100vw - 700px) * 0.015), 13px);
+  }
+  .reminders-shell .reminder-card-block{
+    margin-top: clamp(8px, calc(12px + (100vw - 700px) * 0.04), 12px);
+  }
+  .reminders-shell .fab-add{
+    width: clamp(48px, calc(56px + (100vw - 700px) * 0.08), 56px);
+    height: clamp(48px, calc(56px + (100vw - 700px) * 0.08), 56px);
+  }
+  .reminders-shell .fab-add-plus{
+    font-size: clamp(28px, calc(33.6px + (100vw - 700px) * 0.056), 33.6px);
+  }
+  .reminders-shell .add-resource-cluster{
+    gap: clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px);
+  }
+  .reminders-shell .add-resource-hint{
+    font-size: clamp(12.5px, calc(14px + (100vw - 700px) * 0.015), 14px);
+  }
+  .reminders-shell .search input{
+    padding:
+      clamp(9px, calc(11px + (100vw - 700px) * 0.02), 11px)
+      clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px);
+  }
+  .reminders-shell .reminders-archive-toggle{
+    width: clamp(30px, calc(34px + (100vw - 700px) * 0.04), 34px);
+    height: clamp(30px, calc(34px + (100vw - 700px) * 0.04), 34px);
+  }
+
+  .admin-user-list{
+    gap: clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px);
+  }
+  .admin-user-row.panel{
+    padding:
+      clamp(10px, calc(14px + (100vw - 700px) * 0.04), 14px)
+      clamp(12px, calc(16px + (100vw - 700px) * 0.04), 16px);
+  }
+  .admin-user-email{
+    font-size: clamp(11px, calc(12px + (100vw - 700px) * 0.01), 12px);
+  }
+
+  .tools-hub-sidebar{
+    gap: clamp(8px, calc(10px + (100vw - 700px) * 0.02), 10px);
+  }
+  .tools-hub-card{
+    padding:
+      clamp(10px, calc(12px + (100vw - 700px) * 0.02), 12px)
+      clamp(12px, calc(14px + (100vw - 700px) * 0.02), 14px);
+  }
+  .tools-hub-card-with-icon{
+    gap: clamp(8px, calc(12px + (100vw - 700px) * 0.04), 12px);
+  }
+  .tools-hub-card h2{
+    font-size: clamp(12px, calc(13px + (100vw - 700px) * 0.01), 13px);
+    line-height: clamp(20px, calc(22px + (100vw - 700px) * 0.02), 22px);
+  }
+  .tools-hub-empty-heading{
+    font-size: clamp(14px, calc(16px + (100vw - 700px) * 0.02), 16px);
+  }
+
+  .alumni-meta-block{
+    font-size: clamp(11.5px, calc(12.5px + (100vw - 700px) * 0.01), 12.5px);
+  }
+  .alumni-download-xlsx{
+    font-size: clamp(11.5px, calc(12.5px + (100vw - 700px) * 0.01), 12.5px);
+  }
+  .alumni-th-btn{
+    padding:
+      clamp(4px, calc(6px + (100vw - 700px) * 0.02), 6px)
+      clamp(6px, calc(8px + (100vw - 700px) * 0.02), 8px);
+  }
+  .alumni-table{
+    font-size: clamp(10px, calc(11px + (100vw - 700px) * 0.01), 11px);
   }
 }
 
@@ -2641,6 +2896,13 @@ main.bug-reports-shell.reminders-shell{
 .reminders-shell .reminders-plus-row{
   padding-left: 0;
   padding-right: 0;
+}
+/* Don’t use home’s fixed 50% .content-search column — it won’t shrink and clips/pushes the list above 700px. */
+.reminders-shell .reminders-plus-row .content-search{
+  flex: 1 1 auto;
+  width: auto;
+  max-width: none;
+  min-width: 0;
 }
 .reminders-shell .reminders-search-wrap{
   flex-direction: row;
