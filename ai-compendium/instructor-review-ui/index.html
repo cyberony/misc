@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AI Perspectives — Quiz review</title>
-    <link rel="stylesheet" href="/review/styles.css?v=20260410" />
+    <link rel="stylesheet" href="/review/styles.css?v=20260408" />
   </head>
   <body>
     <header class="review-topbar" aria-label="Site">
@@ -23,6 +23,12 @@
         <label for="assignmentSelect">Assignment</label>
         <div class="assignment-picker-row">
           <select id="assignmentSelect" aria-label="Choose assignment to grade"></select>
+          <button type="button" class="btn-rename-assignment" id="btnRenameAssignment" title="Rename assignment (list only)" aria-label="Rename assignment">
+            <svg class="btn-rename-assignment-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+          </button>
           <button type="button" class="btn-delete-assignment" id="btnDeleteAssignment" title="Delete selected assignment" aria-label="Delete selected assignment">
             <svg class="btn-delete-assignment-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M3 6h18"></path>
@@ -35,6 +41,14 @@
         </div>
       </div>
       <span class="meta" id="metaLine"></span>
+      <span class="assignment-due assignment-due-wrap" id="assignmentDueWrap" hidden>
+        <button
+          type="button"
+          class="due-pill due-pill--clickable"
+          id="assignmentDuePill"
+          aria-label="Set assignment due date"
+        ></button>
+      </span>
       <div class="actions">
         <button type="button" class="primary" id="btnUploadAssignment">Upload assignment data</button>
         <button type="button" id="btnExport">Export all (JSON)</button>
@@ -49,6 +63,7 @@
       <div class="pane-left" id="studentList"></div>
       <aside class="pane-right">
         <h2 id="commentTitle">Comments</h2>
+        <p class="student-submission-meta" id="studentSubmissionMeta" hidden></p>
         <div class="comment-fields">
           <div class="comment-row">
             <div class="comment-actions">
@@ -222,45 +237,68 @@
     <div id="uploadModal" class="review-modal" hidden aria-hidden="true">
       <div class="review-modal-backdrop" id="uploadModalBackdrop"></div>
       <div class="review-modal-panel" role="dialog" aria-labelledby="uploadModalTitle" aria-modal="true">
-        <h2 id="uploadModalTitle" class="review-modal-title">Upload assignment data</h2>
-        <p class="review-modal-hint muted">Provide a Canvas-style <code>students.json</code> (with <code>questions</code> and <code>students</code>). Optional <code>comments.json</code> merge shape.</p>
+        <div class="review-modal-head">
+          <h2 id="uploadModalTitle" class="review-modal-title">Upload assignment data</h2>
+          <button type="button" class="review-modal-close" id="uploadModalClose" aria-label="Close">✕</button>
+        </div>
         <div class="review-modal-fields">
           <label class="review-modal-label">
-            Assignment ID <span class="muted">(slug, e.g. week-2-reflection)</span>
-            <input type="text" id="uploadId" class="review-modal-input" autocomplete="off" placeholder="week-2-reflection" />
+            Assignment report CSV
+            <input type="file" id="uploadCsvFile" accept=".csv,text/csv" />
           </label>
           <label class="review-modal-label">
-            Title <span class="muted">(shown in the list)</span>
-            <input type="text" id="uploadTitle" class="review-modal-input" autocomplete="off" placeholder="Week 2 reflection" />
-          </label>
-          <label class="review-modal-label">
-            Folder name <span class="muted">(on disk, e.g. Week 2 Reflection)</span>
-            <input type="text" id="uploadDir" class="review-modal-input" autocomplete="off" placeholder="Week 2 Reflection" />
-          </label>
-          <label class="review-modal-label">
-            students.json
-            <input type="file" id="uploadStudentsFile" accept="application/json,.json" />
-          </label>
-          <label class="review-modal-label">
-            comments.json <span class="muted">(optional)</span>
-            <input type="file" id="uploadCommentsFile" accept="application/json,.json" />
+            Assignment ID <span class="review-modal-optional">(optional — for Canvas upload later)</span>
+            <input type="text" id="uploadId" class="review-modal-input" autocomplete="off" placeholder="e.g., Assignment 7 (1759267)" />
           </label>
         </div>
         <div class="review-modal-actions">
-          <button type="button" id="uploadModalCancel">Cancel</button>
-          <button type="button" id="uploadModalSubmit">Upload</button>
+          <button type="button" class="primary" id="uploadModalSubmit">Upload</button>
         </div>
       </div>
     </div>
 
     <div id="confirmDeleteDialog" class="confirm-dialog" hidden role="dialog" aria-modal="true" aria-live="assertive">
-      <span id="confirmDeleteMessage" class="confirm-dialog-msg"></span>
+      <div class="confirm-dialog-top">
+        <span id="confirmDeleteMessage" class="confirm-dialog-msg"></span>
+        <button type="button" class="confirm-dialog-x" id="confirmDeleteClose" aria-label="Close">✕</button>
+      </div>
       <div class="confirm-dialog-actions">
-        <button type="button" id="confirmDeleteCancel">Cancel</button>
         <button type="button" class="confirm-dialog-danger" id="confirmDeleteOk">Delete</button>
       </div>
     </div>
 
-    <script src="/review/app.js?v=20260410"></script>
+    <div id="renameAssignmentModal" class="review-modal" hidden aria-hidden="true">
+      <div class="review-modal-backdrop" id="renameAssignmentModalBackdrop"></div>
+      <div class="review-modal-panel" role="dialog" aria-labelledby="renameAssignmentModalTitle">
+        <div class="review-modal-head">
+          <h2 class="review-modal-title" id="renameAssignmentModalTitle">Rename assignment</h2>
+          <button type="button" class="review-modal-close" id="renameAssignmentModalClose" aria-label="Close">✕</button>
+        </div>
+        <p class="review-modal-hint">Shown in the assignment list only. Does not change files on disk or the assignment id.</p>
+        <label class="review-modal-label">Display name <input type="text" id="renameAssignmentInput" class="review-modal-input" autocomplete="off" /></label>
+        <div class="review-modal-actions">
+          <button type="button" class="primary" id="renameAssignmentSave">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="dueDateModal" class="review-modal" hidden aria-hidden="true">
+      <div class="review-modal-backdrop" id="dueDateModalBackdrop"></div>
+      <div class="review-modal-panel" role="dialog" aria-labelledby="dueDateModalTitle">
+        <div class="review-modal-head">
+          <h2 class="review-modal-title" id="dueDateModalTitle">Assignment due date</h2>
+          <button type="button" class="review-modal-close" id="dueDateModalClose" aria-label="Close">✕</button>
+        </div>
+        <p class="review-modal-hint">Calendar day in UTC (YYYY-MM-DD). Used for on-time vs late in the student panel.</p>
+        <label class="review-modal-label">Due date <input type="date" id="dueDateInput" class="review-modal-input" /></label>
+        <div class="review-modal-actions">
+          <button type="button" id="dueDateModalClear">Clear</button>
+          <button type="button" class="primary" id="dueDateModalSave">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-version-stamp" aria-hidden="true">v6.2.0</div>
+    <script src="/review/app.js?v=20260408"></script>
   </body>
 </html>

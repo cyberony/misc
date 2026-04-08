@@ -1831,7 +1831,7 @@ function wireUI() {
   });
   $('#authForm').addEventListener('submit', submitAuth);
 
-  // Signup splash
+  // Signup splash (single primary: OK — Enter activates it)
   $('#signupSplashOk').addEventListener('click', closeSignupSplash);
   signupSplashModal.addEventListener('click', (e) => {
     if (e.target === signupSplashModal) closeSignupSplash();
@@ -1862,6 +1862,20 @@ function wireUI() {
       if (e.target === existingCardModal) closeExistingCardModal();
     });
   }
+
+  /** Modals with a single primary action: Enter activates it (same as compendium UX). */
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    if (signupSplashModal && !signupSplashModal.hidden) {
+      e.preventDefault();
+      closeSignupSplash();
+      return;
+    }
+    if (existingCardModal && !existingCardModal.hidden) {
+      e.preventDefault();
+      closeExistingCardModal();
+    }
+  });
 
   wireBrandInterpunctEasterEgg();
 }

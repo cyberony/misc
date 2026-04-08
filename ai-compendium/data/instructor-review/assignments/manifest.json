@@ -1,14 +1,14 @@
 {
   "assignments": [
     {
-      "id": "thoughts-on-ai",
+      "id": "thoughts-on-ai-quiz-student-analysis-report",
       "title": "Thoughts on AI",
-      "dir": "Thoughts on AI"
+      "dir": "thoughts-on-ai-quiz-student-analysis-report"
     },
     {
-      "id": "week-1-thoughts",
+      "id": "week-1-thoughts-quiz-student-analysis-report",
       "title": "Week 1 Thoughts",
-      "dir": "Week 1 Thoughts"
+      "dir": "week-1-thoughts-quiz-student-analysis-report"
     }
   ]
 }

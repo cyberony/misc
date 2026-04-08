@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-04T21:55:14.690179+00:00",
+  "generatedAt": "2026-04-08T17:51:26.355Z",
   "sourceFile": "Thoughts on AI Quiz Student Analysis Report.csv",
   "questions": [
     {
@@ -117,31 +117,6 @@
         "Its hard to come up with a concrete example of something that an AI won't be able to accomplish even though a part of me thinks it won't be able to fully grasp sentience. The presence of self. However, it is easy to imagine in the next 5-10 years that robots could be deployed with a generalized policy which enables them to accomplish 40%+ of jobs currently done by humans.",
         "My most pressing questions are no longer necessarily about the technical feasibility of the future of AI but more on a philosophical question of whether  we should pursue this as in will it provide a net-benefit to society. Like whether this is like opening Pandora box where we no longer have the means to close it.",
         "Overall I see it as the latest evolution of human tools. We formed tools to work with the physical world and now we formed a tool for the digital/information age."
-      ],
-      "scores": [
-        "0.0",
-        "0.0",
-        "0.0",
-        "0.0",
-        "0.0"
-      ],
-      "nCorrect": "5",
-      "nIncorrect": "0",
-      "totalScore": "0.0"
-    },
-    {
-      "id": "318442",
-      "sisId": "ash3960",
-      "name": "Andre Shportko",
-      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-08 00:00:00 UTC",
-      "attempt": "1",
-      "answers": [
-        "Yes",
-        "While AI has a different errors profile, at the end of the day, it does (1) generate unique ideas (or at least recompiles them productively) (2) navigate the solution space efficiently (not by total exhaustion). In a very reduced sense, intelligence for me seems to be a capacity to enable efficient heuristics to navigate the solution space.",
-        "AI will not be able to initiate the avant-garde in art (only simulate existing styles). Fine arts is historically a response to the social disturbances that are inherently human-initiated and thus only humans are able to capture the initial Zeitgeist.\nTo this end, I think that AI will be able to automate the Math proofs soon.",
-        "Can we stop it if it goes south?",
-        "Human agency is central for me in the high stakes environments such as judiciary, warfare, airspace tech, and healthcare. Unlike SWE, those fields do not tolerate false positives."
       ],
       "scores": [
         "0.0",
@@ -530,31 +505,6 @@
       "totalScore": "2.0"
     },
     {
-      "id": "318443",
-      "sisId": "mlu3960",
-      "name": "Miya Liu",
-      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-08 00:00:00 UTC",
-      "attempt": "1",
-      "answers": [
-        "I don't think it is impossible",
-        "I define thinking in the scope of how animals (especially humans) think, which is roughly the process of taking ideas/perceptions/sensations as input that triggers some neurons to fire, which in case outputs some combination of ideas. For example, upon smelling fried chicken, many might start to think that they would desire fried chicken for dinner. However, sometimes thoughts can also come involuntarily, which I found to be very interesting. If we are looking at thinking in the mechanical way (perhaps one can say the materialistic lens), how current reasoning models are not too far from how humans actually reason and think. I think most people's problem with the argument that AI systems can think lies in the fact that right now LLMs are just doing next token prediction, which doesn't seem very intelligent. There are two ways to look at this. One way is to argue that the fact that such process is a \"black box\" gives room for thinking and true intelligence, and the other can argue that it is only a matter of architecture and structure, which can be further explored. Personally, I am pretty optimistic about the likelihood of AI systems coming to have the capacity of thoughts.",
-        "I don't think there's an aspect in which machines won't be able to do. In 5 years, maybe they will be able to conquer most human tasks (like grocery shopping, delivery, etc.) and replace most manual work. In 10 years we might not be able to differentiate an artificial human and a real human. In 100 years it might be possible that machines are so smart and intelligent they can be incorporated into a part of society.",
-        "I am really interested to think more about how AI is bounded by language. Also how it will challenge the notion of a God for those who are religious.",
-        "I think it's something I'm not super sure about. I sometimes feel skeptical but sometimes really impressed by their progress. That's why I really look forward to all the different guest lectures and discussions we'll have in this class!"
-      ],
-      "scores": [
-        "0.0",
-        "0.0",
-        "0.0",
-        "0.0",
-        "0.0"
-      ],
-      "nCorrect": "5",
-      "nIncorrect": "0",
-      "totalScore": "0.0"
-    },
-    {
       "id": "265703",
       "sisId": "cue0559",
       "name": "Pranav Gogineni",
@@ -704,5 +654,6 @@
       "nIncorrect": "0",
       "totalScore": "0.0"
     }
-  ]
+  ],
+  "dueDate": "2026-04-03"
 }

@@ -45,6 +45,12 @@ Do not invent facts beyond what they implied. Output only the transcript text—
 const COMMENTS_NOTE =
   'comments[id]: { transcribe, polish, polishTranscribeEnd, exportPreferred }. exportPreferred: transcribe|polish (which text to use in export). exportVersion 6.';
 
+/** Spring / localStorage used short ids; compendium manifest uses CSV-slug ids. */
+const LEGACY_ASSIGNMENT_ID_TO_CANONICAL = {
+  'thoughts-on-ai': 'thoughts-on-ai-quiz-student-analysis-report',
+  'week-1-thoughts': 'week-1-thoughts-quiz-student-analysis-report',
+};
+
 const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
 
 function normalizeCommentEntry(raw) {
@@ -142,7 +148,13 @@ function commentsPathForAssignmentId(dataRoot, assignmentId) {
   if (!assignmentId || typeof assignmentId !== 'string') return null;
   const manifestPath = path.join(dataRoot, 'assignments', 'manifest.json');
   const list = readAssignmentsManifest(manifestPath);
-  const a = list.find(x => x && x.id === assignmentId && typeof x.dir === 'string');
+  let a = list.find(x => x && x.id === assignmentId && typeof x.dir === 'string');
+  if (!a) {
+    const canon = LEGACY_ASSIGNMENT_ID_TO_CANONICAL[assignmentId];
+    if (canon) {
+      a = list.find(x => x && x.id === canon && typeof x.dir === 'string');
+    }
+  }
   if (!a) return null;
   const base = path.join(dataRoot, 'assignments');
   const full = path.resolve(base, a.dir);
@@ -454,9 +466,51 @@ function mountInstructorReview(app, opts) {
       }
       let list = readAssignmentsManifest(manifestAssignmentsPath);
       const idx = list.findIndex(a => a && a.id === id);
-      const entry = { id, title, dir };
+      const sourceFile =
+        typeof students.sourceFile === 'string' && students.sourceFile.trim()
+          ? students.sourceFile.trim()
+          : null;
+      const entry = { id, title, dir, ...(sourceFile ? { sourceFile } : {}) };
       if (idx >= 0) list[idx] = entry;
       else list.push(entry);
+      list.sort((a, b) =>
+        String(a.title || a.id).localeCompare(String(b.title || b.id), undefined, { sensitivity: 'base' }),
+      );
+      fs.writeFileSync(manifestAssignmentsPath, `${JSON.stringify({ assignments: list }, null, 2)}\n`, 'utf8');
+      res.json({ ok: true, assignments: list });
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
+  });
+
+  /** POST (not PATCH): matches patch-assignment-meta; some proxies only forward GET/POST. */
+  app.post('/api/instructor-review/rename-assignment', requireMagic, uploadJson, (req, res) => {
+    try {
+      const assignmentId = sanitizeSlug(req.body?.assignmentId);
+      if (!assignmentId) return res.status(400).json({ error: 'Invalid assignment id' });
+      const title = String(req.body?.title || '').trim();
+      if (!title) return res.status(400).json({ error: 'Display name is required' });
+      let list = readAssignmentsManifest(manifestAssignmentsPath);
+      const idx = list.findIndex(a => a && a.id === assignmentId);
+      if (idx < 0) return res.status(404).json({ error: 'Assignment not found' });
+      let next = { ...list[idx], title };
+      const assignmentRoot = assignDirFull(list[idx].dir);
+      if (assignmentRoot) {
+        const studentsPath = path.join(assignmentRoot, 'students.json');
+        if (fs.existsSync(studentsPath)) {
+          try {
+            const doc = JSON.parse(fs.readFileSync(studentsPath, 'utf8'));
+            const sf =
+              doc && typeof doc.sourceFile === 'string' && doc.sourceFile.trim()
+                ? doc.sourceFile.trim()
+                : null;
+            if (sf) next.sourceFile = sf;
+          } catch {
+            /* keep manifest title-only */
+          }
+        }
+      }
+      list[idx] = next;
       list.sort((a, b) =>
         String(a.title || a.id).localeCompare(String(b.title || b.id), undefined, { sensitivity: 'base' }),
       );
@@ -483,6 +537,44 @@ function mountInstructorReview(app, opts) {
         fs.rmSync(assignmentRoot, { recursive: true, force: true });
       }
       res.json({ ok: true, assignments: list });
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
+  });
+
+  app.post('/api/instructor-review/patch-assignment-meta', requireMagic, uploadJson, (req, res) => {
+    try {
+      const assignmentId = sanitizeSlug(req.body?.assignmentId);
+      if (!assignmentId) return res.status(400).json({ error: 'Invalid assignment id' });
+      const list = readAssignmentsManifest(manifestAssignmentsPath);
+      const idx = list.findIndex(a => a && a.id === assignmentId);
+      if (idx < 0) return res.status(404).json({ error: 'Assignment not found' });
+      const { dir } = list[idx];
+      const assignmentRoot = assignDirFull(dir);
+      if (!assignmentRoot) return res.status(400).json({ error: 'Invalid manifest folder' });
+      const studentsPath = path.join(assignmentRoot, 'students.json');
+      if (!fs.existsSync(studentsPath)) return res.status(404).json({ error: 'students.json missing' });
+      let doc;
+      try {
+        doc = JSON.parse(fs.readFileSync(studentsPath, 'utf8'));
+      } catch {
+        return res.status(500).json({ error: 'Could not read students.json' });
+      }
+      if (!doc || typeof doc !== 'object' || Array.isArray(doc)) {
+        return res.status(500).json({ error: 'Invalid students.json shape' });
+      }
+      const rawDue = req.body?.dueDate;
+      if (rawDue === null || rawDue === undefined || rawDue === '') {
+        delete doc.dueDate;
+      } else {
+        const s = String(rawDue).trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+          return res.status(400).json({ error: 'dueDate must be YYYY-MM-DD or empty' });
+        }
+        doc.dueDate = s;
+      }
+      fs.writeFileSync(studentsPath, `${JSON.stringify(doc, null, 2)}\n`, 'utf8');
+      res.json({ ok: true, dueDate: doc.dueDate ?? null });
     } catch (e) {
       res.status(500).json({ error: String(e.message || e) });
     }

@@ -1,0 +1,156 @@
+{
+  "comments": {
+    "204902": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "206187": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "207343": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "212119": {
+      "transcribe": "So, the stochastic parrots argument has been brought up by others as well. It used to be much more commonly stated than it is nowadays. But it is still a notion that a lot of people put forth. That said, if you actually think about the design of an LLM, by design they cannot remember their inputs. So, they cannot quite have the memory that being a stochastic parrot would require. However, it's something definitely worth discussing. Also, it's interesting that your definition of thinking includes the requirement that unique observation has to come out. Something that did not exist in the world before. As far as whether AI models have gone beyond human control in labs, I don't know if that exact scenario where something wrong has happened in a lab situation has occurred. But definitely AI has gone beyond human expectations slash intent in certain circumstances, including in my own experience. There are instances, people and I have observed where AI has done something without having been asked to do it. And I unfortunately agree with your comparison of AI with the nuclear bomb in terms of the amount of harm that AI can bring. So, we are definitely working with lightning in a jar.",
+      "polish": "The stochastic parrots argument has been raised by others and was more commonly discussed in the past, yet it remains a notion that many still present. When considering the design of a large language model (LLM), it's clear that these models, by design, cannot remember their inputs. This limitation means they lack the memory required to be considered stochastic parrots. Nonetheless, this topic is certainly worth discussing.\n\nI find it intriguing that your definition of thinking includes the necessity for unique observations that did not previously exist in the world. Regarding whether AI models have exceeded human control in laboratory settings, I'm not aware that something wrong has happened in a lab setting per se, but Yes, AI has gone beyond user expectations in terms of not following intent. I have personally had such experiences as well, where AI has performed actions without being explicitly instructed to do so.\n\nI also resonate with your comparison of AI to a nuclear bomb in terms of the potential harm it can cause. We are indeed working with something as unpredictable as \"lightning in a jar.\"",
+      "polishTranscribeEnd": 1195,
+      "exportPreferred": "polish"
+    },
+    "213248": {
+      "transcribe": "That's an interesting way to put it, that you think the quote-unquote experience is what makes it feel like the AI is thinking. So yeah, I like how you're looking at it. That's an interesting way of looking at it, given how I personally at least think that yes, the current AIs are able to think, except they don't think in our own way. The fact that they can put together all their knowledge, a lot of their knowledge and concepts to come up with new concepts, that's a form of thinking. It's just not our kind of thinking, but it is a kind of thinking.",
+      "polish": "I like your perspective on the idea that the \"experience\" contributes to the perception of AI thinking. I find it interesting because I believe that current AIs do possess a form of thinking, albeit not in the same way humans do. Their ability to synthesize vast amounts of knowledge and concepts to generate new ideas demonstrates a type of thinking. While it differs from human thought processes, it is still valid. I value your insights and the way you approach this topic.",
+      "polishTranscribeEnd": 554,
+      "exportPreferred": "polish"
+    },
+    "213686": {
+      "transcribe": "very interesting points in #3. I particularly like your Ship of Theseus argument. I did wonder about the contradiction as well, and then I saw you mention it yourself :) I took the contradiction to mean that while you thought AI could conquer all forms of thinking, it's the current AIs that lack that capability due to not having the kind of experiential memory that getting burned by fire gives us. as for quantum, that's a whole other world of possibilities, so yes, who knows -- quantum computing might be the thing that brings real thinking to machines. we're scheduled to get a quantum computing talk, so perhaps we'll learn something along these lines. one other things i very much like in what you said is he possibility that you \"think they'll also discover different aspects of thought that we haven't come up with yet because we're approaching it from a different angle.\" totally agree. it's just like Deep Blue's \"strange\" pawn move that baffled Kasparov in '97 or AlphaGo's similar move in 2015 or '16 that took Lee Sodol and whole world of Go by surprise, as neither move fell within what humans would ever think up.\n\nabsolutely love the first two sentences of #4, especially AI orienting itself in terms of us! a brilliant thought/question that you should bring up if apt during a class discussion. it's worth exploring as a group.\n\n\"Will it lead us out of the end of the world into a new world, or will it keep us in this awful place forever?\" -- this is a gem! perhaps i think so because i myself have wondered this, so i'm biased that way.\n\noverall, i wanna say that if i enjoyed reading all this, and if this was your first writing in this class, i can't wait to read the weekly thoughts!",
+      "polish": "You made very interesting points in response #3. I particularly appreciated your Ship of Theseus argument. I noticed you addressed the contradiction yourself, which was insightful. I interpreted the contradiction to mean that while you believe AI could eventually conquer all forms of thinking, current AIs lack that capability because they do not possess the experiential memory that we gain from experiences, such as getting burned by fire.\n\nRegarding quantum computing, it opens up a whole new world of possibilities. It’s exciting to think that quantum computing might be the key to enabling real thinking in machines. We are scheduled to have a talk on quantum computing, so I hope we can learn more about this topic.\n\nI also resonated with your idea that we might discover different aspects of thought that we haven't yet considered because we are approaching it from a different angle. This reminds me of Deep Blue's unexpected pawn move that baffled Kasparov in 1997, or AlphaGo's surprising move in 2016 that took Lee Sedol and the entire Go community by surprise. Both moves were outside the realm of human thought.\n\nI absolutely loved the first two sentences of response #4, especially the idea of AI orienting itself in terms of us. This is a brilliant thought and a question worth bringing up during class discussions.\n\nYour statement, \"Will it lead us out of the end of the world into a new world, or will it keep us in this awful place forever?\" is a gem. I find it particularly compelling because I have pondered this question myself.\n\nOverall, I want to express how much I enjoyed reading your responses. If this was your first writing in this class, I am eager to read your weekly thoughts!",
+      "polishTranscribeEnd": 1707,
+      "exportPreferred": "polish"
+    },
+    "237058": {
+      "transcribe": "I very much like your simple but elegant definition of thinking. It's not complicated, and it seems very, very objective, and I quite agree with how you're looking at thinking, that it's basically the act of processing facts and generating opinions or doing something accordingly, right? I mean, what more do we need? That pretty much sums up thinking, if you ask me. So I agree with you. Interesting point about thinking of themselves, which is something you mentioned as something that AI might never be able to do, the self-reflection, or I forget what the word is for that. I think it's called introspection. Introspection is something that they might not be able to do, but who knows, right?",
+      "polish": "I appreciate your simple yet elegant definition of thinking. It is straightforward and appears very objective. I agree with your perspective that thinking involves processing facts and generating opinions or actions based on those facts. This definition effectively captures the essence of thinking.\n\nYou also raised an interesting point about self-reflection, which you suggested AI might never be able to achieve. I believe the term you are looking for is introspection. While it seems that AI may struggle with this capability, it remains an open question.",
+      "polishTranscribeEnd": 696,
+      "exportPreferred": "polish"
+    },
+    "238492": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "240023": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "241180": {
+      "transcribe": "Good thoughts that you shared here. A couple of things about number one is about the probabilistic guessing machine. I'm not so sure that I would call an LLM a probabilistic guessing machine. It does output a probability, but the machine itself is very deterministic. There is actually nothing probabilistic about the machine itself. So that's something to keep in mind, and we can probably discuss that further in class. As far as creativity goes, that's also something we should, you know, I encourage you to bring up in class whenever apt, maybe during the philosophy lecture, maybe in some other lecture, but if there's a good place to bring it up, we can explore creativity as well. I love how you're questioning yourself. You said, whatever I said above, part of me is skeptical about it. I like that mindset that even though you have opinions, you are open to those opinions being, you know, wrong or you're just open about other possibilities. That's fantastic. You're also asking the questions, what if AI is already thinking? What if they're already conscious? Good questions. And here's the more profound question, or not more profound, but it's a very profound question. How could this happen just based on images and words without any understanding of the real world slash world model? That's fantastic.",
+      "polish": "You shared some insightful thoughts in your responses. Regarding your first point about the probabilistic guessing machine, I would like to clarify that I wouldn’t characterize a large language model (LLM) in that way. While it does output probabilities, the underlying mechanism is quite deterministic. This distinction is important, and I look forward to discussing it further in class.\n\nOn the topic of creativity, I encourage you to bring it up during our discussions, especially in the philosophy lecture or any relevant context. It’s a valuable area for exploration.\n\nI appreciate your self-reflection, particularly your expression of skepticism about your own views. It’s commendable that you maintain an open mindset, recognizing that your opinions could be challenged or revised. \n\nYour questions about AI, such as whether it is already thinking or conscious, are thought-provoking. Additionally, your inquiry into how such capabilities could arise from images and words without a real-world understanding is a profound one. I look forward to delving deeper into these topics with you.",
+      "polishTranscribeEnd": 1316,
+      "exportPreferred": "polish"
+    },
+    "241621": {
+      "transcribe": "That's an interesting thought that you think thinking requires consciousness. I believe that's pretty much what most people think, whether in terms of consciousness or agency. Agency is a term people often will use where somebody feels like doing something on their own. Thinking has something to do with agency, where the thought is coming from within. So yeah, that's a good point.",
+      "polish": "I find your perspective on the relationship between thinking and consciousness intriguing. It aligns with a common belief that consciousness is essential for thought processes. The concept of agency is also relevant here; it refers to the feeling of acting independently. Thinking is indeed connected to agency, as it often arises from within. You’ve made a strong point.",
+      "polishTranscribeEnd": 383,
+      "exportPreferred": "polish"
+    },
+    "265703": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "266826": {
+      "transcribe": "like that you're not dismissing the possibility that ai's think, perhaps differently than how humans do.",
+      "polish": "I appreciate that you are not dismissing the possibility that AI may think, albeit in a manner different from human thought processes.",
+      "polishTranscribeEnd": 104,
+      "exportPreferred": "polish"
+    },
+    "267269": {
+      "transcribe": "Very nice and simple definition of thinking. I quite agree with you. Every one of us has that question, you know, brewing in our mind.",
+      "polish": "I appreciate your clear and straightforward definition of thinking. I completely agree with you. It’s a question that resonates with all of us.",
+      "polishTranscribeEnd": 134,
+      "exportPreferred": "polish"
+    },
+    "272611": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "287745": {
+      "transcribe": "i don't know exactly what key points kris will address in his talk this time around, but he has in the past talked about intuition in this class, so if he does that, i encourage you to bring up your point about intuition, inner feeling, and evidence and factual statements. these three things are worth doing a deep dive on.",
+      "polish": "I am unsure of the specific key points Kris will address in his upcoming talk. However, he has previously discussed intuition in this class. If he revisits that topic, I encourage you to share your insights about intuition, inner feelings, and evidence and factual statements. These three aspects are worth exploring in depth.",
+      "polishTranscribeEnd": 324,
+      "exportPreferred": "polish"
+    },
+    "287757": {
+      "transcribe": "good dissection of what an ai coding agent needs to do to produce code per our demands. are you likening this process to thinking then? curious to know if that was your intent in #2.\n\n\"Accessing this universal consciousness that is built into our biology.\" -- Whoa! This one's making me think hard! we should talk about this, so i encourage you to bring this up in class if and when apt.\n\n",
+      "polish": "You provided a strong analysis of what an AI coding agent needs to do to generate code according to our specifications. I am curious if you intended to liken this process to thinking in your response to question #2.\n\nYour statement about \"accessing this universal consciousness that is built into our biology\" is quite thought-provoking. I encourage you to bring this up in class when the opportunity arises, as it could lead to an engaging discussion.",
+      "polishTranscribeEnd": 389,
+      "exportPreferred": "polish"
+    },
+    "287797": {
+      "transcribe": "That's a good point you make about sentience. That's a hard nut to crack. Just like consciousness, sentience is also very difficult to define and for lack of a better word, quantify. How would we even achieve it? What does it even mean? We feel it and we can communicate it because we have that shared feeling, shared experience of sentience, but will machines ever achieve it? That's a very good question. Not sure if machines ever will or what that means. And good question about Pandora's box as well.",
+      "polish": "You raised an excellent point about sentience. It is indeed a challenging concept to define and quantify, much like consciousness. I appreciate your inquiry into how we might achieve a clear understanding of it. While we can feel and communicate our shared experiences of sentience, it remains uncertain whether machines will ever attain this quality. Your question about the implications of this possibility, akin to opening Pandora's box, is also thought-provoking.",
+      "polishTranscribeEnd": 504,
+      "exportPreferred": "polish"
+    },
+    "287800": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "287801": {
+      "transcribe": "\"In these aspects I think AI systems are able to form connections between the knowledge they already have and apply them in a way that helps them solve problems.\" -- Brilliant! This seems simple enough as a concept, yet most people don't seem to entertain this possibility at all!",
+      "polish": "I find this insight to be brilliant. The idea that AI systems can form connections between existing knowledge and apply it to solve problems is straightforward yet often overlooked by many.",
+      "polishTranscribeEnd": 280,
+      "exportPreferred": "polish"
+    },
+    "287805": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "288357": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "290550": {
+      "transcribe": "you haven't said what you'd define thinking as. curious to know that. care to drop me a line by email taking a stab at that definition?\n\ninteresting prediction in #3. never thought of it this way -- that larger models and more data might actually get in the way of achieving general intelligence.\n\nlove your point about the comparison of what's happening with large-scale ai model training vs. the pursuit of elegant mathematical and scientific solutions, the latter, in my opinion, being more likely to yield the true fundamentals of intelligence.",
+      "polish": "I noticed that you haven't provided your definition of thinking. I would be curious to know your perspective on that. Please feel free to email me with your thoughts.\n\nYour prediction in question #3 was intriguing. I had never considered that larger models and more data might hinder the achievement of general intelligence.\n\nI also appreciate your comparison between large-scale AI model training and the pursuit of elegant mathematical and scientific solutions. I agree that the latter is more likely to reveal the true fundamentals of intelligence.",
+      "polishTranscribeEnd": 548,
+      "exportPreferred": "polish"
+    },
+    "290812": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    },
+    "296416": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": "transcribe"
+    }
+  },
+  "updatedAt": "2026-04-08T18:30:46.812Z",
+  "note": "comments[id]: { transcribe, polish, polishTranscribeEnd, exportPreferred }. exportPreferred: transcribe|polish (which text to use in export). exportVersion 6."
+}

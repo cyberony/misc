@@ -180,11 +180,220 @@ function getCurrentAssignmentEntry() {
 }
 
 function formatMetaLine() {
-  const entry = getCurrentAssignmentEntry();
-  const title = entry?.title || currentAssignmentId || "";
   const n = bundle?.students?.length ?? 0;
-  const src = bundle?.sourceFile ?? "students.json";
-  return `${title} · ${n} students · ${src}`;
+  return n === 1 ? "1 student" : `${n} students`;
+}
+
+/** Optional top-level field in students.json: YYYY-MM-DD (UTC calendar date, inclusive). Next UTC day after this is at least 1 day late. */
+function getDueDateYmdFromBundle(b) {
+  const raw = b?.dueDate;
+  if (typeof raw !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(raw.trim())) return null;
+  return raw.trim();
+}
+
+function parseCanvasSubmittedUtc(submitted) {
+  if (!submitted || typeof submitted !== "string") return null;
+  const s = submitted.trim();
+  let iso = s;
+  if (!s.includes("T")) {
+    const m = s.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) UTC$/);
+    if (m) iso = `${m[1]}T${m[2]}Z`;
+  }
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+/** Whole calendar days late in UTC: first instant of the UTC day after dueDate counts as 1 day late. */
+function calendarDaysLateUtc(submittedStr, dueDateYmd) {
+  const sub = parseCanvasSubmittedUtc(submittedStr);
+  if (!sub || !dueDateYmd) return null;
+  const subDay = sub.toISOString().slice(0, 10);
+  if (subDay <= dueDateYmd) return 0;
+  const tDue = Date.UTC(
+    parseInt(dueDateYmd.slice(0, 4), 10),
+    parseInt(dueDateYmd.slice(5, 7), 10) - 1,
+    parseInt(dueDateYmd.slice(8, 10), 10),
+  );
+  const tSub = Date.UTC(
+    parseInt(subDay.slice(0, 4), 10),
+    parseInt(subDay.slice(5, 7), 10) - 1,
+    parseInt(subDay.slice(8, 10), 10),
+  );
+  return Math.round((tSub - tDue) / 86400000);
+}
+
+function formatDueDateReadableUtc(ymd) {
+  const y = parseInt(ymd.slice(0, 4), 10);
+  const m = parseInt(ymd.slice(5, 7), 10) - 1;
+  const day = parseInt(ymd.slice(8, 10), 10);
+  const dt = new Date(Date.UTC(y, m, day));
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(dt);
+}
+
+function formatSubmittedReadableUtc(submitted) {
+  const d = parseCanvasSubmittedUtc(submitted);
+  if (!d) return "";
+  return (
+    new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: "UTC",
+    }).format(d) + " UTC"
+  );
+}
+
+function updateAssignmentDueBanner() {
+  const wrap = document.getElementById("assignmentDueWrap");
+  const pill = document.getElementById("assignmentDuePill");
+  if (!wrap || !pill) return;
+  if (!currentAssignmentId || !bundle) {
+    wrap.hidden = true;
+    return;
+  }
+  wrap.hidden = false;
+  pill.hidden = false;
+  const ymd = getDueDateYmdFromBundle(bundle);
+  pill.classList.toggle("due-pill--empty", !ymd);
+  if (!ymd) {
+    pill.textContent = "No due date set";
+    pill.title = "No due date — click to set. Used for on-time vs late.";
+    pill.setAttribute("aria-label", "No due date set. Click to choose assignment due date.");
+    return;
+  }
+  const readable = formatDueDateReadableUtc(ymd);
+  pill.textContent = `Due ${readable}`;
+  pill.title = `Due date ${ymd} (UTC calendar day, inclusive). Click to change.`;
+  pill.setAttribute("aria-label", `Assignment due ${readable}. Click to change.`);
+}
+
+function applyDueDateFromServerResponse(dueDate) {
+  if (!bundle) return;
+  if (dueDate && typeof dueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dueDate.trim())) {
+    bundle.dueDate = dueDate.trim();
+  } else {
+    delete bundle.dueDate;
+  }
+}
+
+async function patchAssignmentDueDate(ymdOrNull) {
+  if (!currentAssignmentId) return false;
+  const res = await fetch(`${REVIEW_API_PREFIX}/patch-assignment-meta`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      assignmentId: currentAssignmentId,
+      dueDate: ymdOrNull === null || ymdOrNull === undefined ? null : String(ymdOrNull),
+    }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    toast(data.error || `Save failed (${res.status})`);
+    return false;
+  }
+  applyDueDateFromServerResponse(data.dueDate);
+  return true;
+}
+
+function wireDueDateEditor() {
+  const modal = document.getElementById("dueDateModal");
+  const backdrop = document.getElementById("dueDateModalBackdrop");
+  const inp = document.getElementById("dueDateInput");
+  const pill = document.getElementById("assignmentDuePill");
+  const closeBtn = document.getElementById("dueDateModalClose");
+  const save = document.getElementById("dueDateModalSave");
+  const clearBtn = document.getElementById("dueDateModalClear");
+  if (!modal || !inp || !pill) return;
+
+  function openDueDateModal() {
+    if (!currentAssignmentId || !bundle) return;
+    inp.value = getDueDateYmdFromBundle(bundle) || "";
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+    inp.focus();
+  }
+
+  function closeDueDateModal() {
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function refreshDueUiAfterSave() {
+    updateAssignmentDueBanner();
+    const s = bundle?.students?.find((x) => String(x.id) === selectedId);
+    updateStudentSubmissionMeta(s || null);
+  }
+
+  pill.addEventListener("click", openDueDateModal);
+  backdrop?.addEventListener("click", closeDueDateModal);
+  closeBtn?.addEventListener("click", closeDueDateModal);
+  clearBtn?.addEventListener("click", async () => {
+    if (!currentAssignmentId) return;
+    const ok = await patchAssignmentDueDate(null);
+    if (ok) {
+      closeDueDateModal();
+      refreshDueUiAfterSave();
+      toast("Due date cleared");
+    }
+  });
+  async function saveDueDateFromModal() {
+    if (!currentAssignmentId) return;
+    const v = inp.value?.trim() || "";
+    const ok = await patchAssignmentDueDate(v || null);
+    if (ok) {
+      closeDueDateModal();
+      refreshDueUiAfterSave();
+      toast(v ? "Due date saved" : "Due date cleared");
+    }
+  }
+
+  save?.addEventListener("click", () => {
+    void saveDueDateFromModal();
+  });
+
+  inp?.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    void saveDueDateFromModal();
+  });
+}
+
+function updateStudentSubmissionMeta(student) {
+  const el = document.getElementById("studentSubmissionMeta");
+  if (!el) return;
+  if (!student) {
+    el.textContent = "";
+    el.hidden = true;
+    el.classList.remove("student-submission-meta--late");
+    return;
+  }
+  el.hidden = false;
+  const subFmt = formatSubmittedReadableUtc(student.submitted);
+  const dueYmd = getDueDateYmdFromBundle(bundle);
+  if (!dueYmd) {
+    el.textContent = subFmt ? `Submitted ${subFmt}` : "";
+    el.classList.remove("student-submission-meta--late");
+    return;
+  }
+  const lateDays = calendarDaysLateUtc(student.submitted, dueYmd);
+  if (lateDays === null) {
+    el.textContent = subFmt ? `Submitted ${subFmt}` : "—";
+    el.classList.remove("student-submission-meta--late");
+    return;
+  }
+  el.classList.toggle("student-submission-meta--late", lateDays > 0);
+  const status =
+    lateDays === 0 ? "On time" : lateDays === 1 ? "1 day late" : `${lateDays} days late`;
+  el.textContent = subFmt ? `Submitted ${subFmt} · ${status}` : status;
 }
 
 /**
@@ -193,6 +402,32 @@ function formatMetaLine() {
  */
 /** Avoid stale HTTP cache of JSON (comments.json looked empty in the UI after disk was fixed). */
 const REVIEW_STATIC_FETCH = { cache: "no-store", credentials: "include" };
+
+/**
+ * manifest.json may omit sourceFile (older uploads); students.json has it. Without this, only
+ * assignments already loaded in-session get option[title] tooltips until you switch tabs.
+ */
+async function enrichManifestSourceFilesFromDisk() {
+  if (!assignmentManifest.length) return;
+  const bust = `t=${Date.now()}`;
+  await Promise.all(
+    assignmentManifest.map(async (a, i) => {
+      if (a.sourceFile && String(a.sourceFile).trim()) return;
+      if (!a.dir) return;
+      try {
+        const url = `${assignmentFileUrl(a.dir, "students.json")}?${bust}`;
+        const res = await fetch(url, REVIEW_STATIC_FETCH);
+        if (!res.ok) return;
+        const doc = await res.json();
+        const sf = typeof doc.sourceFile === "string" ? doc.sourceFile.trim() : "";
+        if (!sf) return;
+        assignmentManifest[i] = { ...assignmentManifest[i], sourceFile: sf };
+      } catch {
+        /* ignore */
+      }
+    }),
+  );
+}
 
 async function migrateLegacyLocalCommentsToServerOnce() {
   try {
@@ -296,6 +531,16 @@ async function loadAssignmentBundle(id) {
   const stuRes = await fetch(stuUrl, REVIEW_STATIC_FETCH);
   if (!stuRes.ok) throw new Error(`students.json missing for assignment: ${id}`);
   bundle = await stuRes.json();
+  const sf = typeof bundle.sourceFile === "string" ? bundle.sourceFile.trim() : "";
+  if (sf) {
+    const ix = assignmentManifest.findIndex((a) => a.id === id);
+    if (ix >= 0) {
+      assignmentManifest[ix] = { ...assignmentManifest[ix], sourceFile: sf };
+      const sel = document.getElementById("assignmentSelect");
+      const opt = sel?.querySelector(`option[value="${id}"]`);
+      if (opt) opt.title = sf;
+    }
+  }
   comments = {};
   const comRes = await fetch(comUrl, REVIEW_STATIC_FETCH);
   if (comRes.ok) {
@@ -305,6 +550,7 @@ async function loadAssignmentBundle(id) {
     toast(`Could not load comments.json (${comRes.status}). Using empty comments.`);
   }
   currentAssignmentId = id;
+  syncAssignmentSelectTooltip();
   renderStudents();
   if (bundle.students?.length) {
     selectStudent(bundle.students[0].id);
@@ -315,6 +561,7 @@ async function loadAssignmentBundle(id) {
     const tr = getTranscribeBox();
     const pl = getPolishBox();
     document.getElementById("commentTitle").textContent = "Comments";
+    updateStudentSubmissionMeta(null);
     if (tr) {
       tr.disabled = true;
       tr.value = "";
@@ -403,24 +650,41 @@ function toast(msg) {
 function showDeleteConfirmDialog(message, onConfirm) {
   const wrap = document.getElementById("confirmDeleteDialog");
   const msgEl = document.getElementById("confirmDeleteMessage");
-  const cancel = document.getElementById("confirmDeleteCancel");
+  const closeBtn = document.getElementById("confirmDeleteClose");
   const ok = document.getElementById("confirmDeleteOk");
-  if (!wrap || !msgEl || !cancel || !ok) return;
+  if (!wrap || !msgEl || !closeBtn || !ok) return;
   msgEl.textContent = message;
   wrap.hidden = false;
   wrap.classList.add("show");
-  const hide = () => {
+
+  function removeEnter() {
+    document.removeEventListener("keydown", onEnterKey);
+  }
+
+  function hide() {
+    removeEnter();
     wrap.classList.remove("show");
     wrap.hidden = true;
-  };
-  const onCancel = () => {
+  }
+
+  function onEnterKey(e) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    hide();
+    onConfirm();
+  }
+
+  const onDismiss = () => {
     hide();
   };
+
   const onOk = () => {
     hide();
     onConfirm();
   };
-  cancel.addEventListener("click", onCancel, { once: true });
+
+  document.addEventListener("keydown", onEnterKey);
+  closeBtn.addEventListener("click", onDismiss, { once: true });
   ok.addEventListener("click", onOk, { once: true });
 }
 
@@ -435,14 +699,150 @@ function slugifyAssignmentId(raw) {
   return s.slice(0, 63);
 }
 
-function applyServerAssignmentsList(list) {
+/** Strip UTF-8 BOM so CSV header parses. */
+function stripLeadingBom(text) {
+  if (text.charCodeAt(0) === 0xfeff) return text.slice(1);
+  return text;
+}
+
+/** Minimal RFC4180-style CSV parse (Canvas quiz exports; quoted fields supported). */
+function parseCsvRows(text) {
+  const s = stripLeadingBom(text);
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (s[i + 1] === '"') {
+          field += '"';
+          i++;
+          continue;
+        }
+        inQuotes = false;
+        continue;
+      }
+      field += c;
+      continue;
+    }
+    if (c === '"') {
+      inQuotes = true;
+      continue;
+    }
+    if (c === ",") {
+      row.push(field);
+      field = "";
+      continue;
+    }
+    if (c === "\n" || c === "\r") {
+      if (c === "\r" && s[i + 1] === "\n") i++;
+      row.push(field);
+      field = "";
+      rows.push(row);
+      row = [];
+      continue;
+    }
+    field += c;
+  }
+  row.push(field);
+  if (row.length > 1 || (row.length === 1 && row[0] !== "")) {
+    rows.push(row);
+  }
+  return rows;
+}
+
+/** Canvas Quiz Student Analysis Report layout (matches scripts/import_from_csv.py). */
+const CANVAS_Q_COL_START = 8;
+const CANVAS_TRAILER_COLS = 3;
+
+function cleanCanvasQuestionHeader(raw) {
+  if (!raw) return "";
+  let t = String(raw).trim();
+  t = t.replace(/^\d+:\s*/, "");
+  return t.trim();
+}
+
+function inferCanvasQuestionPairs(header) {
+  const rest = header.length - CANVAS_Q_COL_START - CANVAS_TRAILER_COLS;
+  if (rest < 2 || rest % 2 !== 0) {
+    throw new Error(
+      `Unexpected CSV: ${header.length} columns; expected ${CANVAS_Q_COL_START} + 2×questions + ${CANVAS_TRAILER_COLS} (Canvas quiz report).`,
+    );
+  }
+  return rest / 2;
+}
+
+function parseCanvasQuizCsv(text) {
+  const rows = parseCsvRows(text);
+  if (!rows.length) throw new Error("Empty CSV");
+  const header = rows[0];
+  const qPairs = inferCanvasQuestionPairs(header);
+  const questions = [];
+  for (let i = 0; i < qPairs; i++) {
+    const qIdx = CANVAS_Q_COL_START + i * 2;
+    const rawQ = header[qIdx] ?? "";
+    questions.push({
+      index: i + 1,
+      canvasColumnHeader: String(rawQ).trim(),
+      text: cleanCanvasQuestionHeader(rawQ),
+    });
+  }
+  const summaryStart = CANVAS_Q_COL_START + qPairs * 2;
+  const students = [];
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    if (row.length < summaryStart + CANVAS_TRAILER_COLS) continue;
+    const name = row[0].trim();
+    if (!name) continue;
+    const sid = row[1].trim();
+    const answers = [];
+    const scores = [];
+    for (let i = 0; i < qPairs; i++) {
+      const aIdx = CANVAS_Q_COL_START + i * 2;
+      const sIdx = aIdx + 1;
+      answers.push(row[aIdx]?.trim() ?? "");
+      scores.push(row[sIdx]?.trim() ?? "");
+    }
+    students.push({
+      id: sid,
+      sisId: row[2].trim(),
+      name,
+      section: row[3].trim(),
+      submitted: row[6].trim(),
+      attempt: row[7].trim(),
+      answers,
+      scores,
+      nCorrect: row[summaryStart].trim(),
+      nIncorrect: row[summaryStart + 1].trim(),
+      totalScore: row[summaryStart + 2].trim(),
+    });
+  }
+  students.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+  return { questions, students };
+}
+
+async function applyServerAssignmentsList(list) {
   assignmentManifest = Array.isArray(list) ? list.filter((a) => a && a.id && a.dir) : [];
+  await enrichManifestSourceFilesFromDisk();
   fillAssignmentDropdown();
 }
 
-function syncDeleteButtonState() {
-  const btn = document.getElementById("btnDeleteAssignment");
-  if (btn) btn.disabled = assignmentManifest.length === 0;
+function syncAssignmentActionButtons() {
+  const del = document.getElementById("btnDeleteAssignment");
+  const ren = document.getElementById("btnRenameAssignment");
+  const empty = assignmentManifest.length === 0;
+  if (del) del.disabled = empty;
+  if (ren) ren.disabled = empty;
+}
+
+function syncAssignmentSelectTooltip() {
+  const sel = document.getElementById("assignmentSelect");
+  if (!sel) return;
+  const a = assignmentManifest.find((x) => x.id === sel.value);
+  const fn = a?.sourceFile && String(a.sourceFile).trim();
+  sel.title = fn || "";
 }
 
 function fillAssignmentDropdown() {
@@ -454,11 +854,14 @@ function fillAssignmentDropdown() {
     const opt = document.createElement("option");
     opt.value = a.id;
     opt.textContent = a.title || a.id;
+    const fn = a.sourceFile && String(a.sourceFile).trim();
+    if (fn) opt.title = fn;
     sel.appendChild(opt);
   }
   const pick = assignmentManifest.some((a) => a.id === keepPrev) ? keepPrev : assignmentManifest[0]?.id;
   if (pick) sel.value = pick;
-  syncDeleteButtonState();
+  syncAssignmentSelectTooltip();
+  syncAssignmentActionButtons();
 }
 
 function wireAssignmentSelect() {
@@ -482,13 +885,10 @@ function closeUploadModal() {
     m.hidden = true;
     m.setAttribute("aria-hidden", "true");
   }
-  document.getElementById("uploadId") && (document.getElementById("uploadId").value = "");
-  document.getElementById("uploadTitle") && (document.getElementById("uploadTitle").value = "");
-  document.getElementById("uploadDir") && (document.getElementById("uploadDir").value = "");
-  const sf = document.getElementById("uploadStudentsFile");
-  const cf = document.getElementById("uploadCommentsFile");
-  if (sf) sf.value = "";
-  if (cf) cf.value = "";
+  const idEl = document.getElementById("uploadId");
+  if (idEl) idEl.value = "";
+  const csv = document.getElementById("uploadCsvFile");
+  if (csv) csv.value = "";
 }
 
 function openUploadModal() {
@@ -497,55 +897,59 @@ function openUploadModal() {
     m.hidden = false;
     m.setAttribute("aria-hidden", "false");
   }
-  document.getElementById("uploadId")?.focus();
+  document.getElementById("uploadCsvFile")?.focus();
 }
 
 async function submitUploadModal() {
-  const idInput = document.getElementById("uploadId")?.value?.trim() || "";
-  const title = document.getElementById("uploadTitle")?.value?.trim() || "";
-  let dir = document.getElementById("uploadDir")?.value?.trim() || "";
-  const studentsFile = document.getElementById("uploadStudentsFile")?.files?.[0];
-  if (!studentsFile) {
-    toast("Choose a students.json file.");
+  const idInputRaw = document.getElementById("uploadId")?.value?.trim() || "";
+  const csvFile = document.getElementById("uploadCsvFile")?.files?.[0];
+  if (!csvFile) {
+    toast("Choose a CSV file (Canvas quiz student analysis report).");
     return;
   }
-  let students;
+  const lower = csvFile.name.toLowerCase();
+  if (!lower.endsWith(".csv")) {
+    toast("Only .csv files are accepted.");
+    return;
+  }
+  let parsed;
   try {
-    students = JSON.parse(await studentsFile.text());
-  } catch {
-    toast("Could not parse students.json.");
+    parsed = parseCanvasQuizCsv(await csvFile.text());
+  } catch (e) {
+    toast(e?.message || "Could not parse CSV.");
     return;
   }
-  if (!Array.isArray(students.questions) || !Array.isArray(students.students)) {
-    toast("students.json must include questions and students arrays.");
+  if (!parsed.students.length) {
+    toast("No student rows found in CSV.");
     return;
   }
-  const id = slugifyAssignmentId(idInput) || slugifyAssignmentId(title);
-  if (!id) {
-    toast("Enter a title or assignment ID.");
-    return;
-  }
-  if (!title) {
-    toast("Enter a display title.");
-    return;
-  }
-  if (!dir) dir = title;
+  const students = {
+    generatedAt: new Date().toISOString(),
+    sourceFile: csvFile.name,
+    questions: parsed.questions,
+    students: parsed.students,
+  };
 
-  let commentsPayload = undefined;
-  const commentsFile = document.getElementById("uploadCommentsFile")?.files?.[0];
-  if (commentsFile) {
-    try {
-      commentsPayload = JSON.parse(await commentsFile.text());
-    } catch {
-      toast("Could not parse comments.json.");
+  let id;
+  let title;
+  let dir;
+  if (idInputRaw) {
+    id = slugifyAssignmentId(idInputRaw);
+    if (!id) {
+      toast("Assignment ID must be a valid slug (letters, numbers, hyphens). Or leave it blank to use the file name.");
       return;
     }
+    title = idInputRaw.trim();
+    dir = id;
+  } else {
+    const base = csvFile.name.replace(/\.csv$/i, "").trim() || "import";
+    id = slugifyAssignmentId(base);
+    if (!id) id = `a-${Date.now().toString(36)}`;
+    title = base;
+    dir = id;
   }
 
   const body = { id, title, dir, students };
-  if (commentsPayload && typeof commentsPayload === "object") {
-    body.comments = commentsPayload;
-  }
 
   const res = await fetch(`${REVIEW_API_PREFIX}/assignments`, {
     method: "POST",
@@ -559,7 +963,7 @@ async function submitUploadModal() {
     return;
   }
   closeUploadModal();
-  applyServerAssignmentsList(data.assignments);
+  await applyServerAssignmentsList(data.assignments);
   try {
     localStorage.setItem(LS_LAST_ASSIGNMENT, id);
   } catch (_) {
@@ -581,9 +985,14 @@ function wireUploadModal() {
   document.getElementById("btnUploadAssignment")?.addEventListener("click", () => {
     openUploadModal();
   });
-  document.getElementById("uploadModalCancel")?.addEventListener("click", closeUploadModal);
+  document.getElementById("uploadModalClose")?.addEventListener("click", closeUploadModal);
   document.getElementById("uploadModalBackdrop")?.addEventListener("click", closeUploadModal);
   document.getElementById("uploadModalSubmit")?.addEventListener("click", () => {
+    void submitUploadModal();
+  });
+  document.getElementById("uploadId")?.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
     void submitUploadModal();
   });
 }
@@ -595,7 +1004,9 @@ function wireDeleteAssignment() {
     if (!id || assignmentManifest.length === 0) return;
     const meta = assignmentManifest.find((a) => a.id === id);
     const label = meta?.title || id;
-    showDeleteConfirmDialog(`Delete “${label}” and remove its folder on the server? This cannot be undone.`, async () => {
+    showDeleteConfirmDialog(
+      `Delete “${label}” and remove its whole assignment folder on the server (including students.json and comments.json)? This cannot be undone.`,
+      async () => {
       const res = await fetch(`${REVIEW_API_PREFIX}/assignments/${encodeURIComponent(id)}`, {
         method: "DELETE",
         credentials: "include",
@@ -605,7 +1016,7 @@ function wireDeleteAssignment() {
         toast(data.error || `Delete failed (${res.status})`);
         return;
       }
-      applyServerAssignmentsList(data.assignments);
+      await applyServerAssignmentsList(data.assignments);
       if (data.assignments.length === 0) {
         abortRecording();
         bundle = { questions: [], students: [], sourceFile: null };
@@ -613,7 +1024,7 @@ function wireDeleteAssignment() {
         currentAssignmentId = null;
         selectedId = null;
         document.getElementById("studentList").innerHTML =
-          '<p class="empty-state">No assignments. Upload assignment data to get started.</p>';
+          '<p class="empty-state">No assignments. Use <strong>Upload assignment data</strong> with an assignment report CSV to get started.</p>';
         document.getElementById("commentTitle").textContent = "Comments";
         const tr = getTranscribeBox();
         const pl = getPolishBox();
@@ -626,6 +1037,7 @@ function wireDeleteAssignment() {
           pl.value = "";
         }
         document.getElementById("metaLine").textContent = "";
+        updateAssignmentDueBanner();
         updateCommentTools();
         toast("Assignment deleted.");
         return;
@@ -646,6 +1058,85 @@ function wireDeleteAssignment() {
       }
       toast("Assignment deleted.");
     });
+  });
+}
+
+function wireRenameAssignment() {
+  const modal = document.getElementById("renameAssignmentModal");
+  const backdrop = document.getElementById("renameAssignmentModalBackdrop");
+  const inp = document.getElementById("renameAssignmentInput");
+  const closeBtn = document.getElementById("renameAssignmentModalClose");
+  const saveBtn = document.getElementById("renameAssignmentSave");
+  const openBtn = document.getElementById("btnRenameAssignment");
+
+  function openRenameModal() {
+    if (!currentAssignmentId || assignmentManifest.length === 0) return;
+    const ent = getCurrentAssignmentEntry();
+    if (!ent || !inp) return;
+    inp.value = ent.title || ent.id;
+    if (modal) {
+      modal.hidden = false;
+      modal.setAttribute("aria-hidden", "false");
+    }
+    inp.focus();
+    inp.select();
+  }
+
+  function closeRenameModal() {
+    if (modal) {
+      modal.hidden = true;
+      modal.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  async function saveRename() {
+    if (!currentAssignmentId || !inp) return;
+    const title = inp.value?.trim() || "";
+    if (!title) {
+      toast("Enter a display name.");
+      return;
+    }
+    const res = await fetch(`${REVIEW_API_PREFIX}/rename-assignment`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ assignmentId: currentAssignmentId, title }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      toast(data.error || `Rename failed (${res.status})`);
+      return;
+    }
+    await applyServerAssignmentsList(data.assignments);
+    const ix = assignmentManifest.findIndex((a) => a.id === currentAssignmentId);
+    if (ix >= 0 && bundle?.sourceFile) {
+      const sf = String(bundle.sourceFile).trim();
+      if (sf && !assignmentManifest[ix].sourceFile) {
+        assignmentManifest[ix] = { ...assignmentManifest[ix], sourceFile: sf };
+        fillAssignmentDropdown();
+      }
+    }
+    const sel = document.getElementById("assignmentSelect");
+    if (sel) sel.value = currentAssignmentId;
+    const meta = document.getElementById("metaLine");
+    if (meta) meta.textContent = formatMetaLine();
+    closeRenameModal();
+    toast("Assignment renamed.");
+  }
+
+  openBtn?.addEventListener("click", openRenameModal);
+  backdrop?.addEventListener("click", closeRenameModal);
+  closeBtn?.addEventListener("click", closeRenameModal);
+  saveBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    void saveRename();
+  });
+  inp?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      void saveRename();
+    }
   });
 }
 
@@ -1193,6 +1684,7 @@ function selectStudent(id) {
       pl.disabled = !sid;
       pl.value = sid ? entry.polish : "";
     }
+    updateStudentSubmissionMeta(sid && s ? s : null);
     updateCommentTools();
   } finally {
     suppressCommentPersist = false;
@@ -1218,12 +1710,10 @@ function renderStudents() {
   root.innerHTML = "";
 
   if (!bundle?.students?.length) {
-    const ae = getCurrentAssignmentEntry();
-    const pathHint = ae
-      ? `data/instructor-review/assignments/${ae.dir}/students.json`
-      : "data/instructor-review/assignments/…/students.json";
     root.innerHTML =
-      `<p class="empty-state">No students for this assignment. Add <code>${pathHint}</code> or use Import JSON.</p>`;
+      '<p class="empty-state">No students for this assignment. Re-upload an <strong>assignment report CSV</strong> via <strong>Upload assignment data</strong>, or use <strong>Import JSON</strong> if you have a saved export to merge.</p>';
+    document.getElementById("metaLine").textContent = formatMetaLine();
+    updateAssignmentDueBanner();
     return;
   }
 
@@ -1273,6 +1763,7 @@ function renderStudents() {
   }
 
   document.getElementById("metaLine").textContent = formatMetaLine();
+  updateAssignmentDueBanner();
 }
 
 function buildExportPayload() {
@@ -1292,6 +1783,7 @@ function buildExportPayload() {
     exportedAt: new Date().toISOString(),
     assignmentId: currentAssignmentId,
     assignmentTitle: asg?.title ?? null,
+    dueDate: getDueDateYmdFromBundle(bundle),
     questions: bundle.questions,
     students: bundle.students,
     comments: norm,
@@ -1321,10 +1813,12 @@ function onImportFile(e) {
       const data = JSON.parse(reader.result);
       mergeCommentsFromFile(data);
       if (Array.isArray(data.students) && data.students.length && data.questions) {
+        const due = typeof data.dueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(data.dueDate.trim()) ? data.dueDate.trim() : undefined;
         bundle = {
           questions: data.questions,
           students: data.students,
           sourceFile: data.sourceFile ?? "imported",
+          ...(due ? { dueDate: due } : {}),
         };
         renderStudents();
       }
@@ -1436,6 +1930,8 @@ async function init() {
   wireAssignmentSelect();
   wireUploadModal();
   wireDeleteAssignment();
+  wireRenameAssignment();
+  wireDueDateEditor();
   wireReviewHomeLogout();
 
   try {
@@ -1445,14 +1941,16 @@ async function init() {
     assignmentManifest = Array.isArray(man.assignments)
       ? man.assignments.filter((a) => a && a.id && a.dir)
       : [];
+    await enrichManifestSourceFilesFromDisk();
     fillAssignmentDropdown();
     await migrateLegacyLocalCommentsToServerOnce();
 
     if (!assignmentManifest.length) {
       document.getElementById("studentList").innerHTML =
-        '<p class="empty-state">No assignments yet. Use <strong>Upload assignment data</strong> to add a Canvas-style <code>students.json</code>.</p>';
+        '<p class="empty-state">No assignments yet. Use <strong>Upload assignment data</strong> with an <strong>assignment report CSV</strong>.</p>';
       document.getElementById("metaLine").textContent = "0 assignments";
-      syncDeleteButtonState();
+      updateAssignmentDueBanner();
+      syncAssignmentActionButtons();
       return;
     }
 
@@ -1476,9 +1974,11 @@ async function init() {
     if (pl) pl.disabled = true;
     if (as) as.disabled = true;
     if (asp) asp.disabled = true;
+    updateAssignmentDueBanner();
+    updateStudentSubmissionMeta(null);
     updateCommentTools();
     toast("Load error — check assignments manifest");
-    return;
+  return;
   }
 }
 

@@ -457,10 +457,17 @@ if (reminderAddModalClose) {
 }
 
 document.addEventListener('keydown', (e) => {
-  if (e.key !== 'Escape') return;
   const m = $('#reminderAddModal');
   if (!m || m.hidden) return;
-  closeReminderAddModal();
+  if (e.key === 'Escape') {
+    closeReminderAddModal();
+    return;
+  }
+  /* Single primary button (Add reminder): Enter submits; Shift+Enter keeps a newline in the textarea. */
+  if (e.key === 'Enter' && !e.shiftKey && e.target && e.target.id === 'reminderNlInput') {
+    e.preventDefault();
+    void submitReminderNl();
+  }
 });
 
 load();
