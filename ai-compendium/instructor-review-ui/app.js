@@ -128,6 +128,8 @@ let comments = {};
 let assignmentManifest = [];
 let currentAssignmentId = null;
 let selectedId = null;
+/** Block persistCommentsFromDom while selectedId and textareas are out of sync (avoids saving wrong id + stale DOM). */
+let suppressCommentPersist = false;
 /** Serialize server writes so each text change persists in order. */
 let persistQueue = Promise.resolve();
 let _polishBusy = false;
@@ -275,8 +277,15 @@ async function loadAssignmentBundle(id) {
     /* ignore */
   }
 
-  const stuUrl = assignmentFileUrl(entry.dir, "students.json");
-  const comUrl = assignmentFileUrl(entry.dir, "comments.json");
+  /* Canvas ids are global: the same student id can appear on another assignment.
+     If we keep selectedId set, the first selectStudent() after merge runs
+     flushCommentToMap() while the textareas still show the *previous* assignment's
+     text for that id and overwrites the merged comments (often with ""), wiping disk. */
+  selectedId = null;
+
+  const bust = `t=${Date.now()}`;
+  const stuUrl = `${assignmentFileUrl(entry.dir, "students.json")}?${bust}`;
+  const comUrl = `${assignmentFileUrl(entry.dir, "comments.json")}?${bust}`;
   const stuRes = await fetch(stuUrl, REVIEW_STATIC_FETCH);
   if (!stuRes.ok) throw new Error(`students.json missing for assignment: ${id}`);
   bundle = await stuRes.json();
@@ -285,6 +294,8 @@ async function loadAssignmentBundle(id) {
   if (comRes.ok) {
     const comFile = await comRes.json();
     mergeCommentsFromFile(comFile);
+  } else {
+    toast(`Could not load comments.json (${comRes.status}). Using empty comments.`);
   }
   currentAssignmentId = id;
   renderStudents();
@@ -323,6 +334,7 @@ function ensureCommentEntry(id) {
 }
 
 function persistCommentsFromDom() {
+  if (suppressCommentPersist) return;
   if (!selectedId) return;
   ensureCommentEntry(selectedId);
   const tr = getTranscribeBox();
@@ -1107,32 +1119,37 @@ function selectStudent(id) {
   abortRecording();
   syncInstructionButtons();
   flushCommentToMap();
-  const sid = id == null || id === "" ? null : String(id);
-  selectedId = sid;
-  document.querySelectorAll(".student-block").forEach((el) => {
-    el.classList.toggle("selected", el.dataset.id === sid);
-  });
-  const tr = getTranscribeBox();
-  const pl = getPolishBox();
-  const s = bundle?.students?.find((x) => String(x.id) === sid);
-  document.getElementById("commentTitle").textContent = s
-    ? `Comments — ${s.name}`
-    : "Comments";
-  const entry = sid ? normalizeCommentEntry(comments[sid]) : normalizeCommentEntry(null);
-  /* Do not assign comments[sid] = empty when comments[sid] was undefined.
+  suppressCommentPersist = true;
+  try {
+    const sid = id == null || id === "" ? null : String(id);
+    selectedId = sid;
+    document.querySelectorAll(".student-block").forEach((el) => {
+      el.classList.toggle("selected", el.dataset.id === sid);
+    });
+    const tr = getTranscribeBox();
+    const pl = getPolishBox();
+    const s = bundle?.students?.find((x) => String(x.id) === sid);
+    document.getElementById("commentTitle").textContent = s
+      ? `Comments — ${s.name}`
+      : "Comments";
+    const entry = sid ? normalizeCommentEntry(comments[sid]) : normalizeCommentEntry(null);
+    /* Do not assign comments[sid] = empty when comments[sid] was undefined.
      normalizeCommentEntry(undefined) is empty; writing that made autosave persist "" and wipe the file. */
-  if (sid && comments[sid] !== undefined) {
-    comments[sid] = entry;
+    if (sid && comments[sid] !== undefined) {
+      comments[sid] = entry;
+    }
+    if (tr) {
+      tr.disabled = !sid;
+      tr.value = sid ? entry.transcribe : "";
+    }
+    if (pl) {
+      pl.disabled = !sid;
+      pl.value = sid ? entry.polish : "";
+    }
+    updateCommentTools();
+  } finally {
+    suppressCommentPersist = false;
   }
-  if (tr) {
-    tr.disabled = !sid;
-    tr.value = sid ? entry.transcribe : "";
-  }
-  if (pl) {
-    pl.disabled = !sid;
-    pl.value = sid ? entry.polish : "";
-  }
-  updateCommentTools();
 }
 
 function toggleExpand(block, studentId) {

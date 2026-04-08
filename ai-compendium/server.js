@@ -68,7 +68,19 @@ app.get('/review', (req, res) => {
   res.redirect(301, '/review/');
 });
 
-app.use('/review', magicAuth.requireMagicPageHtml, express.static(REVIEW_UI_DIR));
+app.use(
+  '/review',
+  magicAuth.requireMagicPageHtml,
+  express.static(REVIEW_UI_DIR, {
+    setHeaders(res, filePath) {
+      const lower = String(filePath || '').toLowerCase();
+      if (lower.endsWith('.html') || lower.endsWith('.js') || lower.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+      }
+    },
+  }),
+);
 
 app.use(express.static(PUBLIC_DIR));
 
