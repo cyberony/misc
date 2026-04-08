@@ -23,7 +23,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const TAG = process.env.COMMENTS_FALLBACK_TAG || 'comments-fallback';
 const COMMENTS_NOTE =
-  'comments[id]: { transcribe, polish, polishTranscribeEnd, exportPreferred }. exportPreferred: transcribe|polish (which text to use in export). exportVersion 6.';
+  'comments[id]: { transcribe, polish, polishTranscribeEnd, exportPreferred }. exportPreferred: null|transcribe|polish. exportVersion 6.';
 
 /** misc repo root (parent of ai-compendium). */
 function findMiscRoot() {
@@ -57,11 +57,8 @@ function normalizeCommentEntry(raw) {
   const polish = typeof obj.polish === 'string' ? obj.polish : '';
   const endRaw = Number(obj.polishTranscribeEnd);
   const polishTranscribeEnd = Number.isFinite(endRaw) && endRaw >= 0 ? Math.floor(endRaw) : 0;
-  let exportPreferred =
+  const exportPreferred =
     obj.exportPreferred === 'transcribe' || obj.exportPreferred === 'polish' ? obj.exportPreferred : null;
-  if (!exportPreferred) {
-    exportPreferred = polish.trim() ? 'polish' : 'transcribe';
-  }
   return { transcribe, polish, polishTranscribeEnd, exportPreferred };
 }
 

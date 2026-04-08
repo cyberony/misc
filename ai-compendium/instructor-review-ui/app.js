@@ -53,7 +53,7 @@ function dictateButtonTranscribing() {
   const btn = document.getElementById("btnDictate");
   if (!btn) return;
   btn.innerHTML = ICON_MIC;
-  btn.classList.add("icon-tool-busy");
+  btn.classList.remove("icon-tool-busy");
   btn.setAttribute("aria-label", "Transcribing…");
 }
 
@@ -67,7 +67,7 @@ function polishButtonIdle() {
 function polishButtonBusy() {
   const btn = document.getElementById("btnPolish");
   if (!btn) return;
-  btn.innerHTML = ICON_SPINNER;
+  btn.innerHTML = ICON_POLISH;
   btn.setAttribute("aria-label", "Polishing…");
 }
 
@@ -137,10 +137,10 @@ let _polishBusy = false;
 let activeRecordingKind = null; // null | "plain" | "raw" | "polish"
 
 function normalizeCommentEntry(val) {
-  const base = { transcribe: "", polish: "", polishTranscribeEnd: 0, exportPreferred: "transcribe" };
+  const base = { transcribe: "", polish: "", polishTranscribeEnd: 0, exportPreferred: null };
   if (val == null) return base;
   if (typeof val === "string") {
-    return { ...base, transcribe: val, polish: "", exportPreferred: "transcribe" };
+    return { ...base, transcribe: val, polish: "", exportPreferred: null };
   }
   if (typeof val === "object") {
     const transcribe = typeof val.transcribe === "string" ? val.transcribe : "";
@@ -152,11 +152,9 @@ function normalizeCommentEntry(val) {
           ? transcribe.length
           : 0;
     if (polishTranscribeEnd > transcribe.length) polishTranscribeEnd = transcribe.length;
-    let exportPreferred =
-      val.exportPreferred === "transcribe" || val.exportPreferred === "polish" ? val.exportPreferred : null;
-    if (!exportPreferred) {
-      exportPreferred = polish.trim() ? "polish" : "transcribe";
-    }
+    /* Ignore exportPreferred on load from disk/merge so thumbs never start "on" from saved JSON.
+       Session clicks still set comments[id].exportPreferred until reload; export infers when null. */
+    const exportPreferred = null;
     return { transcribe, polish, polishTranscribeEnd, exportPreferred };
   }
   return base;
@@ -602,9 +600,7 @@ function persistCommentsFromDom() {
     exportPreferred:
       cur.exportPreferred === "polish" || cur.exportPreferred === "transcribe"
         ? cur.exportPreferred
-        : String(pl.value || "").trim()
-          ? "polish"
-          : "transcribe",
+        : null,
   };
   schedulePersistCommentsToFile();
 }
@@ -645,6 +641,29 @@ function toast(msg) {
   el.classList.add("show");
   clearTimeout(toast._t);
   toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+}
+
+const KITT_SCAN_IDS = ["btnDictate", "btnPolish", "btnAssist", "btnAssistPolish"];
+
+/** Knight Rider–style scanner on the active tool (mic, wand, or assist). */
+function clearKittScan() {
+  for (const bid of KITT_SCAN_IDS) {
+    const el = document.getElementById(bid);
+    if (el) {
+      el.classList.remove("kitt-scan");
+      el.removeAttribute("aria-busy");
+    }
+  }
+}
+
+function setKittScan(id) {
+  clearKittScan();
+  if (!id) return;
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add("kitt-scan");
+    el.setAttribute("aria-busy", "true");
+  }
 }
 
 function showDeleteConfirmDialog(message, onConfirm) {
@@ -1451,6 +1470,14 @@ async function startVoiceRecording(kind) {
       dictateButtonTranscribing();
     }
     mainTranscribeInFlight = true;
+    /* One button only: mic for plain dictation; the assist bubble you used for instruction mode. */
+    if (doneKind === "raw") {
+      setKittScan("btnAssist");
+    } else if (doneKind === "polish") {
+      setKittScan("btnAssistPolish");
+    } else {
+      setKittScan("btnDictate");
+    }
     updateCommentTools();
 
     try {
@@ -1486,6 +1513,7 @@ async function startVoiceRecording(kind) {
       toast(String(e.message || e));
     } finally {
       mainTranscribeInFlight = false;
+      clearKittScan();
       if (micBtn) {
         micBtn.disabled = false;
         dictateButtonIdle();
@@ -1546,6 +1574,7 @@ async function polishComment() {
     polishButtonBusy();
   }
   _polishBusy = true;
+  setKittScan("btnPolish");
   updateCommentTools();
   try {
     const body = existing
@@ -1578,6 +1607,7 @@ async function polishComment() {
     toast("Polish failed — is review-server running?");
   } finally {
     _polishBusy = false;
+    clearKittScan();
     if (btn) {
       btn.disabled = false;
       polishButtonIdle();
@@ -1590,6 +1620,15 @@ function polishCommentBusy() {
   return _polishBusy;
 }
 
+function commentPipelineBusy() {
+  return mainTranscribeInFlight || polishCommentBusy();
+}
+
+function syncCommentFieldsProcessingChrome() {
+  const busy = commentPipelineBusy();
+  document.querySelector(".comment-fields")?.classList.toggle("comment-fields--processing", busy);
+}
+
 function updateCommentTools() {
   const tr = getTranscribeBox();
   const pl = getPolishBox();
@@ -1598,18 +1637,15 @@ function updateCommentTools() {
   const assist = document.getElementById("btnAssist");
   const assistPolish = document.getElementById("btnAssistPolish");
   if (!dictate || !tr) return;
+  const pipelineBusy = commentPipelineBusy();
+  if (tr) tr.disabled = !selectedId;
+  if (pl) pl.disabled = !selectedId;
   const can = !!selectedId && !tr.disabled;
-  const pipelineBusy = polishCommentBusy();
-  dictate.disabled = !can || mainTranscribeInFlight || pipelineBusy;
+  dictate.disabled = !can || pipelineBusy;
   if (polish) {
-    polish.disabled =
-      !can ||
-      !tr.value.trim() ||
-      isRecording ||
-      mainTranscribeInFlight ||
-      pipelineBusy;
+    polish.disabled = !can || !tr.value.trim() || isRecording || pipelineBusy;
   }
-  const assistDisabled = !can || mainTranscribeInFlight || pipelineBusy;
+  const assistDisabled = !can || pipelineBusy;
   if (assist) assist.disabled = assistDisabled;
   if (assistPolish) {
     const hasPolishedText = !!(pl && pl.value.trim());
@@ -1618,6 +1654,16 @@ function updateCommentTools() {
   }
   syncInstructionButtons();
   syncExportLikeButtons();
+  syncCommentFieldsProcessingChrome();
+}
+
+function syncExportPrefFieldClass(pref) {
+  const root = document.querySelector(".comment-fields");
+  if (!root) return;
+  root.classList.remove("export-pref--none", "export-pref--transcribe", "export-pref--polish");
+  if (pref === "transcribe") root.classList.add("export-pref--transcribe");
+  else if (pref === "polish") root.classList.add("export-pref--polish");
+  else root.classList.add("export-pref--none");
 }
 
 function syncExportLikeButtons() {
@@ -1625,30 +1671,30 @@ function syncExportLikeButtons() {
   const plBtn = document.getElementById("btnExportLikePolish");
   const tr = getTranscribeBox();
   if (!trBtn || !plBtn) return;
+  const pipelineBusy = commentPipelineBusy();
   const can = !!selectedId && tr && !tr.disabled;
-  trBtn.disabled = !can;
-  plBtn.disabled = !can;
+  trBtn.disabled = !can || pipelineBusy;
+  plBtn.disabled = !can || pipelineBusy;
   if (!can || !selectedId) {
     trBtn.setAttribute("aria-pressed", "false");
     plBtn.setAttribute("aria-pressed", "false");
+    syncExportPrefFieldClass(null);
     return;
   }
   let pref = comments[selectedId]?.exportPreferred;
   if (pref !== "transcribe" && pref !== "polish") {
-    const plVal = pl?.value ?? "";
-    pref = String(plVal).trim() ? "polish" : "transcribe";
+    pref = null;
   }
   trBtn.setAttribute("aria-pressed", pref === "transcribe" ? "true" : "false");
   plBtn.setAttribute("aria-pressed", pref === "polish" ? "true" : "false");
-  /* Only active (non-gray) thumb is clickable; clicking it hands off to the other thumb. */
-  trBtn.disabled = pref !== "transcribe";
-  plBtn.disabled = pref !== "polish";
+  syncExportPrefFieldClass(pref);
 }
 
 function setExportPreferred(which) {
   if (!selectedId || (which !== "transcribe" && which !== "polish")) return;
   ensureCommentEntry(selectedId);
-  comments[selectedId].exportPreferred = which;
+  const cur = comments[selectedId].exportPreferred;
+  comments[selectedId].exportPreferred = cur === which ? null : which;
   syncExportLikeButtons();
   schedulePersistCommentsToFile();
 }
@@ -1772,7 +1818,16 @@ function buildExportPayload() {
   const norm = normalizeCommentsObject(comments);
   const exportByStudentId = {};
   for (const [id, e] of Object.entries(norm)) {
-    const from = e.exportPreferred === "transcribe" ? "transcribe" : "polish";
+    let from;
+    if (e.exportPreferred === "transcribe") from = "transcribe";
+    else if (e.exportPreferred === "polish") from = "polish";
+    else {
+      from = String(e.transcribe || "").trim()
+        ? "transcribe"
+        : String(e.polish || "").trim()
+          ? "polish"
+          : "transcribe";
+    }
     exportByStudentId[id] = {
       from,
       text: from === "transcribe" ? e.transcribe : e.polish,
@@ -1871,14 +1926,10 @@ function wireVoiceAndPolish() {
 
 function wireExportLikeButtons() {
   document.getElementById("btnExportLikeTranscribe")?.addEventListener("click", () => {
-    if (selectedId && comments[selectedId]?.exportPreferred === "transcribe") {
-      setExportPreferred("polish");
-    }
+    if (selectedId) setExportPreferred("transcribe");
   });
   document.getElementById("btnExportLikePolish")?.addEventListener("click", () => {
-    if (selectedId && comments[selectedId]?.exportPreferred === "polish") {
-      setExportPreferred("transcribe");
-    }
+    if (selectedId) setExportPreferred("polish");
   });
 }
 
@@ -1887,7 +1938,15 @@ function wireCommentBox() {
     if (!selectedId) return;
     ensureCommentEntry(selectedId);
     const tr = getTranscribeBox();
+    const pl = getPolishBox();
     const c = comments[selectedId];
+    if (tr && !String(tr.value || "").trim() && pl) {
+      pl.value = "";
+      if (c) {
+        c.polishTranscribeEnd = 0;
+        c.exportPreferred = null;
+      }
+    }
     if (tr && c && c.polishTranscribeEnd > tr.value.length) {
       c.polishTranscribeEnd = tr.value.length;
     }

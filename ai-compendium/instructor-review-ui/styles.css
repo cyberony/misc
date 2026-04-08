@@ -303,6 +303,12 @@ button.primary:hover {
   display: none;
 }
 
+header.app-header button:disabled,
+header.app-header select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .layout {
   flex: 1;
   min-height: 0;
@@ -589,12 +595,75 @@ button.primary:hover {
 }
 
 .icon-spin {
-  animation: icon-spin 0.75s linear infinite;
+  animation: icon-spin 0.7s linear infinite;
+  transform-origin: center center;
+}
+
+/* Knight Rider–style: single glowing dot shuffling left ↔ right inside the active tool */
+.icon-tool.kitt-scan {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(160, 0, 0, 0.55) !important;
+  background: linear-gradient(180deg, #1a0505 0%, #0a0202 42%, #0a0202 58%, #1a0505 100%) !important;
+  box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.28);
+}
+
+.icon-tool.kitt-scan::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle at 32% 28%, #fff8f8, #ff5555 45%, #8b0000 100%);
+  box-shadow:
+    0 0 4px 1px rgba(255, 80, 80, 0.95),
+    0 0 10px 3px rgba(255, 0, 0, 0.45);
+  transform: translateY(-50%);
+  animation: kitt-dot-shuffle 0.55s ease-in-out infinite alternate;
+}
+
+@keyframes kitt-dot-shuffle {
+  0% {
+    left: 0;
+    transform: translateY(-50%);
+  }
+  100% {
+    left: 100%;
+    transform: translate(-100%, -50%);
+  }
+}
+
+.icon-tool.kitt-scan > .btn-svg {
+  position: relative;
+  z-index: 1;
+  color: #fff7f7 !important;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.95));
+}
+
+.comment-fields .icon-tool.kitt-scan:disabled {
+  opacity: 1;
+  cursor: wait;
 }
 
 .comment-fields .icon-tool:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+/* Whisper / polish / refine in flight: dim every comment tool except the KITT scanner */
+.comment-fields.comment-fields--processing .icon-tool:not(.kitt-scan) {
+  opacity: 0.36;
+  filter: grayscale(0.22);
+}
+
+.comment-fields.comment-fields--processing .icon-tool.kitt-scan {
+  filter: none;
+  opacity: 1;
 }
 
 #btnDictate.listening,
@@ -626,33 +695,76 @@ button.primary:hover {
   height: 1.125rem;
 }
 
-/* Chosen for export: normal (ungrayed) */
-.comment-fields .export-pref-thumb:not(:disabled)[aria-pressed="true"] {
+/* Export thumbs: ungray = not chosen; gray = “I prefer this text for export.” Default: both ungray. */
+
+/* No preference yet: both ungray */
+.comment-fields.export-pref--none .export-pref-thumb {
   opacity: 1;
-  color: var(--text);
+  color: var(--muted);
   background: #fafbfc;
   border-color: var(--border);
 }
 
-.comment-fields .export-pref-thumb:not(:disabled)[aria-pressed="true"]:hover {
+.comment-fields.export-pref--none .export-pref-thumb:hover:not(:disabled) {
   background: #eef1f5;
   border-color: #c9d4e3;
   color: var(--text);
 }
 
-/* Not chosen: grayed out */
-.comment-fields .export-pref-thumb:not(:disabled)[aria-pressed="false"] {
+/* Prefer rough: rough thumb gray, polished thumb ungray */
+.comment-fields.export-pref--transcribe #btnExportLikeTranscribe {
   opacity: 0.4;
   color: var(--muted);
   background: #f0f2f5;
   border-color: #dde3eb;
 }
 
-.comment-fields .export-pref-thumb:not(:disabled)[aria-pressed="false"]:hover {
+.comment-fields.export-pref--transcribe #btnExportLikeTranscribe:hover:not(:disabled) {
   opacity: 0.72;
   color: var(--text);
   background: #eef1f5;
   border-color: #c9d4e3;
+}
+
+.comment-fields.export-pref--transcribe #btnExportLikePolish {
+  opacity: 1;
+  color: var(--muted);
+  background: #fafbfc;
+  border-color: var(--border);
+}
+
+.comment-fields.export-pref--transcribe #btnExportLikePolish:hover:not(:disabled) {
+  background: #eef1f5;
+  border-color: #c9d4e3;
+  color: var(--text);
+}
+
+/* Prefer polished: polished thumb gray, rough thumb ungray */
+.comment-fields.export-pref--polish #btnExportLikePolish {
+  opacity: 0.4;
+  color: var(--muted);
+  background: #f0f2f5;
+  border-color: #dde3eb;
+}
+
+.comment-fields.export-pref--polish #btnExportLikePolish:hover:not(:disabled) {
+  opacity: 0.72;
+  color: var(--text);
+  background: #eef1f5;
+  border-color: #c9d4e3;
+}
+
+.comment-fields.export-pref--polish #btnExportLikeTranscribe {
+  opacity: 1;
+  color: var(--muted);
+  background: #fafbfc;
+  border-color: var(--border);
+}
+
+.comment-fields.export-pref--polish #btnExportLikeTranscribe:hover:not(:disabled) {
+  background: #eef1f5;
+  border-color: #c9d4e3;
+  color: var(--text);
 }
 
 .status-toast {
