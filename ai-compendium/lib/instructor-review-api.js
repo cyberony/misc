@@ -483,7 +483,18 @@ function mountInstructorReview(app, opts) {
     }
   });
 
-  app.use('/api/instructor-review/static', requireMagic, express.static(dataRoot));
+  app.use(
+    '/api/instructor-review/static',
+    requireMagic,
+    (req, res, next) => {
+      if (req.path.endsWith('.json')) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+      }
+      next();
+    },
+    express.static(dataRoot),
+  );
 }
 
 module.exports = { mountInstructorReview };

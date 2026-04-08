@@ -182,6 +182,9 @@ function formatMetaLine() {
  * One-time: old builds cached comments in localStorage. Push any non-empty data to server files, then drop the cache.
  * Source of truth after this is `data/.../comments.json` only.
  */
+/** Avoid stale HTTP cache of JSON (comments.json looked empty in the UI after disk was fixed). */
+const REVIEW_STATIC_FETCH = { cache: "no-store", credentials: "include" };
+
 async function migrateLegacyLocalCommentsToServerOnce() {
   try {
     if (localStorage.getItem(LS_COMMENTS_MIGRATED_TO_FILE) === "1") return;
@@ -274,11 +277,11 @@ async function loadAssignmentBundle(id) {
 
   const stuUrl = assignmentFileUrl(entry.dir, "students.json");
   const comUrl = assignmentFileUrl(entry.dir, "comments.json");
-  const stuRes = await fetch(stuUrl);
+  const stuRes = await fetch(stuUrl, REVIEW_STATIC_FETCH);
   if (!stuRes.ok) throw new Error(`students.json missing for assignment: ${id}`);
   bundle = await stuRes.json();
   comments = {};
-  const comRes = await fetch(comUrl);
+  const comRes = await fetch(comUrl, REVIEW_STATIC_FETCH);
   if (comRes.ok) {
     const comFile = await comRes.json();
     mergeCommentsFromFile(comFile);
@@ -1343,7 +1346,7 @@ async function init() {
   wireReviewHomeLogout();
 
   try {
-    const manRes = await fetch(`${REVIEW_DATA_BASE}assignments/manifest.json`);
+    const manRes = await fetch(`${REVIEW_DATA_BASE}assignments/manifest.json`, REVIEW_STATIC_FETCH);
     if (!manRes.ok) throw new Error("assignments manifest missing");
     const man = await manRes.json();
     assignmentManifest = Array.isArray(man.assignments)
