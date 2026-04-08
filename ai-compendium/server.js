@@ -63,8 +63,10 @@ mountInstructorReview(app, {
   requireMagic: magicAuth.requireMagicPageCookieJson,
 });
 
-/** Without trailing slash, relative asset URLs resolve to site root and load the wrong app.js / styles.css. */
-app.get('/review', (req, res) => {
+/** Without trailing slash, relative asset URLs resolve to site root and load the wrong app.js / styles.css.
+ * Match only exact "/review" to avoid redirecting "/review/" into an infinite 301 loop.
+ */
+app.get(/^\/review$/, (req, res) => {
   res.redirect(301, '/review/');
 });
 

@@ -137,9 +137,11 @@ let _polishBusy = false;
 let activeRecordingKind = null; // null | "plain" | "raw" | "polish"
 
 function normalizeCommentEntry(val) {
-  const base = { transcribe: "", polish: "", polishTranscribeEnd: 0 };
+  const base = { transcribe: "", polish: "", polishTranscribeEnd: 0, exportPreferred: "transcribe" };
   if (val == null) return base;
-  if (typeof val === "string") return { ...base, transcribe: val };
+  if (typeof val === "string") {
+    return { ...base, transcribe: val, polish: "", exportPreferred: "transcribe" };
+  }
   if (typeof val === "object") {
     const transcribe = typeof val.transcribe === "string" ? val.transcribe : "";
     const polish = typeof val.polish === "string" ? val.polish : "";
@@ -150,7 +152,12 @@ function normalizeCommentEntry(val) {
           ? transcribe.length
           : 0;
     if (polishTranscribeEnd > transcribe.length) polishTranscribeEnd = transcribe.length;
-    return { transcribe, polish, polishTranscribeEnd };
+    let exportPreferred =
+      val.exportPreferred === "transcribe" || val.exportPreferred === "polish" ? val.exportPreferred : null;
+    if (!exportPreferred) {
+      exportPreferred = polish.trim() ? "polish" : "transcribe";
+    }
+    return { transcribe, polish, polishTranscribeEnd, exportPreferred };
   }
   return base;
 }
@@ -345,6 +352,12 @@ function persistCommentsFromDom() {
     transcribe: tr.value,
     polish: pl.value,
     polishTranscribeEnd: cur.polishTranscribeEnd,
+    exportPreferred:
+      cur.exportPreferred === "polish" || cur.exportPreferred === "transcribe"
+        ? cur.exportPreferred
+        : String(pl.value || "").trim()
+          ? "polish"
+          : "transcribe",
   };
   schedulePersistCommentsToFile();
 }
@@ -1113,6 +1126,40 @@ function updateCommentTools() {
     assistPolish.disabled = assistDisabled || (!hasPolishedText && !canStopPolishInstruction);
   }
   syncInstructionButtons();
+  syncExportLikeButtons();
+}
+
+function syncExportLikeButtons() {
+  const trBtn = document.getElementById("btnExportLikeTranscribe");
+  const plBtn = document.getElementById("btnExportLikePolish");
+  const tr = getTranscribeBox();
+  if (!trBtn || !plBtn) return;
+  const can = !!selectedId && tr && !tr.disabled;
+  trBtn.disabled = !can;
+  plBtn.disabled = !can;
+  if (!can || !selectedId) {
+    trBtn.setAttribute("aria-pressed", "false");
+    plBtn.setAttribute("aria-pressed", "false");
+    return;
+  }
+  let pref = comments[selectedId]?.exportPreferred;
+  if (pref !== "transcribe" && pref !== "polish") {
+    const plVal = pl?.value ?? "";
+    pref = String(plVal).trim() ? "polish" : "transcribe";
+  }
+  trBtn.setAttribute("aria-pressed", pref === "transcribe" ? "true" : "false");
+  plBtn.setAttribute("aria-pressed", pref === "polish" ? "true" : "false");
+  /* Only active (non-gray) thumb is clickable; clicking it hands off to the other thumb. */
+  trBtn.disabled = pref !== "transcribe";
+  plBtn.disabled = pref !== "polish";
+}
+
+function setExportPreferred(which) {
+  if (!selectedId || (which !== "transcribe" && which !== "polish")) return;
+  ensureCommentEntry(selectedId);
+  comments[selectedId].exportPreferred = which;
+  syncExportLikeButtons();
+  schedulePersistCommentsToFile();
 }
 
 function selectStudent(id) {
@@ -1231,14 +1278,24 @@ function renderStudents() {
 function buildExportPayload() {
   flushCommentToMap();
   const asg = getCurrentAssignmentEntry();
+  const norm = normalizeCommentsObject(comments);
+  const exportByStudentId = {};
+  for (const [id, e] of Object.entries(norm)) {
+    const from = e.exportPreferred === "transcribe" ? "transcribe" : "polish";
+    exportByStudentId[id] = {
+      from,
+      text: from === "transcribe" ? e.transcribe : e.polish,
+    };
+  }
   return {
-    exportVersion: 5,
+    exportVersion: 6,
     exportedAt: new Date().toISOString(),
     assignmentId: currentAssignmentId,
     assignmentTitle: asg?.title ?? null,
     questions: bundle.questions,
     students: bundle.students,
-    comments: normalizeCommentsObject(comments),
+    comments: norm,
+    exportByStudentId,
   };
 }
 
@@ -1318,6 +1375,19 @@ function wireVoiceAndPolish() {
   });
 }
 
+function wireExportLikeButtons() {
+  document.getElementById("btnExportLikeTranscribe")?.addEventListener("click", () => {
+    if (selectedId && comments[selectedId]?.exportPreferred === "transcribe") {
+      setExportPreferred("polish");
+    }
+  });
+  document.getElementById("btnExportLikePolish")?.addEventListener("click", () => {
+    if (selectedId && comments[selectedId]?.exportPreferred === "polish") {
+      setExportPreferred("transcribe");
+    }
+  });
+}
+
 function wireCommentBox() {
   const onTranscribeInput = () => {
     if (!selectedId) return;
@@ -1354,6 +1424,7 @@ function wireCommentBox() {
 
 async function init() {
   wireCommentBox();
+  wireExportLikeButtons();
   wireVoiceAndPolish();
   syncInstructionButtons();
   window.addEventListener("pagehide", flushPersistenceOnPageExit);

@@ -504,6 +504,42 @@ button.primary:hover {
   color: var(--accent);
 }
 
+/* Export preference: same thumb-up path as compendium; square shell like mic / polish row tools */
+.comment-fields .export-pref-thumb .vote-icon-svg {
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* Chosen for export: normal (ungrayed) */
+.comment-fields .export-pref-thumb:not(:disabled)[aria-pressed="true"] {
+  opacity: 1;
+  color: var(--text);
+  background: #fafbfc;
+  border-color: var(--border);
+}
+
+.comment-fields .export-pref-thumb:not(:disabled)[aria-pressed="true"]:hover {
+  background: #eef1f5;
+  border-color: #c9d4e3;
+  color: var(--text);
+}
+
+/* Not chosen: grayed out */
+.comment-fields .export-pref-thumb:not(:disabled)[aria-pressed="false"] {
+  opacity: 0.4;
+  color: var(--muted);
+  background: #f0f2f5;
+  border-color: #dde3eb;
+}
+
+.comment-fields .export-pref-thumb:not(:disabled)[aria-pressed="false"]:hover {
+  opacity: 0.72;
+  color: var(--text);
+  background: #eef1f5;
+  border-color: #c9d4e3;
+}
+
 .status-toast {
   position: fixed;
   top: 50%;

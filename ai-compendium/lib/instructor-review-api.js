@@ -43,7 +43,7 @@ If they ask to delete, clear, or remove all of the text, output nothing (empty o
 Do not invent facts beyond what they implied. Output only the transcript text—no preamble or quotation marks.`;
 
 const COMMENTS_NOTE =
-  'comments[id]: { transcribe, polish, polishTranscribeEnd }. Wand polishes only new raw after End; + then mic = assistant. exportVersion 5.';
+  'comments[id]: { transcribe, polish, polishTranscribeEnd, exportPreferred }. exportPreferred: transcribe|polish (which text to use in export). exportVersion 6.';
 
 const MAX_AUDIO_BYTES = 20 * 1024 * 1024;
 
@@ -53,7 +53,12 @@ function normalizeCommentEntry(raw) {
   const polish = typeof obj.polish === 'string' ? obj.polish : '';
   const endRaw = Number(obj.polishTranscribeEnd);
   const polishTranscribeEnd = Number.isFinite(endRaw) && endRaw >= 0 ? Math.floor(endRaw) : 0;
-  return { transcribe, polish, polishTranscribeEnd };
+  let exportPreferred =
+    obj.exportPreferred === 'transcribe' || obj.exportPreferred === 'polish' ? obj.exportPreferred : null;
+  if (!exportPreferred) {
+    exportPreferred = polish.trim() ? 'polish' : 'transcribe';
+  }
+  return { transcribe, polish, polishTranscribeEnd, exportPreferred };
 }
 
 function entryHasText(entry) {
