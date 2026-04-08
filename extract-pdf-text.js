@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Extract text from a PDF and write to _extracted.txt next to the PDF
- * (or to misc/_extracted.txt if path is just a basename).
+ * (or next to the PDF’s directory if you pass a relative path).
  * Usage: node extract-pdf-text.js <path-to-pdf>
  */
 const fs = require('fs');

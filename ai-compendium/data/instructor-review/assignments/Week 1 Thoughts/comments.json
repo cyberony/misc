@@ -70,6 +70,11 @@
       "polish": "",
       "polishTranscribeEnd": 0
     },
+    "287797": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0
+    },
     "287800": {
       "transcribe": "",
       "polish": "",
@@ -96,6 +101,6 @@
       "polishTranscribeEnd": 0
     }
   },
-  "updatedAt": "2026-04-07T18:34:34.921Z",
+  "updatedAt": "2026-04-08T02:53:09.384Z",
   "note": "comments[id]: { transcribe, polish, polishTranscribeEnd }. Wand polishes only new raw after End; + then mic = assistant. exportVersion 5."
 }
