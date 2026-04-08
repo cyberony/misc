@@ -1107,25 +1107,30 @@ function selectStudent(id) {
   abortRecording();
   syncInstructionButtons();
   flushCommentToMap();
-  selectedId = id;
+  const sid = id == null || id === "" ? null : String(id);
+  selectedId = sid;
   document.querySelectorAll(".student-block").forEach((el) => {
-    el.classList.toggle("selected", el.dataset.id === id);
+    el.classList.toggle("selected", el.dataset.id === sid);
   });
   const tr = getTranscribeBox();
   const pl = getPolishBox();
-  const s = bundle?.students?.find((x) => x.id === id);
+  const s = bundle?.students?.find((x) => String(x.id) === sid);
   document.getElementById("commentTitle").textContent = s
     ? `Comments — ${s.name}`
     : "Comments";
-  const entry = id ? normalizeCommentEntry(comments[id]) : normalizeCommentEntry(null);
-  if (id) comments[id] = entry;
+  const entry = sid ? normalizeCommentEntry(comments[sid]) : normalizeCommentEntry(null);
+  /* Do not assign comments[sid] = empty when comments[sid] was undefined.
+     normalizeCommentEntry(undefined) is empty; writing that made autosave persist "" and wipe the file. */
+  if (sid && comments[sid] !== undefined) {
+    comments[sid] = entry;
+  }
   if (tr) {
-    tr.disabled = !id;
-    tr.value = id ? entry.transcribe : "";
+    tr.disabled = !sid;
+    tr.value = sid ? entry.transcribe : "";
   }
   if (pl) {
-    pl.disabled = !id;
-    pl.value = id ? entry.polish : "";
+    pl.disabled = !sid;
+    pl.value = sid ? entry.polish : "";
   }
   updateCommentTools();
 }
