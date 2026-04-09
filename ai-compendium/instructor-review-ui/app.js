@@ -152,9 +152,10 @@ function normalizeCommentEntry(val) {
           ? transcribe.length
           : 0;
     if (polishTranscribeEnd > transcribe.length) polishTranscribeEnd = transcribe.length;
-    /* Ignore exportPreferred on load from disk/merge so thumbs never start "on" from saved JSON.
-       Session clicks still set comments[id].exportPreferred until reload; export infers when null. */
-    const exportPreferred = null;
+    const exportPreferred =
+      val.exportPreferred === "polish" || val.exportPreferred === "transcribe"
+        ? val.exportPreferred
+        : null;
     return { transcribe, polish, polishTranscribeEnd, exportPreferred };
   }
   return base;
@@ -1774,11 +1775,37 @@ function syncExportLikeButtons() {
   const trBtn = document.getElementById("btnExportLikeTranscribe");
   const plBtn = document.getElementById("btnExportLikePolish");
   const tr = getTranscribeBox();
+  const pl = getPolishBox();
   if (!trBtn || !plBtn) return;
   const pipelineBusy = commentPipelineBusy();
   const can = !!selectedId && tr && !tr.disabled;
-  trBtn.disabled = !can || pipelineBusy;
-  plBtn.disabled = !can || pipelineBusy;
+  const hasTr = !!(tr && String(tr.value || "").trim());
+  const hasPl = !!(pl && String(pl.value || "").trim());
+
+  let prefDirty = false;
+  if (selectedId && comments[selectedId]) {
+    const p = comments[selectedId].exportPreferred;
+    if (p === "transcribe" && !hasTr) {
+      comments[selectedId].exportPreferred = null;
+      prefDirty = true;
+    }
+    if (p === "polish" && !hasPl) {
+      comments[selectedId].exportPreferred = null;
+      prefDirty = true;
+    }
+  }
+  if (prefDirty) schedulePersistCommentsToFile();
+
+  /* Rough export thumb: enable as soon as the top box has text (export can be rough-only; no need to wait for polish or pipeline). */
+  trBtn.disabled = !can || !hasTr;
+  plBtn.disabled = !can || pipelineBusy || !hasPl;
+  trBtn.title = !hasTr
+    ? "Add text to the rough transcript above to choose this for export."
+    : "Use rough transcript for export (JSON/Excel use this when selected)";
+  plBtn.title =
+    can && !pipelineBusy && !hasPl
+      ? "Add text to the polished note above to choose this for export."
+      : "Use polished note for export (JSON/Excel use this when selected)";
   if (!can || !selectedId) {
     trBtn.setAttribute("aria-pressed", "false");
     plBtn.setAttribute("aria-pressed", "false");
@@ -1861,7 +1888,7 @@ function renderStudents() {
 
   if (!bundle?.students?.length) {
     root.innerHTML =
-      '<p class="empty-state">No students for this assignment. Re-upload an <strong>assignment report CSV</strong> via <strong>Upload assignment data</strong>, or use <strong>Import JSON</strong> if you have a saved export to merge.</p>';
+      '<p class="empty-state">No students for this assignment. Re-upload an <strong>assignment report CSV</strong> via <strong>Upload assignment data</strong>.</p>';
     document.getElementById("metaLine").textContent = formatMetaLine();
     updateAssignmentDueBanner();
     return;
@@ -1921,17 +1948,17 @@ function buildExportPayload() {
   const asg = getCurrentAssignmentEntry();
   const norm = normalizeCommentsObject(comments);
   const exportByStudentId = {};
+  const pickFromEntry = (e) => {
+    if (e.exportPreferred === "transcribe") return "transcribe";
+    if (e.exportPreferred === "polish") return "polish";
+    return String(e.transcribe || "").trim()
+      ? "transcribe"
+      : String(e.polish || "").trim()
+        ? "polish"
+        : "transcribe";
+  };
   for (const [id, e] of Object.entries(norm)) {
-    let from;
-    if (e.exportPreferred === "transcribe") from = "transcribe";
-    else if (e.exportPreferred === "polish") from = "polish";
-    else {
-      from = String(e.transcribe || "").trim()
-        ? "transcribe"
-        : String(e.polish || "").trim()
-          ? "polish"
-          : "transcribe";
-    }
+    const from = pickFromEntry(e);
     exportByStudentId[id] = {
       from,
       text: from === "transcribe" ? e.transcribe : e.polish,
@@ -1950,7 +1977,38 @@ function buildExportPayload() {
   };
 }
 
-function downloadExport() {
+function closeExportMenu() {
+  document.getElementById("exportMenuDetails")?.removeAttribute("open");
+}
+
+/** `<details>` does not close on outside click or Escape; wire that so the menu is dismissible. */
+function wireExportMenuDismiss() {
+  const details = document.getElementById("exportMenuDetails");
+  const summary = details?.querySelector("summary");
+  if (!details || !summary) return;
+
+  const syncAria = () => {
+    summary.setAttribute("aria-expanded", details.open ? "true" : "false");
+  };
+  details.addEventListener("toggle", syncAria);
+  syncAria();
+
+  document.addEventListener("pointerdown", (e) => {
+    if (!details.open) return;
+    if (details.contains(e.target)) return;
+    closeExportMenu();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!details.open) return;
+    closeExportMenu();
+    e.preventDefault();
+  });
+}
+
+function downloadExportJson() {
+  closeExportMenu();
   if (!bundle) return;
   const data = buildExportPayload();
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -1963,42 +2021,92 @@ function downloadExport() {
   toast("Downloaded merged JSON");
 }
 
-function onImportFile(e) {
-  const file = e.target.files?.[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      mergeCommentsFromFile(data);
-      if (Array.isArray(data.students) && data.students.length && data.questions) {
-        const due = typeof data.dueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(data.dueDate.trim()) ? data.dueDate.trim() : undefined;
-        bundle = {
-          questions: data.questions,
-          students: data.students,
-          sourceFile: data.sourceFile ?? "imported",
-          ...(due ? { dueDate: due } : {}),
-        };
-        renderStudents();
-      }
-      schedulePersistCommentsToFile();
-      void pushCommentsToServer();
-      if (selectedId) {
-        const ent = normalizeCommentEntry(comments[selectedId]);
-        comments[selectedId] = ent;
-        const tr = getTranscribeBox();
-        const pl = getPolishBox();
-        if (tr) tr.value = ent.transcribe;
-        if (pl) pl.value = ent.polish;
-      }
-      toast("Import applied");
-    } catch (err) {
-      toast("Invalid JSON file");
-      console.error(err);
-    }
+function escapeXmlCell(v) {
+  return String(v ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function downloadExportExcel() {
+  closeExportMenu();
+  if (!bundle) return;
+  flushCommentToMap();
+  const norm = normalizeCommentsObject(comments);
+  const pickFromEntry = (e) => {
+    if (e.exportPreferred === "transcribe") return "transcribe";
+    if (e.exportPreferred === "polish") return "polish";
+    return String(e.transcribe || "").trim()
+      ? "transcribe"
+      : String(e.polish || "").trim()
+        ? "polish"
+        : "transcribe";
   };
-  reader.readAsText(file);
-  e.target.value = "";
+  const headers = [
+    "Student ID",
+    "SIS ID",
+    "Name",
+    "Section",
+    "Submitted",
+    "Q1",
+    "Q2",
+    "Q3",
+    "Q4",
+    "Q5",
+    "Instructor Comment (Selected)",
+    "Comment Source",
+  ];
+  const rows = [];
+  rows.push(headers);
+  for (const s of bundle.students || []) {
+    const e = norm[String(s.id)] || normalizeCommentEntry(null);
+    const from = pickFromEntry(e);
+    const selectedComment = from === "transcribe" ? e.transcribe : e.polish;
+    rows.push([
+      s.id || "",
+      s.sisId || "",
+      s.name || "",
+      s.section || "",
+      s.submitted || "",
+      s.answers?.[0] || "",
+      s.answers?.[1] || "",
+      s.answers?.[2] || "",
+      s.answers?.[3] || "",
+      s.answers?.[4] || "",
+      selectedComment || "",
+      from,
+    ]);
+  }
+
+  const xmlRows = rows
+    .map(
+      (r) =>
+        `<Row>${r
+          .map((cell) => `<Cell><Data ss:Type="String">${escapeXmlCell(cell)}</Data></Cell>`)
+          .join("")}</Row>`,
+    )
+    .join("");
+  const sheetName = (getCurrentAssignmentEntry()?.title || "Export").slice(0, 31);
+  const xml =
+    `<?xml version="1.0"?>` +
+    `<?mso-application progid="Excel.Sheet"?>` +
+    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" ` +
+    `xmlns:o="urn:schemas-microsoft-com:office:office" ` +
+    `xmlns:x="urn:schemas-microsoft-com:office:excel" ` +
+    `xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
+    `<Worksheet ss:Name="${escapeXmlCell(sheetName || "Export")}"><Table>${xmlRows}</Table></Worksheet>` +
+    `</Workbook>`;
+
+  const blob = new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  const slug = (currentAssignmentId || "export").replace(/[^a-z0-9-_]+/gi, "-");
+  a.download = `ai-perspectives-review-${slug}-${getCentralTimeYmdFromInstant(new Date()) || "export"}.xls`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Downloaded Excel export");
 }
 
 function wireVoiceAndPolish() {
@@ -2081,6 +2189,7 @@ function wireCommentBox() {
 
 async function init() {
   wireCommentBox();
+  wireExportMenuDismiss();
   wireExportLikeButtons();
   wireVoiceAndPolish();
   syncInstructionButtons();
@@ -2088,8 +2197,8 @@ async function init() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") flushPersistenceOnPageExit();
   });
-  document.getElementById("btnExport").addEventListener("click", downloadExport);
-  document.getElementById("importInput").addEventListener("change", onImportFile);
+  document.getElementById("btnExportJson").addEventListener("click", downloadExportJson);
+  document.getElementById("btnExportExcel").addEventListener("click", downloadExportExcel);
   wireAssignmentSelect();
   wireUploadModal();
   wireDeleteAssignment();

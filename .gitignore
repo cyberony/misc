@@ -3,4 +3,6 @@ node_modules/
 .venv/
 _extracted.txt
 *.pdf
+# MS Office lock file while a document is open in Excel/Word
+~$*
 search-slides-extract.txt

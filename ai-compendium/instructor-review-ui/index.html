@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AI Perspectives — Quiz review</title>
-    <link rel="stylesheet" href="/review/styles.css?v=20260427" />
+    <link rel="stylesheet" href="/review/styles.css?v=20260436" />
   </head>
   <body>
     <header class="review-topbar" aria-label="Site">
@@ -51,11 +51,13 @@
       </span>
       <div class="actions">
         <button type="button" class="primary" id="btnUploadAssignment">Upload assignment data</button>
-        <button type="button" id="btnExport">Export all (JSON)</button>
-        <label class="file-btn">
-          Import JSON
-          <input type="file" id="importInput" accept="application/json,.json" />
-        </label>
+        <details class="export-menu" id="exportMenuDetails">
+          <summary class="export-menu__summary" aria-expanded="false" aria-haspopup="menu">Export</summary>
+          <div class="export-menu__panel" role="menu" aria-label="Export format">
+            <button type="button" class="export-menu__item" role="menuitem" id="btnExportJson">JSON</button>
+            <button type="button" class="export-menu__item" role="menuitem" id="btnExportExcel">Excel spreadsheet</button>
+          </div>
+        </details>
       </div>
     </header>
 
@@ -303,6 +305,6 @@
       </div>
     </div>
 
-    <script src="/review/app.js?v=20260427"></script>
+    <script src="/review/app.js?v=20260436"></script>
   </body>
 </html>

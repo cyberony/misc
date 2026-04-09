@@ -95,6 +95,12 @@ function readCommentsFileMap(filePath) {
   }
 }
 
+function mergeExportPreference(inc, ex) {
+  if (inc.exportPreferred === 'polish' || inc.exportPreferred === 'transcribe') return inc.exportPreferred;
+  if (ex.exportPreferred === 'polish' || ex.exportPreferred === 'transcribe') return ex.exportPreferred;
+  return null;
+}
+
 function mergeCommentsPreservingNonEmpty(existingMap, incomingMap) {
   const existing = normalizeCommentsObject(existingMap);
   const incoming = normalizeCommentsObject(incomingMap);
@@ -106,7 +112,10 @@ function mergeCommentsPreservingNonEmpty(existingMap, incomingMap) {
     const ex = normalizeCommentEntry(existing[id]);
     const inc = normalizeCommentEntry(incoming[id]);
     if (!entryHasText(inc) && entryHasText(ex)) {
-      merged[id] = ex;
+      merged[id] = {
+        ...ex,
+        exportPreferred: mergeExportPreference(inc, ex),
+      };
       preservedFromExisting += 1;
       continue;
     }

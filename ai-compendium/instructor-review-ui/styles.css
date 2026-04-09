@@ -250,6 +250,65 @@ header.app-header .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  align-items: center;
+}
+
+/* Single “Export” control with JSON / Excel options */
+.export-menu {
+  position: relative;
+}
+
+.export-menu__summary {
+  list-style: none;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--btn-border-strong);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.export-menu__summary::-webkit-details-marker {
+  display: none;
+}
+
+.export-menu__summary::after {
+  content: " ▾";
+  font-size: 0.75em;
+  opacity: 0.75;
+}
+
+.export-menu__summary:hover {
+  border-color: rgba(11, 18, 32, 0.3);
+  background: var(--btn-hover-bg);
+}
+
+.export-menu__panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  min-width: 11rem;
+  padding: 0.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--btn-border);
+  background: var(--panel);
+  box-shadow: 0 6px 24px rgba(11, 18, 32, 0.12);
+}
+
+.export-menu__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.export-menu__item:hover {
+  background: var(--btn-hover-bg);
 }
 
 button,
@@ -637,11 +696,11 @@ header.app-header select:disabled {
 
 .comment-fields .icon-tool:disabled {
   opacity: 0.45;
-  cursor: not-allowed;
+  cursor: default;
 }
 
-/* Whisper / polish / refine in flight: dim every comment tool except the KITT scanner */
-.comment-fields.comment-fields--processing .icon-tool:not(.kitt-scan) {
+/* Whisper / polish / refine in flight: dim comment tools except KITT + rough export thumb (rough can be chosen without polishing). */
+.comment-fields.comment-fields--processing .icon-tool:not(.kitt-scan):not(#btnExportLikeTranscribe) {
   opacity: 0.36;
   filter: grayscale(0.22);
 }
@@ -649,6 +708,11 @@ header.app-header select:disabled {
 .comment-fields.comment-fields--processing .icon-tool.kitt-scan {
   filter: none;
   opacity: 1;
+}
+
+.comment-fields.comment-fields--processing #btnExportLikeTranscribe:not(:disabled) {
+  opacity: 1;
+  filter: none;
 }
 
 #btnDictate.listening,
@@ -680,7 +744,7 @@ header.app-header select:disabled {
   height: 1.125rem;
 }
 
-/* Export thumbs: ungray = not chosen; gray = “I prefer this text for export.” Default: both ungray. */
+/* Export thumbs: default neutral; selected uses subtle accent tint. */
 
 /* No preference yet: both ungray */
 .comment-fields.export-pref--none .export-pref-thumb {
@@ -696,19 +760,18 @@ header.app-header select:disabled {
   color: var(--text);
 }
 
-/* Prefer rough: rough thumb gray, polished thumb ungray */
+/* Prefer rough: same flat “muted control” feel as disabled gray (#f0f2f5 / #dde3eb), blue-shifted */
 .comment-fields.export-pref--transcribe #btnExportLikeTranscribe {
-  opacity: 0.4;
-  color: var(--muted);
-  background: #f0f2f5;
-  border-color: #dde3eb;
+  opacity: 1;
+  color: #1e3f8a;
+  background: #e8ecf4;
+  border-color: #cfd6e6;
 }
 
 .comment-fields.export-pref--transcribe #btnExportLikeTranscribe:hover:not(:disabled) {
-  opacity: 0.72;
-  color: var(--text);
-  background: #eef1f5;
-  border-color: #c9d4e3;
+  color: #1a3778;
+  background: #e2e7f2;
+  border-color: #c6cedf;
 }
 
 .comment-fields.export-pref--transcribe #btnExportLikePolish {
@@ -724,19 +787,18 @@ header.app-header select:disabled {
   color: var(--text);
 }
 
-/* Prefer polished: polished thumb gray, rough thumb ungray */
+/* Prefer polished: same flat muted feel as disabled gray, blue-shifted */
 .comment-fields.export-pref--polish #btnExportLikePolish {
-  opacity: 0.4;
-  color: var(--muted);
-  background: #f0f2f5;
-  border-color: #dde3eb;
+  opacity: 1;
+  color: #1e3f8a;
+  background: #e8ecf4;
+  border-color: #cfd6e6;
 }
 
 .comment-fields.export-pref--polish #btnExportLikePolish:hover:not(:disabled) {
-  opacity: 0.72;
-  color: var(--text);
-  background: #eef1f5;
-  border-color: #c9d4e3;
+  color: #1a3778;
+  background: #e2e7f2;
+  border-color: #c6cedf;
 }
 
 .comment-fields.export-pref--polish #btnExportLikeTranscribe {
@@ -750,6 +812,15 @@ header.app-header select:disabled {
   background: #eef1f5;
   border-color: #c9d4e3;
   color: var(--text);
+}
+
+/* Disabled thumbs should look like other disabled comment tools (e.g., inactive wand). */
+.comment-fields .export-pref-thumb:disabled {
+  opacity: 0.45 !important;
+  cursor: default;
+  color: var(--muted) !important;
+  background: #f0f2f5 !important;
+  border-color: #dde3eb !important;
 }
 
 .status-toast {
