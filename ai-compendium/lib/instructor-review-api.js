@@ -568,6 +568,7 @@ function mountInstructorReview(app, opts) {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
           return res.status(400).json({ error: 'dueDate must be YYYY-MM-DD or empty' });
         }
+        /* Interpreted in the review UI as US Central Time calendar date (CDT/CST zone; inclusive). */
         doc.dueDate = s;
       }
       fs.writeFileSync(studentsPath, `${JSON.stringify(doc, null, 2)}\n`, 'utf8');

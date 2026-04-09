@@ -182,30 +182,124 @@ function formatMetaLine() {
   return n === 1 ? "1 student" : `${n} students`;
 }
 
-/** Optional top-level field in students.json: YYYY-MM-DD (UTC calendar date, inclusive). Next UTC day after this is at least 1 day late. */
+/** Optional top-level field in students.json: YYYY-MM-DD (US Central Time calendar date, inclusive; same zone as America/Chicago). */
 function getDueDateYmdFromBundle(b) {
   const raw = b?.dueDate;
   if (typeof raw !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(raw.trim())) return null;
   return raw.trim();
 }
 
+/** Wall-clock time in America/Chicago → absolute instant (handles CDT/CST). */
+function parseWallClockChicago(ymd, hms) {
+  const [y, mo, d] = ymd.split("-").map(Number);
+  const [h, mi, se] = hms.split(":").map(Number);
+  const pad = (n) => String(n).padStart(2, "0");
+  const base = `${y}-${pad(mo)}-${pad(d)}T${pad(h)}:${pad(mi)}:${pad(se)}`;
+  for (const off of ["-05:00", "-06:00", "-04:00"]) {
+    const dt = new Date(base + off);
+    if (isNaN(dt.getTime())) continue;
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Chicago",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: false,
+    }).formatToParts(dt);
+    const get = (t) => {
+      const p = parts.find((x) => x.type === t);
+      return p ? +p.value : NaN;
+    };
+    if (
+      get("year") === y &&
+      get("month") === mo &&
+      get("day") === d &&
+      get("hour") === h &&
+      get("minute") === mi &&
+      get("second") === se
+    ) {
+      return dt;
+    }
+  }
+  return null;
+}
+
+/** CDT vs CST for an instant (US Central Time / America/Chicago; follows US DST rules). */
+function getCentralAbbreviationForInstant(d) {
+  if (!(d instanceof Date) || isNaN(d.getTime())) return "CT";
+  const longName = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    timeZoneName: "long",
+  })
+    .formatToParts(d)
+    .find((p) => p.type === "timeZoneName")?.value;
+  if (longName === "Central Standard Time") return "CST";
+  if (longName === "Central Daylight Time") return "CDT";
+  const shortName = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    timeZoneName: "short",
+  })
+    .formatToParts(d)
+    .find((p) => p.type === "timeZoneName")?.value;
+  return shortName === "CST" || shortName === "CDT" ? shortName : "CT";
+}
+
+/** Stored wall clock + CDT or CST (not the word “Chicago”). */
+function formatInstantAsCentralWallClock(d) {
+  if (!(d instanceof Date) || isNaN(d.getTime())) return "";
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Chicago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(d);
+  const get = (t) => parts.find((p) => p.type === t)?.value ?? "";
+  const abbr = getCentralAbbreviationForInstant(d);
+  return `${get("year")}-${get("month")}-${get("day")} ${get("hour")}:${get("minute")}:${get("second")} ${abbr}`;
+}
+
+/** YYYY-MM-DD in US Central Time for an absolute instant. */
+function getCentralTimeYmdFromInstant(d) {
+  if (!(d instanceof Date) || isNaN(d.getTime())) return null;
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Chicago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const parts = fmt.formatToParts(d);
+  const get = (t) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+
+/** Parse Canvas export `… UTC`, stored `… CDT|CST` (or legacy `… Chicago`), or ISO 8601. */
 function parseCanvasSubmittedUtc(submitted) {
   if (!submitted || typeof submitted !== "string") return null;
   const s = submitted.trim();
-  let iso = s;
   if (!s.includes("T")) {
-    const m = s.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) UTC$/);
-    if (m) iso = `${m[1]}T${m[2]}Z`;
+    const mUtc = s.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) UTC$/);
+    if (mUtc) return new Date(`${mUtc[1]}T${mUtc[2]}Z`);
+    const mChi = s.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) (Chicago|CDT|CST)$/);
+    if (mChi) return parseWallClockChicago(mChi[1], mChi[2]);
+    return null;
   }
-  const d = new Date(iso);
+  const d = new Date(s);
   return isNaN(d.getTime()) ? null : d;
 }
 
-/** Whole calendar days late in UTC: first instant of the UTC day after dueDate counts as 1 day late. */
-function calendarDaysLateUtc(submittedStr, dueDateYmd) {
+/** Whole calendar days late: submission date (Central Time) vs due YYYY-MM-DD (Central Time calendar, inclusive). */
+function calendarDaysLateCentral(submittedStr, dueDateYmd) {
   const sub = parseCanvasSubmittedUtc(submittedStr);
   if (!sub || !dueDateYmd) return null;
-  const subDay = sub.toISOString().slice(0, 10);
+  const subDay = getCentralTimeYmdFromInstant(sub);
+  if (!subDay) return null;
   if (subDay <= dueDateYmd) return 0;
   const tDue = Date.UTC(
     parseInt(dueDateYmd.slice(0, 4), 10),
@@ -220,33 +314,35 @@ function calendarDaysLateUtc(submittedStr, dueDateYmd) {
   return Math.round((tSub - tDue) / 86400000);
 }
 
-function formatDueDateReadableUtc(ymd) {
+function formatDueDateReadableCentral(ymd) {
   const y = parseInt(ymd.slice(0, 4), 10);
-  const m = parseInt(ymd.slice(5, 7), 10) - 1;
+  const mo = parseInt(ymd.slice(5, 7), 10);
   const day = parseInt(ymd.slice(8, 10), 10);
-  const dt = new Date(Date.UTC(y, m, day));
+  const pad = (n) => String(n).padStart(2, "0");
+  const ymdStr = `${y}-${pad(mo)}-${pad(day)}`;
+  const inst = parseWallClockChicago(ymdStr, "12:00:00");
+  if (!inst) return ymd;
   return new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
     year: "numeric",
-    timeZone: "UTC",
-  }).format(dt);
+    timeZone: "America/Chicago",
+  }).format(inst);
 }
 
 function formatSubmittedReadableUtc(submitted) {
   const d = parseCanvasSubmittedUtc(submitted);
   if (!d) return "";
-  return (
-    new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      timeZone: "UTC",
-    }).format(d) + " UTC"
-  );
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "America/Chicago",
+    timeZoneName: "long",
+  }).format(d);
 }
 
 function updateAssignmentDueBanner() {
@@ -263,13 +359,13 @@ function updateAssignmentDueBanner() {
   pill.classList.toggle("due-pill--empty", !ymd);
   if (!ymd) {
     pill.textContent = "No due date set";
-    pill.title = "No due date — click to set. Used for on-time vs late.";
+    pill.title = "No due date — click to set. Used for on-time vs late (Central Time date).";
     pill.setAttribute("aria-label", "No due date set. Click to choose assignment due date.");
     return;
   }
-  const readable = formatDueDateReadableUtc(ymd);
+  const readable = formatDueDateReadableCentral(ymd);
   pill.textContent = `Due ${readable}`;
-  pill.title = `Due date ${ymd} (UTC calendar day, inclusive). Click to change.`;
+  pill.title = `Due date ${ymd} (Central Time calendar day, inclusive). Click to change.`;
   pill.setAttribute("aria-label", `Assignment due ${readable}. Click to change.`);
 }
 
@@ -382,7 +478,7 @@ function updateStudentSubmissionMeta(student) {
     el.classList.remove("student-submission-meta--late");
     return;
   }
-  const lateDays = calendarDaysLateUtc(student.submitted, dueYmd);
+  const lateDays = calendarDaysLateCentral(student.submitted, dueYmd);
   if (lateDays === null) {
     el.textContent = subFmt ? `Submitted ${subFmt}` : "—";
     el.classList.remove("student-submission-meta--late");
@@ -824,12 +920,20 @@ function parseCanvasQuizCsv(text) {
       answers.push(row[aIdx]?.trim() ?? "");
       scores.push(row[sIdx]?.trim() ?? "");
     }
+    let submitted = row[6].trim();
+    if (submitted && / UTC$/i.test(submitted)) {
+      const mUtc = submitted.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) UTC$/);
+      if (mUtc) {
+        const inst = new Date(`${mUtc[1]}T${mUtc[2]}Z`);
+        if (!isNaN(inst.getTime())) submitted = formatInstantAsCentralWallClock(inst);
+      }
+    }
     students.push({
       id: sid,
       sisId: row[2].trim(),
       name,
       section: row[3].trim(),
-      submitted: row[6].trim(),
+      submitted,
       attempt: row[7].trim(),
       answers,
       scores,
@@ -943,7 +1047,7 @@ async function submitUploadModal() {
     return;
   }
   const students = {
-    generatedAt: new Date().toISOString(),
+    generatedAt: formatInstantAsCentralWallClock(new Date()),
     sourceFile: csvFile.name,
     questions: parsed.questions,
     students: parsed.students,
@@ -1835,7 +1939,7 @@ function buildExportPayload() {
   }
   return {
     exportVersion: 6,
-    exportedAt: new Date().toISOString(),
+    exportedAt: formatInstantAsCentralWallClock(new Date()),
     assignmentId: currentAssignmentId,
     assignmentTitle: asg?.title ?? null,
     dueDate: getDueDateYmdFromBundle(bundle),
@@ -1853,7 +1957,7 @@ function downloadExport() {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   const slug = (currentAssignmentId || "export").replace(/[^a-z0-9-_]+/gi, "-");
-  a.download = `ai-perspectives-review-${slug}-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `ai-perspectives-review-${slug}-${getCentralTimeYmdFromInstant(new Date()) || "export"}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
   toast("Downloaded merged JSON");

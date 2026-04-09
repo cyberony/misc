@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-08T17:51:26.355Z",
+  "generatedAt": "2026-04-08 18:30:00 CDT",
   "sourceFile": "Thoughts on AI Quiz Student Analysis Report.csv",
   "questions": [
     {
@@ -34,7 +34,7 @@
       "sisId": "abm1314",
       "name": "Abdullah Bin Masood",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:05:08 UTC",
+      "submitted": "2026-04-03 15:05:08 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -59,7 +59,7 @@
       "sisId": "nwe4973",
       "name": "Adeshvir Dhanoa",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:02:00 UTC",
+      "submitted": "2026-04-03 15:02:00 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -84,7 +84,7 @@
       "sisId": "sux8975",
       "name": "Alan Wang",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 23:29:43 UTC",
+      "submitted": "2026-04-03 18:29:43 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -109,7 +109,7 @@
       "sisId": "kmy2091",
       "name": "Andnet DeBoer",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:13:12 UTC",
+      "submitted": "2026-04-03 15:13:12 CDT",
       "attempt": "1",
       "answers": [
         "Yes",
@@ -130,11 +130,36 @@
       "totalScore": "0.0"
     },
     {
+      "id": "204608",
+      "sisId": "asq3614",
+      "name": "Andre Shportko",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-08 15:00:00 CDT",
+      "attempt": "1",
+      "answers": [
+        "Yes",
+        "While AI has a different errors profile, at the end of the day, it does (1) generate unique ideas (or at least recompiles them productively) (2) navigate the solution space efficiently (not by total exhaustion). In a very reduced sense, intelligence for me seems to be a capacity to enable efficient heuristics to navigate the solution space.",
+        "AI will not be able to initiate the avant-garde in art (only simulate existing styles). Fine arts is historically a response to the social disturbances that are inherently human-initiated and thus only humans are able to capture the initial Zeitgeist.\nTo this end, I think that AI will be able to automate the Math proofs soon.",
+        "Can we stop it if it goes south?",
+        "Human agency is central for me in the high stakes environments such as judiciary, warfare, airspace tech, and healthcare. Unlike SWE, those fields do not tolerate false positives."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
       "id": "237058",
       "sisId": "jws5030",
       "name": "Casey Zhang",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:07:25 UTC",
+      "submitted": "2026-04-03 15:07:25 CDT",
       "attempt": "1",
       "answers": [
         "Yes",
@@ -159,7 +184,7 @@
       "sisId": "yby0126",
       "name": "Chenwan Zhong",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:13:01 UTC",
+      "submitted": "2026-04-03 15:13:01 CDT",
       "attempt": "1",
       "answers": [
         "Yes",
@@ -184,7 +209,7 @@
       "sisId": "dfv1344",
       "name": "Chenyu Zhu",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:09:31 UTC",
+      "submitted": "2026-04-03 15:09:31 CDT",
       "attempt": "1",
       "answers": [
         "Yes",
@@ -209,7 +234,7 @@
       "sisId": "dlw8642",
       "name": "Daniel Wong",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:10:51 UTC",
+      "submitted": "2026-04-03 15:10:51 CDT",
       "attempt": "1",
       "answers": [
         "Yes",
@@ -234,7 +259,7 @@
       "sisId": "mfm0122",
       "name": "Eden Growney",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:09:43 UTC",
+      "submitted": "2026-04-03 15:09:43 CDT",
       "attempt": "1",
       "answers": [
         "Yes",
@@ -259,7 +284,7 @@
       "sisId": "ecf1002",
       "name": "Eric Fei",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:07:03 UTC",
+      "submitted": "2026-04-03 15:07:03 CDT",
       "attempt": "1",
       "answers": [
         "Yes",
@@ -284,7 +309,7 @@
       "sisId": "rhl4072",
       "name": "Ethan Foong",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:41:14 UTC",
+      "submitted": "2026-04-03 15:41:14 CDT",
       "attempt": "1",
       "answers": [
         "Yes",
@@ -309,7 +334,7 @@
       "sisId": "rpe8271",
       "name": "Florian Jule",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:09:08 UTC",
+      "submitted": "2026-04-03 15:09:08 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -334,7 +359,7 @@
       "sisId": "tdu7314",
       "name": "Julian Tang",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:05:44 UTC",
+      "submitted": "2026-04-03 15:05:44 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -359,7 +384,7 @@
       "sisId": "vwh1509",
       "name": "Jyothi Swaroop Kasina",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:12:09 UTC",
+      "submitted": "2026-04-03 15:12:09 CDT",
       "attempt": "1",
       "answers": [
         "Yes",
@@ -384,7 +409,7 @@
       "sisId": "lea1212",
       "name": "Kyle Zhikai Thompson",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:09:45 UTC",
+      "submitted": "2026-04-03 15:09:45 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -409,7 +434,7 @@
       "sisId": "wsi3567",
       "name": "Longzhang Zhu",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:26:57 UTC",
+      "submitted": "2026-04-03 15:26:57 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -434,7 +459,7 @@
       "sisId": "mjh0873",
       "name": "Marija Jovic",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:09:14 UTC",
+      "submitted": "2026-04-03 15:09:14 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -459,7 +484,7 @@
       "sisId": "dhr9779",
       "name": "Matthew Song",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:07:10 UTC",
+      "submitted": "2026-04-03 15:07:10 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -484,7 +509,7 @@
       "sisId": "wgk1727",
       "name": "Md Saif Ahmad",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:07:33 UTC",
+      "submitted": "2026-04-03 15:07:33 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -505,11 +530,36 @@
       "totalScore": "2.0"
     },
     {
+      "id": "214131",
+      "sisId": "mle6198",
+      "name": "Miya Liu",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-08 18:25:00 CDT",
+      "attempt": "1",
+      "answers": [
+        "I don't think it is impossible",
+        "I define thinking in the scope of how animals (especially humans) think, which is roughly the process of taking ideas/perceptions/sensations as input that triggers some neurons to fire, which in case outputs some combination of ideas. For example, upon smelling fried chicken, many might start to think that they would desire fried chicken for dinner. However, sometimes thoughts can also come involuntarily, which I found to be very interesting. If we are looking at thinking in the mechanical way (perhaps one can say the materialistic lens), how current reasoning models are not too far from how humans actually reason and think. I think most people's problem with the argument that AI systems can think lies in the fact that right now LLMs are just doing next token prediction, which doesn't seem very intelligent. There are two ways to look at this. One way is to argue that the fact that such process is a \"black box\" gives room for thinking and true intelligence, and the other can argue that it is only a matter of architecture and structure, which can be further explored. Personally, I am pretty optimistic about the likelihood of AI systems coming to have the capacity of thoughts.",
+        "I don't think there's an aspect in which machines won't be able to do. In 5 years, maybe they will be able to conquer most human tasks (like grocery shopping, delivery, etc.) and replace most manual work. In 10 years we might not be able to differentiate an artificial human and a real human. In 100 years it might be possible that machines are so smart and intelligent they can be incorporated into a part of society.",
+        "I am really interested to think more about how AI is bounded by language. Also how it will challenge the notion of a God for those who are religious.",
+        "I think it's something I'm not super sure about. I sometimes feel skeptical but sometimes really impressed by their progress. That's why I really look forward to all the different guest lectures and discussions we'll have in this class!"
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "5",
+      "nIncorrect": "0",
+      "totalScore": "0.0"
+    },
+    {
       "id": "265703",
       "sisId": "cue0559",
       "name": "Pranav Gogineni",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:06:40 UTC",
+      "submitted": "2026-04-03 15:06:40 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -534,7 +584,7 @@
       "sisId": "ybe9480",
       "name": "Quinn Langfitt",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:07:12 UTC",
+      "submitted": "2026-04-03 15:07:12 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -559,7 +609,7 @@
       "sisId": "rsk1381",
       "name": "Reem Khalid",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:09:06 UTC",
+      "submitted": "2026-04-03 15:09:06 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -584,7 +634,7 @@
       "sisId": "smb3899",
       "name": "Sonia Bhatia",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:25:07 UTC",
+      "submitted": "2026-04-03 15:25:07 CDT",
       "attempt": "1",
       "answers": [
         "Yes",
@@ -609,7 +659,7 @@
       "sisId": "bfu3205",
       "name": "Yibin Wang",
       "section": "2026SP_COMP_SCI_496-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:08:16 UTC",
+      "submitted": "2026-04-03 15:08:16 CDT",
       "attempt": "1",
       "answers": [
         "No",
@@ -634,7 +684,7 @@
       "sisId": "kqv9434",
       "name": "Yuyang Wang",
       "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
-      "submitted": "2026-04-03 20:07:34 UTC",
+      "submitted": "2026-04-03 15:07:34 CDT",
       "attempt": "1",
       "answers": [
         "Yes",

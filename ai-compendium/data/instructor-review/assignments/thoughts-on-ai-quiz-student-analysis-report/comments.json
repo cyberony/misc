@@ -1,5 +1,11 @@
 {
   "comments": {
+    "204608": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": null
+    },
     "204902": {
       "transcribe": "You make an interesting point about depth in what LLMs produce or the current AIs produce, because do we have a good understanding of depth in anything, whether it's their output or our output? That's something we should explore probably in class, because without that, we are unable to really measure or assess whether something that the AI is saying is deep or not or how that compares with human depth or the depth in human communication. Very good point about quantum computing, by the way, and we're going to explore that more when Professor Kate Smith comes to our class and talks about quantum computing. And very good question in number four, are we always going to be superior to AI? And will they ever be sentient?",
       "polish": "You raised an interesting point about the concept of depth in the outputs produced by large language models (LLMs) and current AI technologies. It prompts us to consider whether we truly understand depth in any context, including both AI outputs and our own. This is a topic worth exploring further in class, as it is essential for assessing the depth of AI-generated content compared to human communication.\n\nI also appreciate your insightful comment regarding quantum computing. We will have the opportunity to delve deeper into this topic when Professor Kate Smith joins us to discuss it in class.\n\nAdditionally, your question about whether humans will always be superior to AI and the possibility of AI achieving sentience is thought-provoking. These are critical issues that warrant further discussion.",
@@ -36,6 +42,12 @@
       "polishTranscribeEnd": 1707,
       "exportPreferred": null
     },
+    "214131": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": null
+    },
     "237058": {
       "transcribe": "I very much like your simple but elegant definition of thinking. It's not complicated, and it seems very, very objective, and I quite agree with how you're looking at thinking, that it's basically the act of processing facts and generating opinions or doing something accordingly, right? I mean, what more do we need? That pretty much sums up thinking, if you ask me. So I agree with you. Interesting point about thinking of themselves, which is something you mentioned as something that AI might never be able to do, the self-reflection, or I forget what the word is for that. I think it's called introspection. Introspection is something that they might not be able to do, but who knows, right?",
       "polish": "I appreciate your simple yet elegant definition of thinking. It is straightforward and appears very objective. I agree with your perspective that thinking involves processing facts and generating opinions or actions based on those facts. This definition effectively captures the essence of thinking.\n\nYou also raised an interesting point about self-reflection, which you suggested AI might never be able to achieve. I believe another word for self-reflection is introspection. While it seems that AI may struggle with this capability, it remains an open question.",
@@ -61,9 +73,9 @@
       "exportPreferred": null
     },
     "241621": {
-      "transcribe": "That's an interesting thought that you think thinking requires consciousness. I believe that's pretty much what most people think, whether in terms of consciousness or agency. Agency is a term people often will use where somebody feels like doing something on their own. Thinking has something to do with agency, where the thought is coming from within. So yeah, that's a good point.",
-      "polish": "I find your perspective on the relationship between thinking and consciousness intriguing. It aligns with a common belief that consciousness is essential for thought processes. The concept of agency is also relevant here; it refers to the feeling of acting independently. Thinking is indeed connected to agency, as it often arises from within. You’ve made a good point.",
-      "polishTranscribeEnd": 383,
+      "transcribe": "Aha, you're bringing up consciousness as a requirement for thinking. That's interesting. There's no way to refute that with any proof. Of course, we don't know exactly what consciousness is and what its role is in intelligence or in thinking. But of course, there are counter arguments that can be given for thinking and consciousness. But yeah, definitely an interesting point. Yep. Simple innovation is definitely something we can expect from AI in 5, 10, and 100 years. I don't know if it's going to take a hundred years to conquer cancer. My hope is it'll take much less time than that. Let's hope in the next 5 to 10 years. Programmers, 5 to 10 years. I don't know. It seems like programming is going to go away. Programming is going to go away or should go away in the next two years. But yeah, maybe you're right because programmers will stick around because there's so much code already written, legacy code that needs to be maintained. Yeah, good question about what's stopping AI from developing self-consciousness. Thank you.",
+      "polish": "You raised an interesting point about consciousness as a requirement for thinking. While we cannot definitively prove or refute this connection, it is clear that our understanding of consciousness and its role in intelligence and thinking is still evolving. There are certainly counterarguments regarding the relationship between thinking and consciousness, which adds depth to the discussion.\n\nI agree that we can expect simple innovations from AI in the next 5, 10, and even 100 years. However, I am hopeful that advancements in areas like cancer research will occur much sooner than a century. Ideally, we should see significant progress within the next 5 to 10 years. At least that's my hope if not a prediction.\n\nRegarding programming, I agree that programming will become less relevant in the near future. That said, programmers will continue to play a crucial role. given the substantial amount of legacy code that requires maintenance, which will keep programmers in demand for quite some time. For newcomers, though, learning program doesn't promise to carry much value.\n\nYour question about what is preventing AI from developing self-consciousness is thought-provoking. Thank you for bringing it up.",
+      "polishTranscribeEnd": 1036,
       "exportPreferred": null
     },
     "265703": {
@@ -151,6 +163,6 @@
       "exportPreferred": null
     }
   },
-  "updatedAt": "2026-04-08T19:56:53.076Z",
+  "updatedAt": "2026-04-09T04:21:52.605Z",
   "note": "comments[id]: { transcribe, polish, polishTranscribeEnd, exportPreferred }. exportPreferred: null|transcribe|polish (unset = neither thumb). exportVersion 6."
 }
