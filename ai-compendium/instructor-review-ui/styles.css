@@ -17,6 +17,19 @@
   /* Question wording: lighter than question number */
   --question-text-blue: #6b9bd6;
   --answer-muted: #5a6573;
+  /* Remembered: full-button blue “liked” scheme (before thumb-only experiment) */
+  --export-like-full-btn-bg: #dbeafe;
+  --export-like-full-btn-border: #93c5fd;
+  --export-like-full-btn-icon: #1d4ed8;
+  --export-like-full-btn-opacity: 0.55;
+  /* Chosen export thumb: outline glyph, brighter blue (stroke keeps wrist gap visible) */
+  --export-like-thumb-blue: var(--accent-dim);
+  /*
+   * Perceived shell of `.export-pref-thumb:disabled` (gray #f0f2f5 / #dde3eb at opacity 0.45)
+   * over white panel — matches border/background without dimming the liked thumb glyph.
+   */
+  --export-pref-disabled-shell-bg: #f8f9fb;
+  --export-pref-disabled-shell-border: #f0f2f6;
 }
 
 * {
@@ -744,6 +757,14 @@ header.app-header select:disabled {
   height: 1.125rem;
 }
 
+.comment-fields .export-pref-thumb .vote-icon-svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 /* Export thumbs: default neutral; selected uses subtle accent tint. */
 
 /* No preference yet: both ungray */
@@ -760,20 +781,6 @@ header.app-header select:disabled {
   color: var(--text);
 }
 
-/* Prefer rough: same flat “muted control” feel as disabled gray (#f0f2f5 / #dde3eb), blue-shifted */
-.comment-fields.export-pref--transcribe #btnExportLikeTranscribe {
-  opacity: 1;
-  color: #1e3f8a;
-  background: #e8ecf4;
-  border-color: #cfd6e6;
-}
-
-.comment-fields.export-pref--transcribe #btnExportLikeTranscribe:hover:not(:disabled) {
-  color: #1a3778;
-  background: #e2e7f2;
-  border-color: #c6cedf;
-}
-
 .comment-fields.export-pref--transcribe #btnExportLikePolish {
   opacity: 1;
   color: var(--muted);
@@ -785,20 +792,6 @@ header.app-header select:disabled {
   background: #eef1f5;
   border-color: #c9d4e3;
   color: var(--text);
-}
-
-/* Prefer polished: same flat muted feel as disabled gray, blue-shifted */
-.comment-fields.export-pref--polish #btnExportLikePolish {
-  opacity: 1;
-  color: #1e3f8a;
-  background: #e8ecf4;
-  border-color: #cfd6e6;
-}
-
-.comment-fields.export-pref--polish #btnExportLikePolish:hover:not(:disabled) {
-  color: #1a3778;
-  background: #e2e7f2;
-  border-color: #c6cedf;
 }
 
 .comment-fields.export-pref--polish #btnExportLikeTranscribe {
@@ -814,13 +807,37 @@ header.app-header select:disabled {
   color: var(--text);
 }
 
-/* Disabled thumbs should look like other disabled comment tools (e.g., inactive wand). */
+/* Disabled thumbs: gray when unselected (e.g. no text in that box). */
 .comment-fields .export-pref-thumb:disabled {
   opacity: 0.45 !important;
   cursor: default;
   color: var(--muted) !important;
   background: #f0f2f5 !important;
   border-color: #dde3eb !important;
+}
+
+/*
+ * Chosen thumb: shell matches unselected `.export-pref-thumb:disabled` over white;
+ * glyph stays stroked so the wrist gap reads white, in subtle blue.
+ */
+.comment-fields.export-pref--transcribe #btnExportLikeTranscribe:disabled,
+.comment-fields.export-pref--polish #btnExportLikePolish:disabled {
+  opacity: 1 !important;
+  cursor: default !important;
+  background: var(--export-pref-disabled-shell-bg) !important;
+  border-color: var(--export-pref-disabled-shell-border) !important;
+  color: var(--muted) !important;
+  filter: none;
+}
+
+.comment-fields.export-pref--transcribe #btnExportLikeTranscribe:disabled .vote-icon-svg path,
+.comment-fields.export-pref--polish #btnExportLikePolish:disabled .vote-icon-svg path {
+  fill: none !important;
+  stroke: var(--export-like-thumb-blue) !important;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 1 !important;
 }
 
 .status-toast {

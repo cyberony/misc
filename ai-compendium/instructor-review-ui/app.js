@@ -1796,36 +1796,54 @@ function syncExportLikeButtons() {
   }
   if (prefDirty) schedulePersistCommentsToFile();
 
-  /* Rough export thumb: enable as soon as the top box has text (export can be rough-only; no need to wait for polish or pipeline). */
-  trBtn.disabled = !can || !hasTr;
-  plBtn.disabled = !can || pipelineBusy || !hasPl;
-  trBtn.title = !hasTr
-    ? "Add text to the rough transcript above to choose this for export."
-    : "Use rough transcript for export (JSON/Excel use this when selected)";
-  plBtn.title =
-    can && !pipelineBusy && !hasPl
-      ? "Add text to the polished note above to choose this for export."
-      : "Use polished note for export (JSON/Excel use this when selected)";
   if (!can || !selectedId) {
+    trBtn.disabled = true;
+    plBtn.disabled = true;
     trBtn.setAttribute("aria-pressed", "false");
     plBtn.setAttribute("aria-pressed", "false");
     syncExportPrefFieldClass(null);
+    trBtn.title = "Use rough transcript for export.";
+    plBtn.title = "Use polished note for export.";
     return;
   }
+
   let pref = comments[selectedId]?.exportPreferred;
   if (pref !== "transcribe" && pref !== "polish") {
     pref = null;
   }
+
+  /* Selected thumb: disabled (non-clickable) and blue; only the other thumb is enabled to switch. */
+  trBtn.disabled = !hasTr || pref === "transcribe";
+  plBtn.disabled = pipelineBusy || !hasPl || pref === "polish";
+
   trBtn.setAttribute("aria-pressed", pref === "transcribe" ? "true" : "false");
   plBtn.setAttribute("aria-pressed", pref === "polish" ? "true" : "false");
   syncExportPrefFieldClass(pref);
+
+  if (!hasTr) {
+    trBtn.title = "Add text to the rough transcript above to choose this for export.";
+  } else if (pref === "transcribe") {
+    trBtn.title =
+      "Rough transcript is selected for export. Click the polished thumb to switch.";
+  } else {
+    trBtn.title = "Use rough transcript for export (JSON/Excel use this when selected).";
+  }
+
+  if (pipelineBusy) {
+    plBtn.title = "Unavailable while a tool is running.";
+  } else if (!hasPl) {
+    plBtn.title = "Add text to the polished note above to choose this for export.";
+  } else if (pref === "polish") {
+    plBtn.title = "Polished note is selected for export. Click the rough thumb to switch.";
+  } else {
+    plBtn.title = "Use polished note for export (JSON/Excel use this when selected).";
+  }
 }
 
 function setExportPreferred(which) {
   if (!selectedId || (which !== "transcribe" && which !== "polish")) return;
   ensureCommentEntry(selectedId);
-  const cur = comments[selectedId].exportPreferred;
-  comments[selectedId].exportPreferred = cur === which ? null : which;
+  comments[selectedId].exportPreferred = which;
   syncExportLikeButtons();
   schedulePersistCommentsToFile();
 }
@@ -2021,16 +2039,33 @@ function downloadExportJson() {
   toast("Downloaded merged JSON");
 }
 
-function escapeXmlCell(v) {
-  return String(v ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
+/** Excel sheet name: invalid chars removed, max 31 chars. */
+function safeExcelSheetName(name) {
+  const s = String(name || "Export")
+    .replace(/[\\/*?:\[\]]/g, " ")
+    .trim()
+    .slice(0, 31);
+  return s || "Export";
 }
 
-function downloadExportExcel() {
+/**
+ * Sort key for roster order: "Last, First …" → segment before comma; otherwise
+ * two-part names use the second token; three or more parts use the middle name (second token).
+ */
+function lastNameSortKey(name) {
+  const s = String(name || "").trim();
+  if (!s) return "";
+  if (/,/.test(s)) {
+    return s.split(",")[0].trim();
+  }
+  const parts = s.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "";
+  if (parts.length === 1) return parts[0];
+  /* Two tokens: second is last name; three+: second is middle name (sort as requested). */
+  return parts[1];
+}
+
+async function downloadExportExcel() {
   closeExportMenu();
   if (!bundle) return;
   flushCommentToMap();
@@ -2060,7 +2095,14 @@ function downloadExportExcel() {
   ];
   const rows = [];
   rows.push(headers);
-  for (const s of bundle.students || []) {
+  const studentsSorted = [...(bundle.students || [])].sort((a, b) => {
+    const cmp = lastNameSortKey(a.name).localeCompare(lastNameSortKey(b.name), undefined, {
+      sensitivity: "base",
+    });
+    if (cmp !== 0) return cmp;
+    return String(a.name || "").localeCompare(String(b.name || ""), undefined, { sensitivity: "base" });
+  });
+  for (const s of studentsSorted) {
     const e = norm[String(s.id)] || normalizeCommentEntry(null);
     const from = pickFromEntry(e);
     const selectedComment = from === "transcribe" ? e.transcribe : e.polish;
@@ -2080,33 +2122,36 @@ function downloadExportExcel() {
     ]);
   }
 
-  const xmlRows = rows
-    .map(
-      (r) =>
-        `<Row>${r
-          .map((cell) => `<Cell><Data ss:Type="String">${escapeXmlCell(cell)}</Data></Cell>`)
-          .join("")}</Row>`,
-    )
-    .join("");
-  const sheetName = (getCurrentAssignmentEntry()?.title || "Export").slice(0, 31);
-  const xml =
-    `<?xml version="1.0"?>` +
-    `<?mso-application progid="Excel.Sheet"?>` +
-    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" ` +
-    `xmlns:o="urn:schemas-microsoft-com:office:office" ` +
-    `xmlns:x="urn:schemas-microsoft-com:office:excel" ` +
-    `xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
-    `<Worksheet ss:Name="${escapeXmlCell(sheetName || "Export")}"><Table>${xmlRows}</Table></Worksheet>` +
-    `</Workbook>`;
-
-  const blob = new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  const slug = (currentAssignmentId || "export").replace(/[^a-z0-9-_]+/gi, "-");
-  a.download = `ai-perspectives-review-${slug}-${getCentralTimeYmdFromInstant(new Date()) || "export"}.xls`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-  toast("Downloaded Excel export");
+  const sheetName = safeExcelSheetName(getCurrentAssignmentEntry()?.title || "Export");
+  try {
+    const res = await fetch(`${REVIEW_API_PREFIX}/export-xlsx`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sheetName, rows }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      const msg =
+        err.error ||
+        (res.status === 413
+          ? "Excel export failed: request body too large (server limit)."
+          : `Excel export failed (${res.status})`);
+      toast(msg);
+      return;
+    }
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    const slug = (currentAssignmentId || "export").replace(/[^a-z0-9-_]+/gi, "-");
+    a.download = `ai-perspectives-review-${slug}-${getCentralTimeYmdFromInstant(new Date()) || "export"}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast("Downloaded Excel export");
+  } catch (e) {
+    console.error(e);
+    toast(String(e.message || e));
+  }
 }
 
 function wireVoiceAndPolish() {
@@ -2198,7 +2243,9 @@ async function init() {
     if (document.visibilityState === "hidden") flushPersistenceOnPageExit();
   });
   document.getElementById("btnExportJson").addEventListener("click", downloadExportJson);
-  document.getElementById("btnExportExcel").addEventListener("click", downloadExportExcel);
+  document.getElementById("btnExportExcel").addEventListener("click", () => {
+    void downloadExportExcel();
+  });
   wireAssignmentSelect();
   wireUploadModal();
   wireDeleteAssignment();

@@ -14,7 +14,8 @@ const magicAuth = require('./lib/magic-page-auth');
 const { mountInstructorReview } = require('./lib/instructor-review-api');
 
 const app = express();
-app.use(express.json({ limit: '1mb' }));
+/* Instructor review (save-comments, export-xlsx) can send multi‑MB JSON; route handlers use up to 25mb. */
+app.use(express.json({ limit: '25mb' }));
 
 const PROJECT_ROOT = __dirname;
 const DATA_DIR = path.join(PROJECT_ROOT, 'data');

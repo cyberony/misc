@@ -287,6 +287,19 @@ async function refinePolished(key, polishText, instruction) {
   return content.trim();
 }
 
+function sanitizeExcelSheetNameForExport(name) {
+  const s = String(name || 'Export')
+    .replace(/[\\/*?:\[\]]/g, ' ')
+    .trim()
+    .slice(0, 31);
+  return s || 'Export';
+}
+
+function normalizeExcelCellText(value) {
+  if (value == null) return '';
+  return String(value).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+}
+
 /**
  * @param {import('express').Application} app
  * @param {{ dataRoot: string; requireMagic: import('express').RequestHandler }} opts
@@ -296,11 +309,59 @@ function mountInstructorReview(app, opts) {
   const legacyComments = path.join(dataRoot, 'comments.json');
 
   const json5mb = express.json({ limit: '5mb' });
+  const json25mb = express.json({ limit: '25mb' });
   const rawAudio = express.raw({ type: () => true, limit: `${MAX_AUDIO_BYTES + 1024 * 1024}` });
 
   function getKey() {
     return String(process.env.OPENAI_API_KEY || '').trim();
   }
+
+  /** Excel (.xlsx) with wrapText so newlines render as paragraph breaks in cells. */
+  app.post('/api/instructor-review/export-xlsx', requireMagic, json25mb, async (req, res) => {
+    const rows = req.body?.rows;
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return res.status(400).json({ error: 'Body must include a non-empty "rows" array of arrays.' });
+    }
+    const header = rows[0];
+    if (!Array.isArray(header)) {
+      return res.status(400).json({ error: 'rows[0] must be the header row (array of column titles).' });
+    }
+    const colCount = header.length;
+    const sheetName = sanitizeExcelSheetNameForExport(req.body?.sheetName);
+    try {
+      const ExcelJS = require('exceljs');
+      const workbook = new ExcelJS.Workbook();
+      const ws = workbook.addWorksheet(sheetName);
+      ws.addRow(header.map(normalizeExcelCellText));
+      const headerRow = ws.getRow(1);
+      headerRow.eachCell((cell) => {
+        cell.alignment = { wrapText: true, vertical: 'top' };
+        cell.font = { bold: true };
+      });
+      for (let r = 1; r < rows.length; r++) {
+        const row = rows[r];
+        if (!Array.isArray(row)) continue;
+        const vals = [];
+        for (let c = 0; c < colCount; c++) {
+          vals.push(normalizeExcelCellText(row[c]));
+        }
+        const excelRow = ws.addRow(vals);
+        excelRow.eachCell((cell) => {
+          cell.alignment = { wrapText: true, vertical: 'top' };
+        });
+      }
+      const defaultWidths = [10, 12, 28, 36, 20, 44, 44, 44, 44, 44, 44, 40, 14];
+      for (let i = 0; i < colCount; i++) {
+        ws.getColumn(i + 1).width = defaultWidths[i] ?? 28;
+      }
+      const buf = await workbook.xlsx.writeBuffer();
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Cache-Control', 'no-store');
+      res.send(Buffer.from(buf));
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
+  });
 
   app.post('/api/instructor-review/polish', requireMagic, json5mb, async (req, res) => {
     const key = getKey();

@@ -1,6 +1,6 @@
 {
   "name": "ai-compendium",
-  "version": "6.4.0",
+  "version": "6.5.0",
   "description": "",
   "main": "index.js",
   "keywords": [],
@@ -10,6 +10,7 @@
   "dependencies": {
     "chrono-node": "^2.9.0",
     "dotenv": "^17.3.1",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "node-cron": "^4.2.1",
     "nodemailer": "^6.9.16",
