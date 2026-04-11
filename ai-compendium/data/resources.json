@@ -136,21 +136,6 @@
     }
   ],
   "sessions": {
-    "c86b086edaed04ae60040b41d9be74f33c710d895aa17cbe4d30767a839e3c3f": {
-      "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
-      "createdAt": "2026-03-27T15:38:07.281Z",
-      "expiresAt": 1775835487281
-    },
-    "911725b381cfdf43c618d04fa748cb10242f6b22e17cd1f810e71f2cedab3203": {
-      "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
-      "createdAt": "2026-03-27T15:48:48.457Z",
-      "expiresAt": 1775836128457
-    },
-    "57dc812c44e68db229742e4330e51e29768b4e1266930f853ea134c49a907083": {
-      "userId": "e19c0caa-64d1-42ea-9de0-ba39580378c3",
-      "createdAt": "2026-03-27T15:51:50.193Z",
-      "expiresAt": 1775836310193
-    },
     "2fd8e3c7a0a26ca28ce87c9e4faa46ca4f6b5f074aaa65cec10857f1a71d5152": {
       "userId": "8f85509d-a9f9-4095-96f6-6779571ec596",
       "createdAt": "2026-04-06T17:11:23.656Z",

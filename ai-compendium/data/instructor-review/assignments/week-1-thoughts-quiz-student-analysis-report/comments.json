@@ -18,6 +18,12 @@
       "polishTranscribeEnd": 0,
       "exportPreferred": null
     },
+    "207343": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": null
+    },
     "212119": {
       "transcribe": "",
       "polish": "",
@@ -139,7 +145,7 @@
       "exportPreferred": null
     },
     "290550": {
-      "transcribe": "",
+      "transcribe": "O",
       "polish": "",
       "polishTranscribeEnd": 0,
       "exportPreferred": null
@@ -155,8 +161,14 @@
       "polish": "",
       "polishTranscribeEnd": 0,
       "exportPreferred": null
+    },
+    "MANUAL_JIAHAO_DENG": {
+      "transcribe": "",
+      "polish": "",
+      "polishTranscribeEnd": 0,
+      "exportPreferred": null
     }
   },
-  "updatedAt": "2026-04-09T18:57:37.253Z",
+  "updatedAt": "2026-04-11T18:08:58.224Z",
   "note": "comments[id]: { transcribe, polish, polishTranscribeEnd, exportPreferred }. exportPreferred: null|transcribe|polish (unset = neither thumb). exportVersion 6."
 }

@@ -247,6 +247,14 @@ function getCentralAbbreviationForInstant(d) {
   return shortName === "CST" || shortName === "CDT" ? shortName : "CT";
 }
 
+/** America/Chicago offset at this moment, for UI copy (CST vs CDT). */
+function getCentralZoneLabelForNow() {
+  const abbr = getCentralAbbreviationForInstant(new Date());
+  if (abbr === "CDT") return "Central Daylight Time (CDT)";
+  if (abbr === "CST") return "Central Standard Time (CST)";
+  return `US Central Time (${abbr})`;
+}
+
 /** Stored wall clock + CDT or CST (not the word “Chicago”). */
 function formatInstantAsCentralWallClock(d) {
   if (!(d instanceof Date) || isNaN(d.getTime())) return "";
@@ -407,11 +415,15 @@ function wireDueDateEditor() {
   const closeBtn = document.getElementById("dueDateModalClose");
   const save = document.getElementById("dueDateModalSave");
   const clearBtn = document.getElementById("dueDateModalClear");
+  const tzHint = document.getElementById("dueDateModalTzHint");
   if (!modal || !inp || !pill) return;
 
   function openDueDateModal() {
     if (!currentAssignmentId || !bundle) return;
     inp.value = getDueDateYmdFromBundle(bundle) || "";
+    if (tzHint) {
+      tzHint.textContent = `Using ${getCentralZoneLabelForNow()}.`;
+    }
     modal.hidden = false;
     modal.setAttribute("aria-hidden", "false");
     inp.focus();
@@ -647,8 +659,9 @@ async function loadAssignmentBundle(id) {
   currentAssignmentId = id;
   syncAssignmentSelectTooltip();
   renderStudents();
-  if (bundle.students?.length) {
-    selectStudent(bundle.students[0].id);
+  const roster = sortStudentsByLastNameForRoster(bundle.students);
+  if (roster.length) {
+    selectStudent(roster[0].id);
   } else {
     abortRecording();
     selectedId = null;
@@ -869,6 +882,60 @@ function parseCsvRows(text) {
   return rows;
 }
 
+/** Surname for sorting: last whitespace-delimited token, or segment before comma for "Last, First …". */
+function lastNameSortKey(name) {
+  const s = String(name || "").trim();
+  if (!s) return "";
+  if (/,/.test(s)) {
+    return s.split(",")[0].trim().toLowerCase();
+  }
+  const parts = s.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "";
+  return parts[parts.length - 1].toLowerCase();
+}
+
+/** First given name for roster quirks (first token, or after comma for "Last, First …"). */
+function firstNameToken(name) {
+  const s = String(name || "").trim();
+  if (!s) return "";
+  if (/,/.test(s)) {
+    const rest = s.split(",")[1]?.trim() || "";
+    return (rest.split(/\s+/)[0] || "").toLowerCase();
+  }
+  return (s.split(/\s+/)[0] || "").toLowerCase();
+}
+
+/**
+ * Sort by last name; pin first-name "Abdullah" to immediately after the last first-name "Sonia"
+ * in last-name order (class-specific request).
+ */
+function sortStudentsByLastNameForRoster(students) {
+  const arr = [...(students || [])];
+  const abdullahs = arr.filter((s) => firstNameToken(s.name) === "abdullah");
+  const rest = arr.filter((s) => firstNameToken(s.name) !== "abdullah");
+  rest.sort((a, b) => {
+    const cmp = lastNameSortKey(a.name).localeCompare(lastNameSortKey(b.name), undefined, {
+      sensitivity: "base",
+    });
+    if (cmp !== 0) return cmp;
+    return String(a.name || "").localeCompare(String(b.name || ""), undefined, { sensitivity: "base" });
+  });
+  let insertAfter = -1;
+  for (let i = rest.length - 1; i >= 0; i--) {
+    if (firstNameToken(rest[i].name) === "sonia") {
+      insertAfter = i;
+      break;
+    }
+  }
+  abdullahs.sort((a, b) =>
+    String(a.name || "").localeCompare(String(b.name || ""), undefined, { sensitivity: "base" }),
+  );
+  if (insertAfter === -1) {
+    return rest.concat(abdullahs);
+  }
+  return [...rest.slice(0, insertAfter + 1), ...abdullahs, ...rest.slice(insertAfter + 1)];
+}
+
 /** Canvas Quiz Student Analysis Report layout (matches scripts/import_from_csv.py). */
 const CANVAS_Q_COL_START = 8;
 const CANVAS_TRAILER_COLS = 3;
@@ -943,8 +1010,7 @@ function parseCanvasQuizCsv(text) {
       totalScore: row[summaryStart + 2].trim(),
     });
   }
-  students.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
-  return { questions, students };
+  return { questions, students: sortStudentsByLastNameForRoster(students) };
 }
 
 async function applyServerAssignmentsList(list) {
@@ -1912,7 +1978,7 @@ function renderStudents() {
     return;
   }
 
-  for (const s of bundle.students) {
+  for (const s of sortStudentsByLastNameForRoster(bundle.students)) {
     const block = document.createElement("div");
     block.className = "student-block";
     block.dataset.id = s.id;
@@ -1989,7 +2055,7 @@ function buildExportPayload() {
     assignmentTitle: asg?.title ?? null,
     dueDate: getDueDateYmdFromBundle(bundle),
     questions: bundle.questions,
-    students: bundle.students,
+    students: sortStudentsByLastNameForRoster(bundle.students),
     comments: norm,
     exportByStudentId,
   };
@@ -2048,23 +2114,6 @@ function safeExcelSheetName(name) {
   return s || "Export";
 }
 
-/**
- * Sort key for roster order: "Last, First …" → segment before comma; otherwise
- * two-part names use the second token; three or more parts use the middle name (second token).
- */
-function lastNameSortKey(name) {
-  const s = String(name || "").trim();
-  if (!s) return "";
-  if (/,/.test(s)) {
-    return s.split(",")[0].trim();
-  }
-  const parts = s.split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return "";
-  if (parts.length === 1) return parts[0];
-  /* Two tokens: second is last name; three+: second is middle name (sort as requested). */
-  return parts[1];
-}
-
 async function downloadExportExcel() {
   closeExportMenu();
   if (!bundle) return;
@@ -2095,14 +2144,7 @@ async function downloadExportExcel() {
   ];
   const rows = [];
   rows.push(headers);
-  const studentsSorted = [...(bundle.students || [])].sort((a, b) => {
-    const cmp = lastNameSortKey(a.name).localeCompare(lastNameSortKey(b.name), undefined, {
-      sensitivity: "base",
-    });
-    if (cmp !== 0) return cmp;
-    return String(a.name || "").localeCompare(String(b.name || ""), undefined, { sensitivity: "base" });
-  });
-  for (const s of studentsSorted) {
+  for (const s of sortStudentsByLastNameForRoster(bundle.students)) {
     const e = norm[String(s.id)] || normalizeCommentEntry(null);
     const from = pickFromEntry(e);
     const selectedComment = from === "transcribe" ? e.transcribe : e.polish;

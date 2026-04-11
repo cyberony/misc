@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AI Perspectives — Quiz review</title>
-    <link rel="stylesheet" href="/review/styles.css?v=20260446" />
+    <link rel="stylesheet" href="/review/styles.css?v=20260448" />
   </head>
   <body>
     <header class="review-topbar" aria-label="Site">
@@ -291,12 +291,7 @@
           <h2 class="review-modal-title" id="dueDateModalTitle">Assignment due date</h2>
           <button type="button" class="review-modal-close" id="dueDateModalClose" aria-label="Close">✕</button>
         </div>
-        <p class="review-modal-hint">
-          Calendar day in US Central Time (YYYY-MM-DD). During daylight saving (typically second Sunday in March through first Sunday in November in Illinois), wall clocks use
-          <strong>Central Daylight Time (CDT, UTC−5)</strong>; otherwise <strong>Central Standard Time (CST, UTC−6)</strong> — see
-          <a href="https://www.timeanddate.com/time/zone/usa/chicago" target="_blank" rel="noopener noreferrer">timeanddate.com (Chicago zone)</a>.
-          Used for on-time vs late in the student panel.
-        </p>
+        <p class="review-modal-hint" id="dueDateModalTzHint"></p>
         <label class="review-modal-label">Due date <input type="date" id="dueDateInput" class="review-modal-input" /></label>
         <div class="review-modal-actions">
           <button type="button" id="dueDateModalClear">Clear</button>
@@ -305,6 +300,6 @@
       </div>
     </div>
 
-    <script src="/review/app.js?v=20260439"></script>
+    <script src="/review/app.js?v=20260449"></script>
   </body>
 </html>

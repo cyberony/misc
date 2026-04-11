@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-08 12:56:31 CDT",
+  "generatedAt": "2026-04-10 11:50:00 CDT",
   "sourceFile": "Week 1 Thoughts Quiz Student Analysis Report.csv",
   "questions": [
     {
@@ -59,6 +59,29 @@
         "I believe my standpoint of AI definitely has been challenged this week. The human species has claimed to be different from every other thing alive, even within in its own species, to be proposed as unique and different. The mere fact, the something we created has the capability to be like us or even surpass us is an interesting yet terrifying thought. If we are all trying to maximize value functions, what makes us truly different from AI. What separates humanity from AI?",
         "What separates human intellect from AI intellect? \n\nIs there a dissolution of human intelligence due to AI?\n\nIs it merging to become one?",
         "Sure, and it's okay to mention my name."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "3",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "241621",
+      "sisId": "sux8975",
+      "name": "Alan Wang",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-07 20:58:09 CDT",
+      "attempt": "2",
+      "answers": [
+        "The idea of having free will = intelligence to me seemed like a easy answer to a complex question. What even is \"free will\"? Hypothetically, if I give LLM prompts and computational resources that leads to the belief that they are free to do whatever they'd like just like humans, does this give the LLM free will as well? This hand wavy definition of free will is glossing over a lot of assumptions. I liked that Prof Alam talked about the sci-fi origin story that made you become a researcher, and I think that's one of the most \"human thing\", the drive and motivation, and curiosity that pushes you towards to success in a field. I also remember that when I was in middle school I played watchdog (a hacker video game) that led to my first java program. I think the emotional and wanting to do something came first, and then the technical work came after to catch up with that vision. I think that's one of the thing that's most aligned with human intelligence, it's to want and to desire something so badly to use actions to pursue that. LLMs can simulate those intelligent outputs but it doesn't really want anything, at least from what we know right now.",
+        "Again that free will discussion moved me more than I thought, I came in thinking free will and agency is pretty easy to define like Prof Alam said I control whether I want to dance on the desk or not in class, I thought it's obvious that I'm calling the shots and make those decisions. But how do you know your brain isn't computing those decisions inside the brain like an LLM? If you say people are driven by self agency not weights and biases, I'd argue that chemicals in biological systems are like weights that drive you to do certain things. If I can't define what makes my choices mine vs computed I have no ground to stand on an AI \"doesn't really choose.\"",
+        "Is the next word prediction idea of LLM a little too reductive, because neurons are just electrochemical gradients, but we assume we have consciousness, then why do we accept that transformers don't have consciousness? \n\nDoes representation require physics presence? This goes to the point where you talked about how abstract objects exist independently or only in their minds.",
+        "Sure but anonymously."
       ],
       "scores": [
         "0.0",
@@ -600,6 +623,29 @@
       "totalScore": "0.0"
     },
     {
+      "id": "207343",
+      "sisId": "smb3899",
+      "name": "Sonia Bhatia",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-08 22:59:37 CDT",
+      "attempt": "1",
+      "answers": [
+        "Our discussion on whether people are inherently selfish-- meaning they always act according to their own values and self-interest-- stood out to me the most. At first, I strongly disagreed with this idea and immediately thought of counterexamples, like acts of altruism or self-sacrifice. However, what I found compelling was how those examples were reframed: even seemingly selfless actions can be interpreted as aligned with an individual’s internal values (such as empathy, morality, or a desire to help others). In that sense, the argument becomes much harder to refute.\n\nWhere I still diverge, though, is in the use of the word “selfish.” To me, “selfish” carries a negative connotation: it implies being excessively concerned with one’s own needs at the expense of others. I don’t think it’s accurate or fair to describe all human behavior this way. Instead, I think it’s more precise to say that people act in accordance with what they value most, which often includes other people’s well-being. For example, someone helping a friend isn’t necessarily disregarding others—they may genuinely value that friend’s happiness as part of their own decision-making. So while I now better understand the logic behind the argument, I think the framing could be improved to avoid confusing self-interest with moral selfishness.\n\nI also found our discussions on intelligence and free will especially interesting because they challenged assumptions I hadn’t really questioned before. The idea that intelligence doesn’t have a clear threshold, and that concepts like “genius” are socially constructed rather than objectively defined, made me rethink how we categorize people. It connects to the discussion about animal intelligence as well; depending on how we define intelligence, many animals clearly demonstrate forms of problem-solving and adaptation that we might otherwise overlook.",
+        "Before this past class, my understanding of intelligence and thinking was mostly centered around internal cognitive processes: essentially, using one’s mind to reason, make decisions, and produce thoughts. I associated intelligence with things like problem-solving ability, logical reasoning, and academic performance. Through our discussions, I realized that my definition was somewhat narrow. I now think intelligence also involves the ability to learn from experience, adapt to new situations, and apply knowledge in flexible ways. This broader view made me reconsider not only how we evaluate human intelligence, but also how we think about intelligence in animals and artificial systems. I also realized that debates about AI are often less about the technology itself and more about how we choose to define key concepts like thinking and intelligence.\n\nOn the topic of free will, I still lean toward believing that people do have it, but I appreciated hearing opposing viewpoints. The idea that our decisions might be fully determined by prior causes or subconscious processes is unsettling, but also interesting. It made me think more critically about how much control we actually have over our choices versus how much is influenced by factors we don’t fully perceive.",
+        "One question that has stayed with me from this week’s discussions is about animal intelligence, specifically whether innate behaviors should count as “intelligent.” For example, many animals have complex behaviors such as birds building nests or spiders weaving webs. These seem like sophisticated problem-solving. However, these behaviors are often instinctual rather than learned, and the animal may not be consciously aware that it is “solving a problem.” This makes me wonder: does intelligence require awareness and intentionality, or is producing an effective outcome enough?\n\nTo explore this question further, I would be interested in looking into research on animal cognition, particularly studies that distinguish between instinctual behavior and learned problem-solving. I also think it would be useful to explore philosophical perspectives on intelligence and consciousness, since this question seems to sit at the intersection of both fields.\n\nI am also curious about the idea that people always act based on their own values. While I understand the argument intellectually, I am still wondering: Is there a meaningful distinction between acting in alignment with one’s values and being “selfish,” or is that just a matter of language and framing? This question makes me want to explore more philosophical perspectives, particularly in ethics and psychology, to see how different fields approach human motivation.",
+        "Sure but anonymously."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "3",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
       "id": "296416",
       "sisId": "bfu3205",
       "name": "Yibin Wang",
@@ -634,6 +680,29 @@
         "My understanding of AI did change after this week’s discussion, particularly in the way I think about them. Before this week, I saw AI as something like a very advanced word predictor like what we mentioned in our discussion. In other words, I saw it as a system that generates responses by predicting what comes next based on patterns in data that it was fed. I believed that by purely predicting patterns of that fed data, the AI was not solving problems by ‘thinking’ in a humane way. This, in turn, makes it non-intelligent. I tended to think there was still a pretty clear distinction between human thinking and artificial intelligence thinking.\n\nHowever, the discussion made that line of distinction feel less simple to me. I started wondering whether humans also function in ways that are not completely different from “prediction.” At first, that idea felt a little scary, because it seemed strange and uncomfortable to compare human thought to the workings of AI. However, the more I thought about it, the more reasonable it became. Humans also constantly respond to patterns and draw on past experience, and by learning from the past, we anticipate what comes next and use what we know to act in response. However, that does not mean humans and AI are the same, but it made me question whether the gap was as clearly defined as I used to believe.\n\nMy views also changed as we discussed the definition of intelligence itself. We talked about how intelligent beings possess traits like learning, creativity, and the use of resources to accomplish tasks. When I think about AI from that perspective, it becomes harder to view it as unintelligent. AI is constantly improving by taking in more information, and, as a result, changes their behavior over time and solves more problems. Those are exactly some of the traits we identified as signs of intelligence. Even if AI does not have consciousness or emotions, it still seems to meet some standards of an intelligent being that we set. \n\nSo I would say my view did not completely flip. I still think AI is different from humans in several important ways, but I no longer feel as confident saying that AI is merely a tool that is unintelligent. Now, I think the harder question is not whether AI is intelligent or not, but what kind of intelligence it has and how that compares to human intelligence. That feels like a much more difficult and interesting question.",
         "We talked about whether AI is intelligent this week, but what follows if we actually begin to treat it as intelligent? If AI is intelligent, then what are the legal and social consequences of that? Would AI deserve rights and should we protect it in some way? I also wonder when AI creates something like music or art, who should get credit for the creation and could AI itself ever have property rights? \n\nTo explore these questions, I would want to look more closely at current legal debates around AI-generated works, particularly questions of authorship, copyright, and ownership. I would also want to read more about broader discussions of rights in order to understand whether intelligence alone should have legal consequences. What interests me most is that I don’t think this question will stay theoretical for long. Once AI begins creating and participating in social life in more complex ways, society will have to decide how far legal recognition should go.",
         "Sure, and it's okay to mention my name."
+      ],
+      "scores": [
+        "0.0",
+        "0.0",
+        "0.0",
+        "0.0"
+      ],
+      "nCorrect": "3",
+      "nIncorrect": "1",
+      "totalScore": "0.0"
+    },
+    {
+      "id": "MANUAL_JIAHAO_DENG",
+      "sisId": "manual-import",
+      "name": "Jiahao Deng",
+      "section": "2026SP_COMP_SCI_396-0_SEC7 Special Topics in Computer Science: AI Perspectives",
+      "submitted": "2026-04-10 12:00:00 CDT",
+      "attempt": "1",
+      "answers": [
+        "I found whether conscious thinking is integral to the definition of intelligence worth-pondering. You claimed that conscious thinking is just drips from the perpetual outpour of unconscious thinking. I want to learn more about the research papers behind it, to convince myself of several questions: first off, how do scientists determine if one's thinking consciously or unconsciously? If they can distinguish between conscious and unconscious thinking, then do two of them show up differently in a brain scan? (i.e. are conscious thoughts recognizable from unconscious thoughts, as in brain signals)\n\nI still don't quite understand how you spin others-benefiting behaviors as selfish acts. I still think that altruism is solely defined by the result or a disposition–whether the other person becomes a beneficiary or victim. Whether one decides to perform warm-glow altruism because it feels good to do it, is secondary.",
+        "I came through a more comprehensive, systematic way to look at the definition of intelligence, when we went through a list of potential indicators of intelligence:\n-learning\n-free will\n-emotion\n-instinct\nYou also brought up a good point about non-growing entity can still be intelligent–the falling Einstein.\n\nHowever, outside the classroom, I learned something new–AI might have emotions. I learned that when one dials up the desperation value for a model, it is more inclined to cheat on an evaluation.\n\nI came across even more examples of  The Wisdom of Crowd: the explorer explosion's impact on the stock market, how to identify the lost submarine. The preconditions for this phenomenon are: 1.familiarity with the domain, 2.diverse predictions 3.independent voting. How do modern leaders utilize this effect to better govern?",
+        "When the neurologist comes to speak, I will certainly prod their brain about conscious vs. unconscious thinking.\n\nFrom now on, I will ask each speaker this set of questions:\n1.If AI outdoes us in a wider and wider range of tasks, perhaps eventually to beat us in any task conceivable, then what are men to do for their lives? How do they convince themselves that they still have value or meaning in their lives?\n2. In this fast-changing, revolutionary era, what skill sets are most valuable to ride the tsunami of AI, instead of being swallowed by it?",
+        "Please speak to me for confirmation before posting anywhere."
       ],
       "scores": [
         "0.0",
