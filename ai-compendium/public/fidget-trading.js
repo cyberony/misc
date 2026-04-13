@@ -193,6 +193,12 @@ let proposer = 'p1';
 /** After Plus: next drag from opponent adds to “take” */
 let plusPickActive = false;
 
+/** P1 clicked + on computer’s offer — edit, then Send counter-offer */
+let counterEditActive = false;
+
+/** Computer demanded more; P1 must use Send revision (not Propose) */
+let p1MustSendRevision = false;
+
 const zones = {
   give: [],
   take: [],
@@ -230,6 +236,8 @@ function returnCenterToInventories() {
 
 function executeTrade() {
   plusPickActive = false;
+  counterEditActive = false;
+  p1MustSendRevision = false;
   const giveIds = new Set(zones.give);
   const takeIds = new Set(zones.take);
   if (proposer === 'p1') {
@@ -256,6 +264,8 @@ function executeTrade() {
 
 function rejectTrade() {
   plusPickActive = false;
+  counterEditActive = false;
+  p1MustSendRevision = false;
   returnCenterToInventories();
 }
 
@@ -355,6 +365,9 @@ function tactileAiPress(which) {
 function initItems() {
   items = [];
   nextId = 0;
+  counterEditActive = false;
+  p1MustSendRevision = false;
+  plusPickActive = false;
   for (let i = 0; i < 10; i++) items.push(makeItem(i, 'p1'));
   for (let i = 0; i < 10; i++) items.push(makeItem(10 + i, 'p2'));
   resetCenter();
@@ -421,7 +434,7 @@ function canDragStart(id) {
   if (phase === 'p1_review' && proposer === 'p2') {
     const z = zoneForItemId(id);
     if (z === 'give' || z === 'take') return false;
-    if (plusPickActive && it.owner === 'p2' && z === 'p2-inv') return true;
+    if (counterEditActive && it.owner === 'p2' && z === 'p2-inv') return true;
     return false;
   }
   if (phase === 'p2_build') return false;
@@ -462,20 +475,49 @@ function fullRender() {
   updateChrome();
 }
 
+function updateDropLabels() {
+  const gL = document.getElementById('ftDropGiveLabel');
+  const gS = document.getElementById('ftDropGiveSub');
+  const tL = document.getElementById('ftDropTakeLabel');
+  const tS = document.getElementById('ftDropTakeSub');
+  const giveBox = document.getElementById('ftDropGive');
+  const takeBox = document.getElementById('ftDropTake');
+  if (!gL || !tL || !giveBox || !takeBox) return;
+  giveBox.classList.remove('ft-drop--side-p1', 'ft-drop--side-p2');
+  takeBox.classList.remove('ft-drop--side-p1', 'ft-drop--side-p2');
+  if (proposer === 'p1') {
+    giveBox.classList.add('ft-drop--side-p1');
+    takeBox.classList.add('ft-drop--side-p2');
+    gL.textContent = 'You offer';
+    if (gS) gS.textContent = 'Your toys on the table';
+    tL.textContent = 'You want';
+    if (tS) tS.textContent = 'From computer’s shelf';
+  } else {
+    giveBox.classList.add('ft-drop--side-p2');
+    takeBox.classList.add('ft-drop--side-p1');
+    gL.textContent = 'Computer offers';
+    if (gS) gS.textContent = 'Their toys on the table';
+    tL.textContent = 'Computer wants';
+    if (tS) tS.textContent = 'From your shelf';
+  }
+}
+
 function updateChrome() {
   const st = els.status;
   const pl = els.phaseLabel;
-  if (plusPickActive && st) {
-    st.textContent = 'Drag one more toy from the computer’s shelf into Offering (what you get).';
-    if (pl) pl.textContent = 'Ask for more — one drag from the computer’s shelf';
-  }
-  if (pl && !plusPickActive) {
+  updateDropLabels();
+
+  if (counterEditActive && st) {
+    st.textContent =
+      'Drag computer toys into Computer offers (left). When done, tap Send counter-offer — then the computer chooses.';
+    if (pl) pl.textContent = 'Editing counter-offer — use Send counter-offer when ready';
+  } else if (pl && !counterEditActive) {
     if (phase === 'p1_build' && proposer === 'p1') {
-      pl.textContent = 'Your turn — drag toys into Offering / Asking for, then use Propose trade.';
+      pl.textContent = 'Your turn — drag toys into the boxes, then Propose trade (or Send revision if asked).';
     } else if (phase === 'ai_think') {
       pl.textContent = 'Computer is deciding…';
     } else if (phase === 'p1_review' && proposer === 'p2') {
-      pl.textContent = 'Computer proposed a trade — respond with the bottom row.';
+      pl.textContent = 'Computer proposed — respond with the bottom row (+ adds toys; then Send counter-offer).';
     } else if (phase === 'p2_build') {
       pl.textContent = 'Computer is building an offer…';
     }
@@ -487,31 +529,56 @@ function updateChrome() {
     const act = btn.getAttribute('data-ft-act');
     let on = false;
     if (p1Active) on = act === 'reject' && (zones.give.length > 0 || zones.take.length > 0);
-    if (p1Review) on = act === 'accept' || act === 'reject' || act === 'plus';
+    if (p1Review) {
+      if (counterEditActive) on = false;
+      else on = act === 'accept' || act === 'reject' || act === 'plus';
+    }
     btn.disabled = !on;
     btn.classList.toggle('ft-pad--disabled', !on);
   });
 
   const proposeBtn = document.getElementById('ftPropose');
-  if (proposeBtn) {
-    const canPropose =
-      p1Active && (zones.give.length > 0 || zones.take.length > 0);
-    proposeBtn.disabled = !canPropose;
-    proposeBtn.classList.toggle('ft-propose-btn--disabled', !canPropose);
+  const revisionBtn = document.getElementById('ftRevisionSubmit');
+  const canSubmit =
+    p1Active && (zones.give.length > 0 || zones.take.length > 0);
+  if (proposeBtn && revisionBtn) {
+    if (p1MustSendRevision) {
+      proposeBtn.hidden = true;
+      revisionBtn.hidden = false;
+      revisionBtn.disabled = !canSubmit;
+      revisionBtn.classList.toggle('ft-revision-btn--disabled', !canSubmit);
+    } else {
+      proposeBtn.hidden = false;
+      revisionBtn.hidden = true;
+      proposeBtn.disabled = !canSubmit;
+      proposeBtn.classList.toggle('ft-propose-btn--disabled', !canSubmit);
+    }
   }
+
+  const counterWrap = document.getElementById('ftCounterWrap');
+  const primaryWrap = document.getElementById('ftPrimaryActionWrap');
+  if (counterWrap) counterWrap.hidden = !counterEditActive;
+  if (primaryWrap) primaryWrap.hidden = counterEditActive;
+
   document.querySelectorAll('[data-ft-role="p2"]').forEach((btn) => {
     btn.disabled = true;
     btn.classList.add('ft-pad--disabled');
   });
 
-  if (st && !plusPickActive) {
+  if (st && !counterEditActive) {
     if (phase === 'ai_think') {
       st.textContent = 'Computer is thinking about your offer…';
     } else if (phase === 'p1_build' && proposer === 'p1') {
-      st.textContent =
-        'Offer your toys on the left pile; pick what you want from the computer on the right pile. Propose trade sends it; ✕ clears.';
+      if (p1MustSendRevision) {
+        st.textContent =
+          'Computer asked for more — adjust the table, then Send revision to computer.';
+      } else {
+        st.textContent =
+          'Left column = your shelf; right = computer’s shelf. Propose trade sends your offer; ✕ clears.';
+      }
     } else if (phase === 'p1_review') {
-      st.textContent = '✓ accept · ✕ reject (everything returns) · + then drag one more computer toy into Offering.';
+      st.textContent =
+        '✓ accept · ✕ reject · + to add computer toys, then Send counter-offer for their turn.';
     } else if (phase === 'p2_build') {
       st.textContent = 'Computer is setting up its offer…';
     }
@@ -542,14 +609,13 @@ function wireDropZone(zoneEl, zoneKind) {
     if (!id || !allowDropTarget(zoneKind, id)) return;
     if (zoneKind === 'give' || zoneKind === 'take') {
       if (
-        plusPickActive &&
+        counterEditActive &&
         zoneKind === 'give' &&
         phase === 'p1_review' &&
         proposer === 'p2' &&
         itemById(id)?.owner === 'p2'
       ) {
         moveItemToZone(id, 'give');
-        plusPickActive = false;
         fullRender();
         return;
       }
@@ -575,13 +641,39 @@ function wirePads() {
 function proposeTrade() {
   if (phase !== 'p1_build' || proposer !== 'p1') return;
   if (zones.give.length === 0 && zones.take.length === 0) {
-    if (els.status) els.status.textContent = 'Add at least one toy to Offering or Asking for.';
+    if (els.status) els.status.textContent = 'Add at least one toy to the trade boxes.';
     return;
   }
+  p1MustSendRevision = false;
   phase = 'ai_think';
   fullRender();
   setTimeout(() => {
     aiRespondToP1();
+  }, 520);
+}
+
+function sendRevisionToComputer() {
+  if (!p1MustSendRevision || phase !== 'p1_build' || proposer !== 'p1') return;
+  if (zones.give.length === 0 && zones.take.length === 0) {
+    if (els.status) els.status.textContent = 'Add at least one toy to the trade boxes.';
+    return;
+  }
+  p1MustSendRevision = false;
+  phase = 'ai_think';
+  fullRender();
+  setTimeout(() => {
+    aiRespondToP1();
+  }, 520);
+}
+
+function submitP1CounterOffer() {
+  if (!counterEditActive || phase !== 'p1_review' || proposer !== 'p2') return;
+  counterEditActive = false;
+  plusPickActive = false;
+  phase = 'ai_think';
+  fullRender();
+  setTimeout(() => {
+    aiRespondToP2Offer();
   }, 520);
 }
 
@@ -642,6 +734,7 @@ function onP1Pad(act) {
         },
       );
     } else if (act === 'plus') {
+      counterEditActive = true;
       plusPickActive = true;
       fullRender();
     }
@@ -697,9 +790,10 @@ function aiRespondToP1() {
           () => {
             if (els.status) {
               els.status.textContent =
-                'Computer wants more — adjust your offer and use Propose trade again.';
+                'Computer wants more — adjust the trade, then Send revision to computer.';
             }
             phase = 'p1_build';
+            p1MustSendRevision = true;
             fullRender();
           },
         );
@@ -725,6 +819,90 @@ function aiRespondToP1() {
         if (els.status) els.status.textContent = 'Computer rejected. Its turn to propose…';
         fullRender();
         setTimeout(aiBuildOffer, 820);
+      },
+    );
+  });
+}
+
+/** After P1 sends a counter-offer (computer was proposer). AI responds to the staged table. */
+function aiRespondToP2Offer() {
+  const giveN = zones.give.length;
+  const takeN = zones.take.length;
+  if (giveN === 0 && takeN === 0) {
+    phase = 'p1_review';
+    proposer = 'p2';
+    fullRender();
+    return;
+  }
+
+  const r = Math.random();
+  let decision = 'reject';
+  if (r < 0.42) decision = 'accept';
+  else if (r < 0.72) decision = 'plus';
+  else decision = 'reject';
+
+  if (decision === 'accept') {
+    tactileAiPress('accept').then(() => {
+      const moving = [...zones.give, ...zones.take];
+      animateFlipThen(
+        moving,
+        () => {
+          executeTrade();
+        },
+        920,
+        () => {
+          proposer = 'p1';
+          phase = 'p1_build';
+          if (els.status) els.status.textContent = 'Trade completed! Your turn to propose.';
+          fullRender();
+        },
+      );
+    });
+    return;
+  }
+  if (decision === 'plus') {
+    tactileAiPress('plus').then(() => {
+      const p1Pool = inventoryIds('p1');
+      if (p1Pool.length) {
+        const pick = p1Pool[Math.floor(Math.random() * p1Pool.length)];
+        animateFlipThen(
+          [pick],
+          () => {
+            moveItemToZone(pick, 'take');
+          },
+          900,
+          () => {
+            if (els.status) {
+              els.status.textContent =
+                'Computer wants more from you — respond with the bottom row (✓ / ✕ / +).';
+            }
+            phase = 'p1_review';
+            proposer = 'p2';
+            fullRender();
+          },
+        );
+      } else {
+        if (els.status) els.status.textContent = 'Computer passes on demanding more.';
+        phase = 'p1_review';
+        proposer = 'p2';
+        fullRender();
+      }
+    });
+    return;
+  }
+  tactileAiPress('reject').then(() => {
+    const moving = [...zones.give, ...zones.take];
+    animateFlipThen(
+      moving,
+      () => {
+        rejectTrade();
+      },
+      880,
+      () => {
+        proposer = 'p1';
+        phase = 'p1_build';
+        if (els.status) els.status.textContent = 'Computer rejected your counter. Your turn to propose.';
+        fullRender();
       },
     );
   });
@@ -778,6 +956,10 @@ function init() {
   wirePads();
   const proposeBtn = document.getElementById('ftPropose');
   if (proposeBtn) proposeBtn.addEventListener('click', proposeTrade);
+  const revisionBtn = document.getElementById('ftRevisionSubmit');
+  if (revisionBtn) revisionBtn.addEventListener('click', sendRevisionToComputer);
+  const counterBtn = document.getElementById('ftCounterSubmit');
+  if (counterBtn) counterBtn.addEventListener('click', submitP1CounterOffer);
   wireDropZone(els.invP1, 'p1-inv');
   wireDropZone(els.invP2, 'p2-inv');
   wireDropZone(document.getElementById('ftDropGive'), 'give');

@@ -77,7 +77,8 @@
                   data-zone="give"
                   data-drop-kind="give"
                 >
-                  <span class="ft-drop-label">Offering</span>
+                  <span class="ft-drop-label" id="ftDropGiveLabel">Offering</span>
+                  <span class="ft-drop-sublabel" id="ftDropGiveSub" aria-hidden="true"></span>
                   <div class="ft-drop-items" id="ftDropGiveItems"></div>
                 </div>
                 <div
@@ -86,15 +87,24 @@
                   data-zone="take"
                   data-drop-kind="take"
                 >
-                  <span class="ft-drop-label">Asking for</span>
+                  <span class="ft-drop-label" id="ftDropTakeLabel">Asking for</span>
+                  <span class="ft-drop-sublabel" id="ftDropTakeSub" aria-hidden="true"></span>
                   <div class="ft-drop-items" id="ftDropTakeItems"></div>
                 </div>
               </div>
             </div>
 
-            <div class="ft-propose-wrap">
+            <div class="ft-primary-action-wrap" id="ftPrimaryActionWrap">
               <button type="button" class="ft-propose-btn" id="ftPropose" disabled>
                 Propose trade
+              </button>
+              <button type="button" class="ft-revision-btn" id="ftRevisionSubmit" hidden>
+                Send revision to computer
+              </button>
+            </div>
+            <div class="ft-counter-wrap" id="ftCounterWrap" hidden>
+              <button type="button" class="ft-counter-btn" id="ftCounterSubmit">
+                Send counter-offer
               </button>
             </div>
 
@@ -131,7 +141,7 @@
       </div>
     </main>
 
-    <div class="app-version-stamp" aria-hidden="true">v6.5.1</div>
+    <div class="app-version-stamp" aria-hidden="true">v6.5.2</div>
     <script src="/fidget-trading.js"></script>
   </body>
 </html>
