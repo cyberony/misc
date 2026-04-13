@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MSAI · CAT — Fidget Trading</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" type="image/png" href="/assets/cat.png" />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+    <header class="topbar bug-reports-topbar">
+      <div class="brand">
+        <a class="brand-logo-link" href="/" aria-label="Home">
+          <img class="logo" src="/assets/cat.png" alt="CAT logo" />
+        </a>
+        <div>
+          <h1 class="bug-reports-page-heading">
+            <span class="brand-kicker">MSAI · CAT</span>
+            <span class="bug-reports-heading-sep" aria-hidden="true">|</span>
+            <span class="bug-reports-heading-page">Fidget Trading</span>
+          </h1>
+          <p class="subtitle">Two-player trade game — you’re Player 1; Player 2 is the computer</p>
+        </div>
+      </div>
+      <div class="auth-strip">
+        <a class="auth-link auth-link-with-icon" href="/">
+          <span class="auth-link-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
+          </span>
+          <span>Home</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="bug-reports-shell fidget-trading-shell">
+      <div class="ft-game" id="ftGame">
+        <aside class="ft-inv ft-inv--p1 panel" aria-label="Your inventory">
+          <div class="ft-inv-head">
+            <h2 class="ft-inv-title">You</h2>
+            <span class="ft-inv-badge">Player 1</span>
+          </div>
+          <div class="ft-inv-grid" id="ftInvP1" data-zone="p1-inv"></div>
+        </aside>
+
+        <div class="ft-center-wrap">
+          <div class="ft-board panel" aria-label="Trading board">
+            <p class="ft-board-kicker" id="ftPhaseLabel">Your turn — build a trade</p>
+
+            <div class="ft-player-label">Player 2 (computer) — top row</div>
+            <div class="ft-pad-row ft-pad-row--p2" id="ftRowP2" role="group" aria-label="Computer actions">
+              <button type="button" class="ft-pad ft-pad--green" data-ft-role="p2" data-ft-act="accept" aria-label="Accept trade">
+                <svg class="ft-pad-glyph" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M10 24 L20 34 L38 14" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                </svg>
+              </button>
+              <button type="button" class="ft-pad ft-pad--blue" data-ft-role="p2" data-ft-act="plus" aria-label="Ask for more">
+                <svg class="ft-pad-glyph" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M24 10 V38 M10 24 H38" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none" />
+                </svg>
+              </button>
+              <button type="button" class="ft-pad ft-pad--pink" data-ft-role="p2" data-ft-act="reject" aria-label="Reject trade">
+                <svg class="ft-pad-glyph" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M12 12 L36 36 M36 12 L12 36" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="ft-trade-pit">
+              <h2 class="ft-title">fidget trading</h2>
+              <div class="ft-drop-grid">
+                <div
+                  class="ft-drop ft-drop--give"
+                  id="ftDropGive"
+                  data-zone="give"
+                  data-drop-kind="give"
+                >
+                  <span class="ft-drop-label">Offering</span>
+                  <div class="ft-drop-items" id="ftDropGiveItems"></div>
+                </div>
+                <div
+                  class="ft-drop ft-drop--take"
+                  id="ftDropTake"
+                  data-zone="take"
+                  data-drop-kind="take"
+                >
+                  <span class="ft-drop-label">Asking for</span>
+                  <div class="ft-drop-items" id="ftDropTakeItems"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ft-player-label">You — bottom row</div>
+            <div class="ft-pad-row ft-pad-row--p1" id="ftRowP1" role="group" aria-label="Your actions">
+              <button type="button" class="ft-pad ft-pad--green" data-ft-role="p1" data-ft-act="accept" aria-label="Accept trade">
+                <svg class="ft-pad-glyph" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M10 24 L20 34 L38 14" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                </svg>
+              </button>
+              <button type="button" class="ft-pad ft-pad--blue" data-ft-role="p1" data-ft-act="plus" aria-label="Ask to add more">
+                <svg class="ft-pad-glyph" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M24 10 V38 M10 24 H38" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none" />
+                </svg>
+              </button>
+              <button type="button" class="ft-pad ft-pad--pink" data-ft-role="p1" data-ft-act="reject" aria-label="Reject trade">
+                <svg class="ft-pad-glyph" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M12 12 L36 36 M36 12 L12 36" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none" />
+                </svg>
+              </button>
+            </div>
+
+            <p id="ftStatus" class="ft-status" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <aside class="ft-inv ft-inv--p2 panel" aria-label="Computer inventory">
+          <div class="ft-inv-head">
+            <h2 class="ft-inv-title">Player 2</h2>
+            <span class="ft-inv-badge ft-inv-badge--ai">Computer</span>
+          </div>
+          <div class="ft-inv-grid" id="ftInvP2" data-zone="p2-inv"></div>
+        </aside>
+      </div>
+    </main>
+
+    <div class="app-version-stamp" aria-hidden="true">v6.5.0</div>
+    <script src="/fidget-trading.js"></script>
+  </body>
+</html>

@@ -23,6 +23,7 @@ const TOOL_SRC = {
   alumni: '/alumni-table.html?embed=1',
   reminders: '/reminders.html?embed=1',
   accounts: '/admin-accounts.html?embed=1',
+  'fidget-trading': '/fidget-trading.html?embed=1',
 };
 
 function authHeaders() {
