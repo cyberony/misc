@@ -1447,13 +1447,18 @@ function abortRecording() {
   }
 }
 
-/** Append dictated text to the end of the transcription (student-facing). */
+/** Append dictated text to the end of the transcription (student-facing). Each new recording starts a new paragraph. */
 function appendToTranscribe(ta, chunk) {
   const t = (chunk || "").trim();
   if (!t) return;
   let v = ta.value;
-  if (v.length > 0 && !/\s$/.test(v) && !/^[.,;:!?]/.test(t)) v += " ";
-  ta.value = v + t;
+  if (v.trim().length > 0) {
+    v = v.replace(/\s+$/, "");
+    v += "\n\n" + t;
+  } else {
+    v = t;
+  }
+  ta.value = v;
   ta.selectionStart = ta.selectionEnd = ta.value.length;
   ta.focus();
   ta.dispatchEvent(new Event("input", { bubbles: true }));
