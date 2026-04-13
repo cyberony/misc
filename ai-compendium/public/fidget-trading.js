@@ -1,7 +1,7 @@
 /**
  * Fidget Trading — two-player turn game; P2 is AI.
  * Drag from your inventory to Offering, from computer inventory to Asking for.
- * Check = accept, Plus = ask for one more (then drag), Cross = reject and return all.
+ * Propose = send offer; Check = accept (when reviewing). Plus / Cross as before.
  */
 
 if (new URLSearchParams(window.location.search).get('embed') === '1') {
@@ -259,6 +259,99 @@ function rejectTrade() {
   returnCenterToInventories();
 }
 
+function wait(ms) {
+  return new Promise((res) => setTimeout(res, ms));
+}
+
+/**
+ * @param {string[]} movingIds
+ * @param {() => void} mutator
+ * @param {number} ms
+ * @param {() => void} [onDone]
+ */
+function animateFlipThen(movingIds, mutator, ms, onDone) {
+  const oldRects = new Map();
+  movingIds.forEach((id) => {
+    const el = document.querySelector(`.ft-fidget[data-item-id="${id}"]`);
+    if (el) oldRects.set(id, el.getBoundingClientRect());
+  });
+  mutator();
+  fullRender();
+  requestAnimationFrame(() => {
+    movingIds.forEach((id) => {
+      const el = document.querySelector(`.ft-fidget[data-item-id="${id}"]`);
+      const o = oldRects.get(id);
+      if (!el || !o) return;
+      const n = el.getBoundingClientRect();
+      const dx = o.left - n.left;
+      const dy = o.top - n.top;
+      el.style.zIndex = '50';
+      el.style.position = 'relative';
+      el.style.transition = 'none';
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        movingIds.forEach((id) => {
+          const el = document.querySelector(`.ft-fidget[data-item-id="${id}"]`);
+          if (!el || !oldRects.has(id)) return;
+          el.style.transition = `transform ${ms}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+          el.style.transform = 'translate(0,0)';
+        });
+      });
+    });
+    setTimeout(() => {
+      movingIds.forEach((id) => {
+        const el = document.querySelector(`.ft-fidget[data-item-id="${id}"]`);
+        if (el) {
+          el.style.transition = '';
+          el.style.transform = '';
+          el.style.zIndex = '';
+          el.style.position = '';
+        }
+      });
+      if (onDone) onDone();
+    }, ms + 120);
+  });
+}
+
+/** Slow tactile “press” on the AI’s top row (visual only). */
+function tactileAiPress(which) {
+  return new Promise((resolve) => {
+    const btn = document.querySelector(`[data-ft-role="p2"][data-ft-act="${which}"]`);
+    const row = document.getElementById('ftRowP2');
+    if (!btn) {
+      resolve();
+      return;
+    }
+    if (row) row.classList.add('ft-pad-row--ai-acting');
+    btn.disabled = false;
+    btn.classList.remove('ft-pad--disabled');
+    wait(620)
+      .then(() => {
+        btn.classList.add('ft-pad--ai-hover');
+        return wait(340);
+      })
+      .then(() => {
+        btn.classList.remove('ft-pad--ai-hover');
+        btn.classList.add('ft-pad--tactile-down');
+        return wait(660);
+      })
+      .then(() => {
+        btn.classList.remove('ft-pad--tactile-down');
+        btn.classList.add('ft-pad--tactile-rebound');
+        return wait(260);
+      })
+      .then(() => {
+        btn.classList.remove('ft-pad--tactile-rebound');
+        btn.disabled = true;
+        btn.classList.add('ft-pad--disabled');
+        if (row) row.classList.remove('ft-pad-row--ai-acting');
+        resolve();
+      });
+  });
+}
+
 function initItems() {
   items = [];
   nextId = 0;
@@ -378,7 +471,7 @@ function updateChrome() {
   }
   if (pl && !plusPickActive) {
     if (phase === 'p1_build' && proposer === 'p1') {
-      pl.textContent = 'Your turn — drag toys into Offering / Asking for, then ✓ to propose.';
+      pl.textContent = 'Your turn — drag toys into Offering / Asking for, then use Propose trade.';
     } else if (phase === 'ai_think') {
       pl.textContent = 'Computer is deciding…';
     } else if (phase === 'p1_review' && proposer === 'p2') {
@@ -393,11 +486,19 @@ function updateChrome() {
   document.querySelectorAll('[data-ft-role="p1"]').forEach((btn) => {
     const act = btn.getAttribute('data-ft-act');
     let on = false;
-    if (p1Active) on = act === 'accept' || act === 'reject';
+    if (p1Active) on = act === 'reject' && (zones.give.length > 0 || zones.take.length > 0);
     if (p1Review) on = act === 'accept' || act === 'reject' || act === 'plus';
     btn.disabled = !on;
     btn.classList.toggle('ft-pad--disabled', !on);
   });
+
+  const proposeBtn = document.getElementById('ftPropose');
+  if (proposeBtn) {
+    const canPropose =
+      p1Active && (zones.give.length > 0 || zones.take.length > 0);
+    proposeBtn.disabled = !canPropose;
+    proposeBtn.classList.toggle('ft-propose-btn--disabled', !canPropose);
+  }
   document.querySelectorAll('[data-ft-role="p2"]').forEach((btn) => {
     btn.disabled = true;
     btn.classList.add('ft-pad--disabled');
@@ -407,7 +508,8 @@ function updateChrome() {
     if (phase === 'ai_think') {
       st.textContent = 'Computer is thinking about your offer…';
     } else if (phase === 'p1_build' && proposer === 'p1') {
-      st.textContent = 'Offer your toys on the left pile; pick what you want from the computer on the right pile. ✓ proposes; ✕ clears.';
+      st.textContent =
+        'Offer your toys on the left pile; pick what you want from the computer on the right pile. Propose trade sends it; ✕ clears.';
     } else if (phase === 'p1_review') {
       st.textContent = '✓ accept · ✕ reject (everything returns) · + then drag one more computer toy into Offering.';
     } else if (phase === 'p2_build') {
@@ -470,50 +572,80 @@ function wirePads() {
   });
 }
 
+function proposeTrade() {
+  if (phase !== 'p1_build' || proposer !== 'p1') return;
+  if (zones.give.length === 0 && zones.take.length === 0) {
+    if (els.status) els.status.textContent = 'Add at least one toy to Offering or Asking for.';
+    return;
+  }
+  phase = 'ai_think';
+  fullRender();
+  setTimeout(() => {
+    aiRespondToP1();
+  }, 520);
+}
+
 function onP1Pad(act) {
   if (phase === 'p1_build' && proposer === 'p1') {
-    if (act === 'accept') {
-      if (zones.give.length === 0 && zones.take.length === 0) {
-        if (els.status) els.status.textContent = 'Add at least one toy to Offering or Asking for.';
+    if (act === 'reject') {
+      const moving = [...zones.give, ...zones.take];
+      if (moving.length === 0) {
+        if (els.status) els.status.textContent = 'Nothing on the table to clear.';
+        fullRender();
         return;
       }
-      phase = 'ai_think';
-      fullRender();
-      setTimeout(aiRespondToP1, 700);
-    } else if (act === 'reject') {
-      rejectTrade();
-      fullRender();
-      if (els.status) els.status.textContent = 'Cleared. Drag toys to try again.';
+      animateFlipThen(
+        moving,
+        () => {
+          rejectTrade();
+        },
+        880,
+        () => {
+          if (els.status) els.status.textContent = 'Cleared. Drag toys to try again.';
+          fullRender();
+        },
+      );
     }
     return;
   }
   if (phase === 'p1_review' && proposer === 'p2') {
     if (act === 'accept') {
-      executeTrade();
-      proposer = 'p1';
-      phase = 'p1_build';
-      plusPickActive = false;
-      if (els.status) els.status.textContent = 'Trade completed! Your turn to propose again.';
-      fullRender();
+      const moving = [...zones.give, ...zones.take];
+      animateFlipThen(
+        moving,
+        () => {
+          executeTrade();
+        },
+        920,
+        () => {
+          proposer = 'p1';
+          phase = 'p1_build';
+          plusPickActive = false;
+          if (els.status) els.status.textContent = 'Trade completed! Your turn to propose again.';
+          fullRender();
+        },
+      );
     } else if (act === 'reject') {
-      rejectTrade();
-      proposer = 'p1';
-      phase = 'p1_build';
-      plusPickActive = false;
-      if (els.status) els.status.textContent = 'Rejected. Your turn to propose a new trade.';
-      fullRender();
+      const moving = [...zones.give, ...zones.take];
+      animateFlipThen(
+        moving,
+        () => {
+          rejectTrade();
+        },
+        880,
+        () => {
+          proposer = 'p1';
+          phase = 'p1_build';
+          plusPickActive = false;
+          if (els.status) els.status.textContent = 'Rejected. Your turn to propose a new trade.';
+          fullRender();
+        },
+      );
     } else if (act === 'plus') {
       plusPickActive = true;
       fullRender();
     }
   }
-}
-
-function flashAiButton(which) {
-  const btn = document.querySelector(`[data-ft-role="p2"][data-ft-act="${which}"]`);
-  if (!btn) return;
-  btn.classList.add('ft-pad--flash');
-  setTimeout(() => btn.classList.remove('ft-pad--flash'), 600);
 }
 
 function aiRespondToP1() {
@@ -532,49 +664,76 @@ function aiRespondToP1() {
   else decision = 'reject';
 
   if (decision === 'accept') {
-    flashAiButton('accept');
-    setTimeout(() => {
-      executeTrade();
-      proposer = 'p2';
-      phase = 'p2_build';
-      if (els.status) els.status.textContent = 'Computer accepted! Its turn to propose…';
-      fullRender();
-      setTimeout(aiBuildOffer, 900);
-    }, 400);
+    tactileAiPress('accept').then(() => {
+      const moving = [...zones.give, ...zones.take];
+      animateFlipThen(
+        moving,
+        () => {
+          executeTrade();
+        },
+        920,
+        () => {
+          proposer = 'p2';
+          phase = 'p2_build';
+          if (els.status) els.status.textContent = 'Computer accepted! Its turn to propose…';
+          fullRender();
+          setTimeout(aiBuildOffer, 880);
+        },
+      );
+    });
     return;
   }
   if (decision === 'plus') {
-    flashAiButton('plus');
-    setTimeout(() => {
+    tactileAiPress('plus').then(() => {
       const p1Pool = inventoryIds('p1');
       if (p1Pool.length) {
         const pick = p1Pool[Math.floor(Math.random() * p1Pool.length)];
-        moveItemToZone(pick, 'take');
-        if (els.status) els.status.textContent = 'Computer wants more — adjust your offer and press ✓ again.';
+        animateFlipThen(
+          [pick],
+          () => {
+            moveItemToZone(pick, 'take');
+          },
+          900,
+          () => {
+            if (els.status) {
+              els.status.textContent =
+                'Computer wants more — adjust your offer and use Propose trade again.';
+            }
+            phase = 'p1_build';
+            fullRender();
+          },
+        );
       } else {
         if (els.status) els.status.textContent = 'Computer passes on demanding more.';
+        phase = 'p1_build';
+        fullRender();
       }
-      phase = 'p1_build';
-      fullRender();
-    }, 400);
+    });
     return;
   }
-  flashAiButton('reject');
-  setTimeout(() => {
-    rejectTrade();
-    proposer = 'p2';
-    phase = 'p2_build';
-    if (els.status) els.status.textContent = 'Computer rejected. Its turn to propose…';
-    fullRender();
-    setTimeout(aiBuildOffer, 800);
-  }, 400);
+  tactileAiPress('reject').then(() => {
+    const moving = [...zones.give, ...zones.take];
+    animateFlipThen(
+      moving,
+      () => {
+        rejectTrade();
+      },
+      880,
+      () => {
+        proposer = 'p2';
+        phase = 'p2_build';
+        if (els.status) els.status.textContent = 'Computer rejected. Its turn to propose…';
+        fullRender();
+        setTimeout(aiBuildOffer, 820);
+      },
+    );
+  });
 }
 
 function aiBuildOffer() {
   const p2 = inventoryIds('p2');
   const p1 = inventoryIds('p1');
   proposer = 'p2';
-  resetCenter();
   if (p2.length === 0 || p1.length === 0) {
     phase = 'p1_build';
     proposer = 'p1';
@@ -586,11 +745,23 @@ function aiBuildOffer() {
   const nt = 1 + Math.floor(Math.random() * Math.min(3, p1.length));
   const sh2 = [...p2].sort(() => Math.random() - 0.5);
   const sh1 = [...p1].sort(() => Math.random() - 0.5);
-  for (let i = 0; i < Math.min(ng, sh2.length); i++) moveItemToZone(sh2[i], 'give');
-  for (let i = 0; i < Math.min(nt, sh1.length); i++) moveItemToZone(sh1[i], 'take');
-  phase = 'p1_review';
-  if (els.status) els.status.textContent = 'Computer’s offer is on the table. Your move (bottom row).';
-  fullRender();
+  const giveIds = sh2.slice(0, Math.min(ng, sh2.length));
+  const takeIds = sh1.slice(0, Math.min(nt, sh1.length));
+  const movingIds = [...giveIds, ...takeIds];
+  animateFlipThen(
+    movingIds,
+    () => {
+      resetCenter();
+      giveIds.forEach((id) => moveItemToZone(id, 'give'));
+      takeIds.forEach((id) => moveItemToZone(id, 'take'));
+      phase = 'p1_review';
+    },
+    960,
+    () => {
+      if (els.status) els.status.textContent = 'Computer’s offer is on the table. Your move (bottom row).';
+      fullRender();
+    },
+  );
 }
 
 function init() {
@@ -605,6 +776,8 @@ function init() {
 
   initItems();
   wirePads();
+  const proposeBtn = document.getElementById('ftPropose');
+  if (proposeBtn) proposeBtn.addEventListener('click', proposeTrade);
   wireDropZone(els.invP1, 'p1-inv');
   wireDropZone(els.invP2, 'p2-inv');
   wireDropZone(document.getElementById('ftDropGive'), 'give');
