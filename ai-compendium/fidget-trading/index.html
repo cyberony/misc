@@ -4,13 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fidget Trading</title>
-    <!-- Own favicon so the tab doesn’t inherit /assets/cat.png from the compendium origin -->
+    <!-- Real URL + ?v= so the tab icon isn’t stuck on a cached /assets/cat.png for this origin -->
     <link
       rel="icon"
       type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23ec4899'/%3E%3Ccircle cx='11' cy='12' r='3' fill='%23fff'/%3E%3Ccircle cx='21' cy='12' r='3' fill='%23fff'/%3E%3Cpath d='M10 22 Q16 18 22 22' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
+      href="/fidget-trading/favicon.svg?v=2"
+      sizes="any"
     />
-    <link rel="stylesheet" href="./game.css" />
+    <link rel="stylesheet" href="/fidget-trading/game.css" />
   </head>
   <body>
     <div class="ft-bg" aria-hidden="true"></div>
@@ -118,7 +119,7 @@
       </div>
     </main>
 
-    <p class="ft-standalone-stamp" aria-hidden="true">Fidget Trading · standalone · v1.0.1</p>
-    <script src="./game.js"></script>
+    <p class="ft-standalone-stamp" aria-hidden="true">Fidget Trading · standalone · v1.0.2</p>
+    <script src="/fidget-trading/game.js"></script>
   </body>
 </html>

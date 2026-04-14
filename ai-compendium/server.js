@@ -86,6 +86,11 @@ app.use(
   }),
 );
 
+/** Same-origin relative URLs (./game.css) resolve wrong without the trailing slash. */
+app.get(/^\/fidget-trading$/, (req, res) => {
+  res.redirect(301, '/fidget-trading/');
+});
+
 app.use(
   '/fidget-trading',
   express.static(FIDGET_TRADING_DIR, {
@@ -99,7 +104,18 @@ app.use(
   }),
 );
 
-app.use(express.static(PUBLIC_DIR));
+/** Avoid stale document shell: browsers often cache `/` → `index.html` longer than named pages like `/tools.html`. */
+app.use(
+  express.static(PUBLIC_DIR, {
+    setHeaders(res, filePath) {
+      const lower = String(filePath || '').toLowerCase();
+      if (lower.endsWith('.html') || lower.endsWith('.js') || lower.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+      }
+    },
+  }),
+);
 
 let writeQueue = Promise.resolve();
 function enqueueWrite(task) {
