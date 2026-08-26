@@ -169,6 +169,6 @@
       "exportPreferred": null
     }
   },
-  "updatedAt": "2026-04-13T00:33:54.707Z",
+  "updatedAt": "2026-04-14T00:07:54.255Z",
   "note": "comments[id]: { transcribe, polish, polishTranscribeEnd, exportPreferred }. exportPreferred: null|transcribe|polish (unset = neither thumb). exportVersion 6."
 }

@@ -27,7 +27,6 @@ const ALUMNI_XLSX = path.join(DATA_DIR, 'alumni', 'MSAI_Alumni_Database.xlsx');
 const REMINDERS_FILE = path.join(DATA_DIR, 'reminders.json');
 
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
-const FIDGET_TRADING_DIR = path.join(PROJECT_ROOT, 'fidget-trading');
 const MAGIC_WORD_HTML = path.join(PUBLIC_DIR, 'magic-word.html');
 
 function normalizeMagicPagePath(raw) {
@@ -76,24 +75,6 @@ app.use(
   '/review',
   magicAuth.requireMagicPageHtml,
   express.static(REVIEW_UI_DIR, {
-    setHeaders(res, filePath) {
-      const lower = String(filePath || '').toLowerCase();
-      if (lower.endsWith('.html') || lower.endsWith('.js') || lower.endsWith('.css')) {
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-      }
-    },
-  }),
-);
-
-/** Same-origin relative URLs (./game.css) resolve wrong without the trailing slash. */
-app.get(/^\/fidget-trading$/, (req, res) => {
-  res.redirect(301, '/fidget-trading/');
-});
-
-app.use(
-  '/fidget-trading',
-  express.static(FIDGET_TRADING_DIR, {
     setHeaders(res, filePath) {
       const lower = String(filePath || '').toLowerCase();
       if (lower.endsWith('.html') || lower.endsWith('.js') || lower.endsWith('.css')) {

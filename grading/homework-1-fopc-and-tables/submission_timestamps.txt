@@ -1,0 +1,49 @@
+Submission timestamps for homework-1-fopc-and-tables
+Roster: 45 students. Repos in folder: 45.
+Deadline: January 25, 2026 11:59:59 PM Central
+
+homework-1-fopc-and-tables-AryaanPe	2026-01-25T11:36:36-06:00	on time
+homework-1-fopc-and-tables-Aryan9Dwivedi	2026-01-18T22:40:23-06:00	on time
+homework-1-fopc-and-tables-Eurekaarrow	2026-01-25T18:19:21-06:00	on time
+homework-1-fopc-and-tables-KarlG322	2026-01-24T18:49:43-06:00	on time
+homework-1-fopc-and-tables-KarlMa4	2026-01-22T15:44:04-06:00	on time
+homework-1-fopc-and-tables-KevinFortuneCodes	2026-01-25T11:18:19-06:00	on time
+homework-1-fopc-and-tables-MatiQ077	2026-01-20T19:22:03-06:00	on time
+homework-1-fopc-and-tables-MinjunGao	2026-01-25T16:56:12-06:00	on time
+homework-1-fopc-and-tables-RickuSicku	2026-01-24T18:34:41-06:00	on time
+homework-1-fopc-and-tables-Sbboss	2026-01-22T14:43:29-06:00	on time
+homework-1-fopc-and-tables-Tavishi-Kaushik	2026-01-25T14:24:22-06:00	on time
+homework-1-fopc-and-tables-Wwwendyy	2026-01-23T10:39:28-06:00	on time
+homework-1-fopc-and-tables-YC-Qiu	2026-01-25T21:14:57-05:00	on time
+homework-1-fopc-and-tables-aasritha-oql7872	2026-01-25T20:56:19-06:00	on time
+homework-1-fopc-and-tables-ajmanerikar1	2026-01-19T17:32:44-06:00	on time
+homework-1-fopc-and-tables-allantang2012	2026-01-21T23:44:22-06:00	on time
+homework-1-fopc-and-tables-amitha-javare-gowda	2026-01-25T20:18:29-06:00	on time
+homework-1-fopc-and-tables-anvimehta	2026-01-25T21:01:32-06:00	on time
+homework-1-fopc-and-tables-asinghAI-13	2026-01-25T19:35:05-06:00	on time
+homework-1-fopc-and-tables-assylbek-creation	2026-01-19T18:58:34-06:00	on time
+homework-1-fopc-and-tables-atom218	2026-01-22T14:42:28-06:00	on time
+homework-1-fopc-and-tables-brybranmuffin	2026-01-23T16:42:58-06:00	on time
+homework-1-fopc-and-tables-cincyjordan	2026-01-25T16:46:34-06:00	on time
+homework-1-fopc-and-tables-edengrowney	2026-01-23T08:50:20-06:00	on time
+homework-1-fopc-and-tables-epi-hui9	2026-01-16T18:19:50+00:00	on time
+homework-1-fopc-and-tables-erichong1113	2026-01-24T20:07:24-06:00	on time
+homework-1-fopc-and-tables-hauemgod	2026-01-23T20:49:23-06:00	on time
+homework-1-fopc-and-tables-jatinhooda-msai	2026-01-26T18:24:47-06:00	LATE
+homework-1-fopc-and-tables-jmoussa99	2026-01-20T21:27:36-06:00	on time
+homework-1-fopc-and-tables-kanaghasivakumar	2026-01-23T11:29:29-06:00	on time
+homework-1-fopc-and-tables-katie34634	2026-01-21T23:09:30-06:00	on time
+homework-1-fopc-and-tables-kennybroccoli	2026-01-22T23:19:04-06:00	on time
+homework-1-fopc-and-tables-kvohra01	2026-01-25T16:55:35-06:00	on time
+homework-1-fopc-and-tables-mia-george	2026-01-23T19:31:34-06:00	on time
+homework-1-fopc-and-tables-monish05	2026-01-24T19:02:59-06:00	on time
+homework-1-fopc-and-tables-ndhanrajani	2026-01-24T22:52:12-06:00	on time
+homework-1-fopc-and-tables-nowilliam1111	2026-01-25T21:16:43-06:00	on time
+homework-1-fopc-and-tables-prakeerthprasad	2026-01-24T15:39:41-06:00	on time
+homework-1-fopc-and-tables-sbuehlman864	2026-01-20T17:39:44-06:00	on time
+homework-1-fopc-and-tables-shi1gesong	2026-02-12T17:54:20-06:00	LATE
+homework-1-fopc-and-tables-spatel418	2026-01-25T17:54:07-06:00	on time
+homework-1-fopc-and-tables-srijareddyk	2026-01-25T21:38:33-06:00	on time
+homework-1-fopc-and-tables-sujitmandava	2026-01-24T12:28:36-06:00	on time
+homework-1-fopc-and-tables-utki007	2026-01-23T20:03:06-06:00	on time
+homework-1-fopc-and-tables-weicheng998	2026-01-25T16:42:32-06:00	on time

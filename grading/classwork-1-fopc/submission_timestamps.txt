@@ -1,0 +1,48 @@
+Submission timestamps for classwork-1-fopc
+Roster: 45 students. Repos in folder: 44 (missing: nowilliam1111).
+Deadline: January 12, 2026 12:30 PM Central (end of class 11:00 AM–12:30 PM)
+
+classwork-1-fopc-AryaanPe	2026-01-12T12:15:35-06:00	on time
+classwork-1-fopc-Aryan9Dwivedi	2026-01-12T22:40:39-06:00	LATE
+classwork-1-fopc-Eurekaarrow	2026-01-12T20:13:05-06:00	LATE
+classwork-1-fopc-KarlG322	2026-01-12T20:03:26-06:00	LATE
+classwork-1-fopc-KarlMa4	2026-01-12T12:18:37-06:00	on time
+classwork-1-fopc-KevinFortuneCodes	2026-01-12T12:22:03-06:00	on time
+classwork-1-fopc-MatiQ077	2026-01-12T12:21:20-06:00	on time
+classwork-1-fopc-MinjunGao	2026-01-12T12:22:19-06:00	on time
+classwork-1-fopc-RickuSicku	2026-01-14T12:52:32-06:00	LATE
+classwork-1-fopc-Sbboss	2026-01-12T12:21:25-06:00	on time
+classwork-1-fopc-Tavishi-Kaushik	2026-01-19T19:54:32-06:00	LATE
+classwork-1-fopc-Wwwendyy	2026-01-12T12:13:57-06:00	on time
+classwork-1-fopc-YC-Qiu	2026-01-12T16:34:21+00:00	on time
+classwork-1-fopc-aasritha-oql7872	2026-01-12T12:21:47-06:00	on time
+classwork-1-fopc-ajmanerikar1	2026-01-12T12:13:25-06:00	on time
+classwork-1-fopc-allantang2012	2026-01-12T12:04:43-06:00	on time
+classwork-1-fopc-amitha-javare-gowda	2026-01-14T09:43:37-06:00	LATE
+classwork-1-fopc-anvimehta	2026-01-12T12:15:17-06:00	on time
+classwork-1-fopc-asinghAI-13	2026-01-14T11:55:30-06:00	LATE
+classwork-1-fopc-assylbek-creation	2026-01-12T14:57:24-06:00	on time
+classwork-1-fopc-atom218	2026-01-12T12:21:41-06:00	on time
+classwork-1-fopc-brybranmuffin	2026-01-12T11:56:30-06:00	on time
+classwork-1-fopc-cincyjordan	2026-01-12T12:18:11-06:00	on time
+classwork-1-fopc-edengrowney	2026-01-12T12:21:37-06:00	on time
+classwork-1-fopc-epi-hui9	2026-01-12T13:48:11-06:00	on time
+classwork-1-fopc-erichong1113	2026-01-13T12:42:28-06:00	LATE
+classwork-1-fopc-hauemgod	2026-01-12T12:22:43-06:00	on time
+classwork-1-fopc-jatinhooda-msai	2026-01-12T12:12:02-06:00	on time
+classwork-1-fopc-jmoussa99	2026-01-12T12:21:46-06:00	on time
+classwork-1-fopc-kanaghasivakumar	2026-01-12T12:20:44-06:00	on time
+classwork-1-fopc-katie34634	2026-01-12T12:20:52-06:00	on time
+classwork-1-fopc-kennybroccoli	2026-01-12T12:11:48-06:00	on time
+classwork-1-fopc-kvohra01	2026-01-12T12:14:41-06:00	on time
+classwork-1-fopc-mia-george	2026-01-12T12:11:52-06:00	on time
+classwork-1-fopc-monish05	2026-01-12T23:52:58+05:30	on time
+classwork-1-fopc-ndhanrajani	2026-01-12T12:21:29-06:00	on time
+classwork-1-fopc-prakeerthprasad	2026-01-12T12:48:48-06:00	on time
+classwork-1-fopc-sbuehlman864	2026-01-12T12:21:48-06:00	on time
+classwork-1-fopc-shi1gesong	2026-01-12T12:03:51-06:00	on time
+classwork-1-fopc-spatel418	2026-01-12T12:18:31-06:00	on time
+classwork-1-fopc-srijareddyk	2026-01-13T02:34:27-06:00	LATE
+classwork-1-fopc-sujitmandava	2026-01-12T12:22:03-06:00	on time
+classwork-1-fopc-utki007	2026-01-12T12:22:20-06:00	on time
+classwork-1-fopc-weicheng998	2026-01-12T14:47:00-06:00	on time

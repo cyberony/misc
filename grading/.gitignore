@@ -1,0 +1,7 @@
+# Do not commit - contains GitHub token
+.github_token
+
+# Student Classroom clones (nested git repos)
+classwork-1-fopc/classwork-1-fopc-*/
+classwork-2-reasoning/classwork-2-reasoning-*/
+homework-1-fopc-and-tables/homework-1-fopc-and-tables-*/

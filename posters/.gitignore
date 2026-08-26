@@ -1,0 +1,2 @@
+# Ignore cloned poster repos; only track the flattened Team*_*.pdf files
+poster-*/

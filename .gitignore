@@ -1,8 +1,12 @@
 node_modules/
 .DS_Store
 .venv/
+__pycache__/
+*.pyc
 _extracted.txt
 *.pdf
 # MS Office lock file while a document is open in Excel/Word
 ~$*
 search-slides-extract.txt
+# MSAI 371 cloned video assets (moved from former sandbox/)
+videos/
