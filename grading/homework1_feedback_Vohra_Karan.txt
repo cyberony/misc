@@ -1,5 +1,0 @@
-Tables, Exercise 3 — Q1: After grouping by state and taking the mean of yieldpercol, you used .max() and printed only the numeric maximum. The question asks which state has the highest average yield per colony, so the answer needs the state label that attains that maximum (e.g. idxmax() on the grouped series, then use that index in the print/return), not the bare number alone. (-0.25 pts)
-
-Tables, Exercise 3 — Q4: You computed variance of totalprod by state and took .min(), but you printed the minimum variance value as if it were the state name. The prompt asks which state has the most consistent (lowest-variance) production, so you need the state corresponding to that minimum (e.g. idxmin()), not only the variance statistic. (-0.25 pts)
-
-Total: 14.5/15 (FOPC 7/7, Tables 7.5/8).

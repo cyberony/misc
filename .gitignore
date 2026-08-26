@@ -8,5 +8,3 @@ _extracted.txt
 # MS Office lock file while a document is open in Excel/Word
 ~$*
 search-slides-extract.txt
-# MSAI 371 cloned video assets (moved from former sandbox/)
-videos/
