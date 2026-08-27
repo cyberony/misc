@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Intro to AI</title>
+  <link rel="stylesheet" href="css/deck.css?v=6">
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <div class="stage">
+
+    <section class="slide gold hero is-current" data-slide="1">
+      <p class="kicker">CS 348 · Northwestern</p>
+      <h1 class="display">Artificial<br><em>Intelligence</em></h1>
+      <p class="meta">Mohammed A. Alam<span>Intro to AI · a first lecture</span></p>
+      <div class="idx">01</div>
+    </section>
+
+    <section class="slide" data-slide="2">
+      <p class="kicker">The name of the field</p>
+      <h1 class="display">Two words.<br>Only one of them<br>is easy.</h1>
+      <div class="idx">02</div>
+    </section>
+
+    <section class="slide" data-slide="3">
+      <p class="kicker">Artificial</p>
+      <h1 class="display">We already know<br>how to make<br><em>fake things.</em></h1>
+      <p class="lede">Tools, forgeries, automata, software. “Artificial” is the boring half of the phrase.</p>
+      <div class="idx">03</div>
+    </section>
+
+    <section class="slide" data-slide="4">
+      <p class="kicker">Intelligence</p>
+      <h1 class="display">This half is<br>an argument,<br>not a fact.</h1>
+      <p class="lede" data-frag>We do not have a clean test for it. We have competing stories: learning, reasoning, language, will, survival.</p>
+      <div class="idx">04</div>
+    </section>
+
+    <section class="slide" data-slide="5">
+      <p class="kicker">Who gets the word?</p>
+      <ul class="who">
+        <li>Humans. Obviously? </li>
+        <li data-frag>Other apes. Dogs. Rats. Fish.</li>
+        <li data-frag>Bees. Ants. A colony, not a mind?</li>
+        <li data-frag class="dim">A caterpillar, eating a leaf.</li>
+      </ul>
+      <div class="idx">05</div>
+    </section>
+
+    <section class="slide" data-slide="6">
+      <p class="kicker">For this course</p>
+      <p class="body">Treat intelligence as <em>mapping a situation onto a decision, a prediction, or an action</em> — by search, by reasoning, or by learning.</p>
+      <div class="rule"></div>
+      <p class="small">That is a working definition. It is allowed to feel incomplete. Completeness is not the point of week one.</p>
+      <div class="idx">06</div>
+    </section>
+
+    <section class="slide gold" data-slide="7">
+      <p class="kicker">A boundary error</p>
+      <h1 class="display">AI is not<br>a suburb of<br>computer science.</h1>
+      <p class="lede">Psychology, math, neuroscience, linguistics, sociology — and, if you want a conversation that isn’t thin, philosophy and theology.</p>
+      <div class="idx">07</div>
+    </section>
+
+    <section class="slide" data-slide="8">
+      <p class="kicker">Another boundary error</p>
+      <div class="nest">
+        <div>
+          <p class="body">ChatGPT is not AI.<br>Deep learning is not AI.<br>Machine learning is not AI.</p>
+          <p class="small" style="margin-top:1.2em;color:var(--muted)">They sit inside it. Symbolic methods still occupy the rest of the box. The field is older, and larger, than the current product cycle.</p>
+        </div>
+        <div class="doll" aria-label="AI contains symbolic AI and ML; ML contains DL">
+          <span>AI</span>
+          <span style="position:absolute;left:22px;top:46%">Symbolic</span>
+          <div class="doll-ml">
+            ML
+            <div class="doll-dl">DL</div>
+          </div>
+        </div>
+      </div>
+      <div class="idx">08</div>
+    </section>
+
+    <section class="slide gold" data-slide="9">
+      <p class="kicker">History, compressed</p>
+      <h1 class="display">We wanted<br>artificial persons<br>before we had<br>computers.</h1>
+      <div class="idx">09</div>
+    </section>
+
+    <section class="slide" data-slide="10">
+      <p class="kicker">Before code</p>
+      <ul class="tl">
+        <li><time>~400 BC</time><span>The Greeks imagine Talos, a bronze guardian, and Pandora, a made woman.</span></li>
+        <li><time>1495</time><span>da Vinci sketches a mechanical knight.</span></li>
+        <li><time>1770</time><span>The Turk: a chess “automaton” that was a man in a box. The hunger was real. The machine was a lie.</span></li>
+        <li><time>1920</time><span>Čapek’s play gives us the word <i>robot</i>.</span></li>
+      </ul>
+      <div class="idx">10</div>
+    </section>
+
+    <section class="slide" data-slide="11">
+      <p class="kicker">The field gets a name</p>
+      <ul class="tl">
+        <li><time>1950</time><span>Turing asks whether machines can think — and proposes a test instead of a metaphysics.</span></li>
+        <li><time>1956</time><span>Dartmouth. Ten people plan a six-week workshop. McCarthy coins “artificial intelligence.” That summer is still going.</span></li>
+        <li><time>early years</time><span>Proofs, ELIZA, SHRDLU, Shakey. Then the wall: a 50-step proof with 5 choices per step is 5<sup>50</sup> paths. You do not brute-force that.</span></li>
+      </ul>
+      <div class="idx">11</div>
+    </section>
+
+    <section class="slide" data-slide="12">
+      <p class="kicker">Why this course exists</p>
+      <h1 class="display" style="font-size:64px">Search. Planning.<br>Representation.<br>Because the naive<br>tree is infinite.</h1>
+      <p class="lede">The combinatorial explosion is not a trivia fact. It is why intelligence — biological or artificial — cannot be “try everything.”</p>
+      <div class="idx">12</div>
+    </section>
+
+    <section class="slide" data-slide="13">
+      <p class="kicker">Winters</p>
+      <ul class="tl">
+        <li><time>1958–69</time><span>The perceptron is sold as a mind. Minsky and Papert show it is a linear classifier. It cannot even do XOR. Funding cools.</span></li>
+        <li><time>1980s</time><span>Expert systems: hand-built rules, expensive to grow, brittle to keep. Another thaw, then another freeze.</span></li>
+        <li><time>the point</time><span>The work did not stop. The press release did.</span></li>
+      </ul>
+      <div class="idx">13</div>
+    </section>
+
+    <section class="slide" data-slide="14">
+      <p class="kicker">The turn</p>
+      <p class="body">Classical AI tried to <em>teach</em> a computer how to do a thing.</p>
+      <p class="body" data-frag style="margin-top:1.1em">Machine learning tries to <em>endow it with the capacity to learn the thing from data.</em></p>
+      <p class="small" data-frag style="margin-top:auto;color:var(--muted)">Neither cancelled the other. We will do both.</p>
+      <div class="idx">14</div>
+    </section>
+
+    <section class="slide pair-slide" data-slide="15">
+      <p class="kicker">1997</p>
+      <h2>Deep Blue beats Kasparov. A very smart machine at a very small game — not a person in a box.</h2>
+      <div class="pair">
+        <img src="assets/p13-1.jpeg" alt="Kasparov at the Deep Blue match">
+        <img src="assets/p13-2.jpeg" alt="IBM Deep Blue">
+      </div>
+      <div class="idx">15</div>
+    </section>
+
+    <section class="slide" data-slide="16">
+      <p class="kicker">The last twenty-five years</p>
+      <ul class="tl">
+        <li><time>compute × data × algorithms</time><span>That product, not a single insight, is what made machine learning loud.</span></li>
+        <li><time>2012–</time><span>Neural nets get rebranded as deep learning and then actually work at scale.</span></li>
+        <li><time>2022</time><span>ChatGPT. An inflection in how the public meets the field — not the end of the field.</span></li>
+      </ul>
+      <div class="idx">16</div>
+    </section>
+
+    <section class="slide gold" data-slide="17">
+      <p class="kicker">Why you are here</p>
+      <div class="why">
+        <article>To take <em>intelligence</em> seriously as a phenomenon, not a product category.</article>
+        <article>To look at the human mind without pretending we already understand it.</article>
+        <article>To build systems that do something useful, on purpose.</article>
+        <article>To sit with the implications — technical, economic, ethical, moral — before they sit with us.</article>
+      </div>
+      <div class="idx">17</div>
+    </section>
+
+    <section class="slide" data-slide="18">
+      <p class="kicker">How this course is built</p>
+      <p class="small" style="margin-bottom:8px;color:var(--muted)">Task-oriented. Five problems we will actually work.</p>
+      <div class="map">
+        <article><b>01</b><p>Represent knowledge, then reason from it.</p></article>
+        <article><b>02</b><p>Treat decisions as search through a space of possibilities.</p></article>
+        <article><b>03</b><p>Plan a sequence of actions toward a goal.</p></article>
+        <article><b>04</b><p>Learn from observation — machine learning.</p></article>
+        <article><b>05</b><p>Take language as a first-class problem, not a UI.</p></article>
+      </div>
+      <div class="idx">18</div>
+    </section>
+
+    <section class="slide" data-slide="19">
+      <p class="kicker">Three words people throw around</p>
+      <div class="terms">
+        <article>
+          <h3>Weak AI</h3>
+          <p>Narrow. Good at a job. Most of what we will build, and most of what ships.</p>
+        </article>
+        <article>
+          <h3>Strong AI / AGI</h3>
+          <p>Human-level, general. A research horizon and a marketing term. Keep the two unconfused.</p>
+        </article>
+        <article>
+          <h3>Superintelligence</h3>
+          <p>Beyond us. Worth reading about. Not this quarter’s homework.</p>
+        </article>
+      </div>
+      <div class="idx">19</div>
+    </section>
+
+    <section class="slide gallery-slide" data-slide="20">
+      <h2>If you read.</h2>
+      <div class="covers">
+        <img src="assets/p20-6.jpeg" alt="Asimov, The Complete Robot">
+        <img src="assets/p20-1.jpeg" alt="Bostrom, Superintelligence">
+        <img src="assets/p20-2.jpeg" alt="Kasparov, Deep Thinking">
+        <img src="assets/p20-4.jpeg" alt="Gordon, Ant Encounters">
+        <img src="assets/p20-3.jpeg" alt="Surowiecki, The Wisdom of Crowds">
+        <img src="assets/p20-8.jpeg" alt="Mollick, Co-Intelligence">
+        <img src="assets/p20-5.jpeg" alt="Kahneman, Thinking, Fast and Slow">
+        <img src="assets/p20-7.jpeg" alt="Hofstadter, Gödel, Escher, Bach">
+      </div>
+      <div class="idx">20</div>
+    </section>
+
+    <section class="slide gallery-slide" data-slide="21">
+      <h2>If you watch.</h2>
+      <div class="covers">
+        <img src="assets/p21-1.jpeg" alt="Terminator 2">
+        <img src="assets/p21-5.jpeg" alt="I, Robot">
+        <img src="assets/p21-7.jpeg" alt="2001: A Space Odyssey">
+        <img src="assets/p21-6.jpeg" alt="The Matrix">
+        <img src="assets/p21-2.jpeg" alt="A.I. Artificial Intelligence">
+        <img src="assets/p21-4.jpeg" alt="Her">
+        <img src="assets/p21-3.jpeg" alt="Ex Machina">
+        <img src="assets/p21-8.jpeg" alt="Subservience">
+      </div>
+      <div class="idx">21</div>
+    </section>
+
+    <section class="slide" data-slide="22">
+      <div class="contact">
+        <h1 class="display">One more.</h1>
+        <img src="assets/p22-1.jpeg" alt="Contact, 1997">
+        <p class="small">Not an AI movie. It is about making contact with a mind that is not ours — and about how little of that encounter is the math, and how much of it is us.</p>
+      </div>
+      <div class="idx">22</div>
+    </section>
+
+  </div>
+  <script src="js/deck.js"></script>
+</body>
+</html>

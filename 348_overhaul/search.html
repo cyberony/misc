@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search</title>
+  <link rel="stylesheet" href="css/deck.css?v=7">
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <div class="stage">
+
+    <section class="slide gold hero is-current" data-slide="1">
+      <p class="kicker">CS 348 · Northwestern</p>
+      <h1 class="display">Search</h1>
+      <p class="meta">Mohammed A. Alam<span>Intro to AI · looking, on purpose</span></p>
+      <div class="idx">01</div>
+    </section>
+
+    <section class="slide" data-slide="2">
+      <p class="kicker">From last time</p>
+      <h1 class="display">A decision is a<br>mapping out of a<br><em>vast</em> space.</h1>
+      <p class="lede">Any thought, any prediction, any utterance. The operation that performs the mapping can be search, or reasoning, or a closed-form computation. Search is the one we can actually watch.</p>
+      <div class="idx">02</div>
+    </section>
+
+    <section class="slide" data-slide="3">
+      <p class="kicker">Before the operation</p>
+      <h1 class="display mid">It all starts with<br><em>representation.</em></h1>
+      <p class="lede">Words. Vectors of those words. Pixels. Digitized sound. You cannot search what you have not made into a state.</p>
+      <div class="idx">03</div>
+    </section>
+
+    <section class="slide" data-slide="4">
+      <p class="kicker">A toy world, then the explosion</p>
+      <p class="body" style="margin-bottom:28px">Suppose the computer is to learn <em>fish</em>, and we allow it only these features.</p>
+      <div class="feats">
+        <article><b>Length</b><span>small · medium · large</span></article>
+        <article><b>Width</b><span>narrow · wide</span></article>
+        <article><b>Shade</b><span>dark · light</span></article>
+        <article><b>Dotted</b><span>yes · no</span></article>
+        <article><b>Dorsal fin</b><span>yes · no</span></article>
+        <article><b>Hazel eyes</b><span>yes · no</span></article>
+      </div>
+      <p class="product">3 × 2 × 2 × 2 × 2 × 2 = 96 instances</p>
+      <div class="idx">04</div>
+    </section>
+
+    <section class="slide" data-slide="5">
+      <p class="kicker">Then the tables stack</p>
+      <h1 class="display">96 rows.<br><em>2</em><sup>96</sup> concepts.</h1>
+      <p class="lede" data-frag>Then 2<sup>(2<sup>96</sup>)</sup> hypotheses — more than the atoms in the universe. Six features of a fish.</p>
+      <div class="idx">05</div>
+    </section>
+
+    <section class="slide gold" data-slide="6">
+      <p class="kicker">The point of the fish</p>
+      <h1 class="display">We do not list.<br>We <em>search.</em></h1>
+      <p class="lede">If a handful of features does this, the space a mind actually works in is not enumerable. Intelligence cannot be “try everything.” That is why this lecture exists.</p>
+      <div class="idx">06</div>
+    </section>
+
+    <section class="slide" data-slide="7">
+      <p class="kicker">A space small enough to draw</p>
+      <div class="puzzle-pair">
+        <figure>
+          <div class="puzzle" aria-label="Start state">
+            <b>5</b><b>4</b><b class="blank"></b>
+            <b>6</b><b>1</b><b>8</b>
+            <b>7</b><b>3</b><b>2</b>
+          </div>
+          <figcaption>Start</figcaption>
+        </figure>
+        <figure>
+          <div class="puzzle" aria-label="Goal state">
+            <b>1</b><b>2</b><b>3</b>
+            <b>8</b><b class="blank"></b><b>4</b>
+            <b>7</b><b>6</b><b>5</b>
+          </div>
+          <figcaption>Goal · clockwise</figcaption>
+        </figure>
+      </div>
+      <p class="lede">The 8-puzzle. Slide a tile into the blank. Each board is a state. Each legal slide is an action. A solution is a path.</p>
+      <div class="idx">07</div>
+    </section>
+
+    <section class="slide tree-photo" data-slide="8">
+      <p class="kicker">Moves become a tree</p>
+      <div class="tree-frame">
+        <img src="assets/search/ink_p14.png" alt="8-puzzle search tree with one solution path highlighted">
+      </div>
+      <p class="small">One path that works: 1–3–7–14–26–46. The rest of the tree is still there, thickening underneath.</p>
+      <div class="idx">08</div>
+    </section>
+
+    <section class="slide gold" data-slide="9">
+      <p class="kicker">Every tree search</p>
+      <h1 class="display">Check.<br>Expand.<br><em>Repeat.</em></h1>
+      <p class="lede">Look at a node. If it is not the goal, generate its children. That is the whole family of algorithms. They disagree only about which node you check next.</p>
+      <div class="idx">09</div>
+    </section>
+
+    <section class="slide" data-slide="10">
+      <p class="kicker">Two different objects</p>
+      <div class="cols uneven">
+        <div>
+          <p class="body">A <em>state</em> is a configuration of the world. The board. The city. The assignment of features.</p>
+          <p class="body" style="margin-top:1.1em">A <em>node</em> is bookkeeping in the tree: the state, the parent, the action that got you here, the path cost, the depth.</p>
+        </div>
+        <div>
+          <p class="small" style="margin-bottom:16px">The expand function fills in a new node — from a map, or from a successor function. The same state can appear as many nodes. That fact will matter.</p>
+          <div class="puzzle sm" aria-hidden="true">
+            <b>5</b><b>4</b><b class="blank"></b>
+            <b>6</b><b>1</b><b>8</b>
+            <b>7</b><b>3</b><b>2</b>
+          </div>
+        </div>
+      </div>
+      <div class="idx">10</div>
+    </section>
+
+    <section class="slide" data-slide="11">
+      <p class="kicker">The only interesting data structure</p>
+      <h1 class="display">The <em>fringe.</em></h1>
+      <p class="lede">Also called the frontier: every node slated to be checked. You pop one. You test it. If it is not the goal, you push its children. Which nodes wait there — and in what order — <em>is</em> the algorithm.</p>
+      <div class="idx">11</div>
+    </section>
+
+    <section class="slide" data-slide="12">
+      <p class="kicker">Order is everything</p>
+      <div class="split-idea">
+        <article>
+          <p class="tag">BFS · FIFO</p>
+          <h3>A <em>queue.</em></h3>
+          <p>People at the polls. The first one in is the first one out. You finish a level before you start the next.</p>
+        </article>
+        <article>
+          <p class="tag">DFS · LIFO</p>
+          <h3>A <em>stack.</em></h3>
+          <p>Plates. The last one on is the first one off. You dive until you cannot, then you come back.</p>
+        </article>
+      </div>
+      <div class="idx">12</div>
+    </section>
+
+    <section class="slide tree-photo" data-slide="13">
+      <p class="kicker">Breadth-first · on the tree</p>
+      <div class="tree-frame">
+        <img src="assets/search/ink_p15.png" alt="BFS exploring the 8-puzzle tree level by level">
+      </div>
+      <p class="small">Finish a generation before you start the next. Node 16, when we use it as a goal, sits on level 3 — BFS will meet everyone shallower first.</p>
+      <div class="idx">13</div>
+    </section>
+
+    <section class="slide walk-slide" data-slide="14">
+      <p class="kicker">BFS · walk the fringe</p>
+      <div class="walk" data-walk="bfs">
+        <div class="walk-copy">
+          <p class="walk-n"></p>
+          <p class="say"></p>
+          <div class="fringe-box">
+            <span class="fringe-label">Fringe · queue</span>
+            <p class="fringe-val"></p>
+          </div>
+          <p class="legend-dots"><span><i class="g"></i>current</span><span><i class="f"></i>fringe</span><span>16 is the goal</span></p>
+        </div>
+        <div class="walk-viz"></div>
+      </div>
+      <div class="idx">14</div>
+    </section>
+
+    <section class="slide" data-slide="15">
+      <p class="kicker">Breadth-first</p>
+      <h1 class="display mid">Always expand<br>the <em>shallowest</em><br>unexpanded node.</h1>
+      <p class="lede">You spend memory keeping a whole generation in the fringe. You get the shortest path in number of steps.</p>
+      <div class="idx">15</div>
+    </section>
+
+    <section class="slide tree-photo" data-slide="16">
+      <p class="kicker">Depth-first · on the tree</p>
+      <div class="tree-frame">
+        <img src="assets/search/ink_p16.png" alt="DFS diving down the 8-puzzle tree">
+      </div>
+      <p class="small">Dive until you cannot. Then back up one and dive again. Same tree as BFS. Opposite handwriting.</p>
+      <div class="idx">16</div>
+    </section>
+
+    <section class="slide walk-slide" data-slide="17">
+      <p class="kicker">DFS · walk the fringe</p>
+      <div class="walk" data-walk="dfs">
+        <div class="walk-copy">
+          <p class="walk-n"></p>
+          <p class="say"></p>
+          <div class="fringe-box">
+            <span class="fringe-label">Fringe · stack</span>
+            <p class="fringe-val"></p>
+          </div>
+          <p class="legend-dots"><span><i class="g"></i>current</span><span><i class="f"></i>fringe</span><span>16 is the goal</span></p>
+        </div>
+        <div class="walk-viz"></div>
+      </div>
+      <div class="idx">17</div>
+    </section>
+
+    <section class="slide" data-slide="18">
+      <p class="kicker">Depth-first</p>
+      <h1 class="display mid">Always expand<br>the <em>deepest</em><br>unexpanded node.</h1>
+      <p class="lede">A stack pops the last child you pushed. If you want to walk left to right, push right to left. Same algorithm. Opposite handwriting.</p>
+      <div class="idx">18</div>
+    </section>
+
+    <section class="slide" data-slide="19">
+      <p class="kicker">Why we keep both</p>
+      <table class="cmp">
+        <thead>
+          <tr><th>The worry</th><th>BFS</th><th>DFS</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Space</td><td class="math">O(b<sup>d+1</sup>)</td><td class="math">O(bm)</td></tr>
+          <tr><td>Time</td><td class="math">O(b<sup>d+1</sup>)</td><td class="math">O(b<sup>m</sup>)</td></tr>
+          <tr><td>Complete?</td><td class="yes">Yes</td><td class="no">No</td></tr>
+          <tr><td>Optimal?</td><td class="yes">Yes · shallowest</td><td class="no">No</td></tr>
+        </tbody>
+      </table>
+      <p class="keys"><span><b>b</b> branching factor</span><span><b>d</b> depth of shallowest goal</span><span><b>m</b> maximum depth</span></p>
+      <div class="idx">19</div>
+    </section>
+
+    <section class="slide" data-slide="20">
+      <p class="kicker">The method has to fit the space</p>
+      <div class="terms">
+        <article>
+          <h3>8-puzzle</h3>
+          <p>A tree of every legal slide. You want a path, not a tour of the tree. Depth-first will do — you do not need every sibling.</p>
+        </article>
+        <article>
+          <h3>LinkedIn</h3>
+          <p>Degrees of connection, level by level. You want the shortest path to a person. Breadth-first: the first time you meet them, that is the shortest.</p>
+        </article>
+        <article>
+          <h3>The trap</h3>
+          <p>Plenty of memory does not make BFS free. Scarce memory does not make DFS wise. Wait one more idea.</p>
+        </article>
+      </div>
+      <div class="idx">20</div>
+    </section>
+
+    <section class="slide gold" data-slide="21">
+      <p class="kicker">What we actually want</p>
+      <h1 class="display">The guarantees<br>of BFS.<br>The memory of<br><em>DFS.</em></h1>
+      <div class="idx">21</div>
+    </section>
+
+    <section class="slide" data-slide="22">
+      <p class="kicker">Iterative deepening</p>
+      <p class="body">Run depth-first with a ceiling L. Then raise L: 0, 1, 2, … until the shallowest goal. Same visit order as BFS. Same memory as DFS.</p>
+      <div class="rule"></div>
+      <p class="small">Depth-limited search alone is incomplete if the goal sits past L. Iterative deepening keeps lifting the ceiling.</p>
+      <p class="lede">It re-searches the top of the tree every time. That sounds wasteful. The last layer costs more than all the others stacked. Waste that is asymptotically free. Time and space both O(b<sup>d</sup>).</p>
+      <div class="idx">22</div>
+    </section>
+
+    <section class="slide" data-slide="23">
+      <p class="kicker">Uninformed search · the scorecard</p>
+      <table class="cmp">
+        <thead>
+          <tr><th></th><th>BFS</th><th>DFS</th><th>DLS</th><th>IDS</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Space</td><td class="math">O(b<sup>d+1</sup>)</td><td class="math">O(bm)</td><td class="math">O(b<sup>L</sup>)</td><td class="math">O(bd)</td></tr>
+          <tr><td>Time</td><td class="math">O(b<sup>d+1</sup>)</td><td class="math">O(b<sup>m</sup>)</td><td class="math">O(b<sup>L</sup>)</td><td class="math">O(b<sup>d</sup>)</td></tr>
+          <tr><td>Complete?</td><td class="yes">Yes</td><td class="no">No</td><td class="no">If L is enough</td><td class="yes">Yes</td></tr>
+          <tr><td>Optimal?</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td></tr>
+        </tbody>
+      </table>
+      <p class="keys"><span>They look only at the tree, not at the states — except to ask: is this the goal? Have I been here?</span></p>
+      <div class="idx">23</div>
+    </section>
+
+    <section class="slide gold" data-slide="24">
+      <p class="kicker">Informed search</p>
+      <h1 class="display">Ask more of a<br>state than<br><em>are you the goal?</em></h1>
+      <div class="idx">24</div>
+    </section>
+
+    <section class="slide" data-slide="25">
+      <p class="kicker">Two kinds of instruction</p>
+      <p class="body">An <em>algorithm</em> is a set of unambiguous steps. It generally stops. It usually aims at optimality, completeness, accuracy, precision.</p>
+      <p class="body" data-frag style="margin-top:1.1em">A <em>heuristic</em> is a rule of thumb. It trades those italics for speed. Good enough, soon enough.</p>
+      <div class="idx">25</div>
+    </section>
+
+    <section class="slide" data-slide="26">
+      <p class="kicker">Two guesses for the 8-puzzle</p>
+      <div class="h-pair">
+        <figure>
+          <div class="puzzle" aria-label="A start state">
+            <b>2</b><b>8</b><b>3</b>
+            <b>1</b><b>6</b><b>4</b>
+            <b class="blank"></b><b>7</b><b>5</b>
+          </div>
+          <figcaption style="font-family:var(--sans);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-top:12px">Toward the clockwise goal</figcaption>
+        </figure>
+        <div class="h-stats">
+          <article>
+            <h3>Hamming</h3>
+            <p>Tiles out of place. Count them. Ignore the blank.</p>
+            <strong>5</strong>
+          </article>
+          <article>
+            <h3>Manhattan</h3>
+            <p>Sum of grid-steps each tile still has to walk.</p>
+            <strong>6</strong>
+          </article>
+        </div>
+      </div>
+      <div class="idx">26</div>
+    </section>
+
+    <section class="slide" data-slide="27">
+      <p class="kicker">Best-first</p>
+      <p class="body" style="margin-bottom:8px">Give every node a score <em>f(n)</em>. Keep the fringe as a priority queue: most desirable first.</p>
+      <div class="terms" style="margin-top:28px">
+        <article>
+          <h3>Greedy</h3>
+          <p><span class="eq" style="font-size:32px;display:block;margin-bottom:10px"><em>f(n) = h(n)</em></span>Expand whoever looks closest to the goal. Ignore what you already spent.</p>
+        </article>
+        <article>
+          <h3>A*</h3>
+          <p><span class="eq" style="font-size:32px;display:block;margin-bottom:10px"><em>f(n) = g(n) + h(n)</em></span>Cost so far, plus a guess at the rest. Do not expand paths already expensive.</p>
+        </article>
+        <article>
+          <h3>The queue</h3>
+          <p>BFS used a queue. DFS used a stack. Greedy and A* use a priority queue — sorted by that score.</p>
+        </article>
+      </div>
+      <div class="idx">27</div>
+    </section>
+
+    <section class="slide gold" data-slide="28">
+      <p class="kicker">The one line to keep</p>
+      <p class="eq"><em>f(n) = g(n) + h(n)</em></p>
+      <p class="lede" style="margin-top:36px"><em>g</em> is the road behind you. <em>h</em> is a rumor about the road ahead. <em>f</em> is whether this path still deserves to be walked.</p>
+      <div class="idx">28</div>
+    </section>
+
+    <section class="slide" data-slide="29">
+      <p class="kicker">Romania, because everyone does</p>
+      <div class="cols uneven top">
+        <div>
+          <p class="body">Sibiu to Bucharest you can do in your head. Three routes. One of them is shorter.</p>
+          <p class="body" style="margin-top:1em">Oradea to Neamt you cannot. That is why the map exists in every textbook — and why A* uses straight-line distance as <em>h</em>. A crow never overestimates a road.</p>
+        </div>
+        <svg class="romania" viewBox="0 0 420 480" aria-label="Romania road map, Oradea to Neamt">
+          <line x1="48" y1="52" x2="42" y2="110"/><line x1="48" y1="52" x2="150" y2="168"/>
+          <line x1="42" y1="110" x2="38" y2="175"/><line x1="38" y1="175" x2="150" y2="168"/>
+          <line x1="38" y1="175" x2="32" y2="250"/><line x1="32" y1="250" x2="78" y2="278"/>
+          <line x1="78" y1="278" x2="88" y2="330"/><line x1="88" y1="330" x2="78" y2="385"/>
+          <line x1="78" y1="385" x2="160" y2="400"/><line x1="160" y1="400" x2="155" y2="250"/>
+          <line x1="150" y1="168" x2="155" y2="250"/><line x1="150" y1="168" x2="230" y2="190"/>
+          <line x1="155" y1="250" x2="248" y2="278"/><line x1="160" y1="400" x2="248" y2="278"/>
+          <line x1="230" y1="190" x2="290" y2="330"/><line x1="248" y1="278" x2="290" y2="330"/>
+          <line x1="290" y1="330" x2="280" y2="410"/><line x1="290" y1="330" x2="345" y2="310"/>
+          <line x1="345" y1="310" x2="400" y2="330"/><line x1="400" y1="330" x2="410" y2="390"/>
+          <line x1="345" y1="310" x2="385" y2="200"/><line x1="385" y1="200" x2="370" y2="130"/>
+          <line x1="370" y1="130" x2="318" y2="78"/>
+          <circle class="hi" cx="48" cy="52" r="5"/>
+          <circle cx="42" cy="110" r="3.5"/><circle cx="38" cy="175" r="3.5"/>
+          <circle cx="150" cy="168" r="3.5"/><circle cx="230" cy="190" r="3.5"/>
+          <circle cx="155" cy="250" r="3.5"/><circle cx="248" cy="278" r="3.5"/>
+          <circle cx="290" cy="330" r="3.5"/><circle cx="345" cy="310" r="3.5"/>
+          <circle class="hi" cx="318" cy="78" r="5"/>
+          <text class="hi" x="58" y="48">Oradea</text>
+          <text x="52" y="114">Zerind</text>
+          <text x="48" y="180">Arad</text>
+          <text x="162" y="164">Sibiu</text>
+          <text x="240" y="186">Fagaras</text>
+          <text x="258" y="272">Pitesti</text>
+          <text x="302" y="338">Bucharest</text>
+          <text x="378" y="196">Iasi</text>
+          <text class="hi" x="328" y="74">Neamt</text>
+        </svg>
+      </div>
+      <div class="idx">29</div>
+    </section>
+
+    <section class="slide walk-slide" data-slide="30">
+      <p class="kicker">A* · on a map, step by step</p>
+      <div class="walk astar" data-walk="astar">
+        <div class="walk-copy">
+          <p class="walk-n"></p>
+          <p class="say"></p>
+        </div>
+        <div class="walk-viz"></div>
+      </div>
+      <div class="idx">30</div>
+    </section>
+
+    <section class="slide tree-photo" data-slide="31">
+      <p class="kicker">Same 8-puzzle, three handwritings</p>
+      <div class="tree-frame">
+        <img src="assets/search/ink_p69.png" alt="A-star tree versus BFS and DFS on the 8-puzzle">
+      </div>
+      <p class="small">A* walks a spine. BFS inflates a generation. DFS dives the wrong well. That is the whole argument for a heuristic.</p>
+      <div class="idx">31</div>
+    </section>
+
+    <section class="slide" data-slide="32">
+      <p class="kicker">Trees are a special case</p>
+      <p class="body">All trees are graphs. Not all graphs are trees. A tree is a DAG in which every node has one parent.</p>
+      <div class="rule"></div>
+      <p class="small"><em>Tree search</em> walks a graph as if it were a tree. You may meet the same state twice. <em>Graph search</em> keeps a closed list so you do not. The closed list costs memory. The duplicate visits cost time. Pick your bill.</p>
+      <div class="idx">32</div>
+    </section>
+
+    <section class="slide" data-slide="33">
+      <p class="kicker">When the rumor is legal</p>
+      <div class="terms">
+        <article>
+          <h3>Admissible</h3>
+          <p><em>h(n) ≤ h*(n)</em>. Never overestimate the true remaining cost. Optimistic. Straight-line distance is the textbook case. If <em>h</em> is admissible, A* returns an optimal path.</p>
+        </article>
+        <article>
+          <h3>Consistent</h3>
+          <p><em>h(n) ≤ c(n, p) + h(p)</em>. The triangle inequality on the way down. <em>f</em> never gets cheaper along a path. Then tree search and graph search both behave.</p>
+        </article>
+        <article>
+          <h3>Inconsistent</h3>
+          <p>Most heuristics you will write are both admissible and consistent. If you somehow write an inconsistent one, only tree search is still safe. Graph search may skip the optimal path.</p>
+        </article>
+      </div>
+      <div class="idx">33</div>
+    </section>
+
+    <section class="slide gold" data-slide="34">
+      <p class="kicker">A last geometry</p>
+      <h1 class="display">Then someone<br>tries to<br><em>stop you.</em></h1>
+      <p class="lede">Games. An adversary. Strategic thinking — and the old question, sitting there again: is that intelligence?</p>
+      <div class="idx">34</div>
+    </section>
+
+    <section class="slide" data-slide="35">
+      <p class="kicker">Minimax</p>
+      <p class="body">Max wants the value of the position high. Min wants it low. Both assume the other will play perfectly. You unroll the tree to a terminal, write +1 / 0 / −1, and back the numbers up.</p>
+      <p class="lede" data-frag>The name is not Max and Min glued together. Minimax means: choose the move that <em>minimizes the maximum loss</em> the opponent can inflict.</p>
+      <div class="idx">35</div>
+    </section>
+
+    <section class="slide" data-slide="36">
+      <p class="kicker">You do not owe the whole tree a look</p>
+      <div class="cols">
+        <div>
+          <p class="body">Cut the tree by depth and you get the <em>horizon effect</em>: a good move sitting one ply past where you stopped looking.</p>
+          <p class="body" style="margin-top:1em">α–β pruning throws away branches that cannot change the decision. Once Max holds a 3, any Min line that has already dipped to 2 can stop. The 15 never gets read.</p>
+        </div>
+        <div class="mm" aria-label="Minimax tree, 15 pruned">
+          <div class="node"><div class="role">Max</div><div class="val">3</div></div>
+          <div class="row">
+            <div class="branch">
+              <div class="node"><div class="role">Min</div><div class="val">3</div></div>
+              <div class="leaves">
+                <div class="leaf">3</div>
+                <div class="leaf">17</div>
+              </div>
+            </div>
+            <div class="branch">
+              <div class="node"><div class="role">Min</div><div class="val">2</div></div>
+              <div class="leaves">
+                <div class="leaf">2</div>
+                <div class="leaf dim">15</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="idx">36</div>
+    </section>
+
+    <section class="slide" data-slide="37">
+      <p class="kicker">What we actually learned</p>
+      <h1 class="display mid">Not a favorite<br>algorithm.<br>A sense of<br><em>suitability.</em></h1>
+      <p class="lede">Each method has a space it is honest in, and a space where it lies — with memory, with time, with a path that is legal and still wrong. The work is matching the method to the map.</p>
+      <div class="idx">37</div>
+    </section>
+
+  </div>
+  <script src="js/walk.js"></script>
+  <script src="js/deck.js"></script>
+</body>
+</html>
