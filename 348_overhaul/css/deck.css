@@ -50,11 +50,12 @@
   color: inherit;
 }
 .slide a[target="_blank"]::after {
-  content: " ▶";
-  font-size: 0.45em;
-  opacity: 0.4;
+  content: " 🔗";
+  font-size: 0.4em;
+  opacity: 0.45;
   vertical-align: middle;
   margin-left: 4px;
+  text-decoration: none;
 }
 
 html, body {
@@ -256,7 +257,7 @@ html, body {
   line-height: 1.22;
 }
 .who li + li { margin-top: 0.12em; }
-.who .dim { color: #fff; }
+.who .dim { color: var(--cream); }
 
 /* Nested dolls */
 .nest {
