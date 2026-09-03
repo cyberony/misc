@@ -49,13 +49,18 @@
 .slide a:visited {
   color: inherit;
 }
-.slide a[target="_blank"]::after {
+.slide a.link-out::after {
   content: " 🔗";
   font-size: 0.4em;
   opacity: 0.45;
   vertical-align: middle;
   margin-left: 4px;
   text-decoration: none;
+}
+.slide a.dot-link {
+  border-bottom: 1px dotted currentColor;
+  padding-bottom: 1px;
+  opacity: 0.85;
 }
 
 html, body {
