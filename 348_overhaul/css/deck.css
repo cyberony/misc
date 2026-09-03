@@ -42,6 +42,16 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+.slide a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+}
+.slide a:visited {
+  color: inherit;
+}
+
 html, body {
   height: 100%;
   background: #070605;
