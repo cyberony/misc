@@ -19,6 +19,13 @@
   font-display: swap;
   src: url("../assets/fonts/inter-tight.woff2") format("woff2");
 }
+@font-face {
+  font-family: "Source Serif 4";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("../assets/fonts/source-serif-4.woff2") format("woff2");
+}
 
 :root {
   --bg: #120f0c;
@@ -29,6 +36,7 @@
   --ink: #16130f;
   --display: "Fraunces", Georgia, serif;
   --sans: "Inter Tight", "Helvetica Neue", sans-serif;
+  --byline: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, serif;
   --on: 1;
 }
 
@@ -80,6 +88,19 @@ html, body {
 
 .slide.is-current { display: flex; flex-direction: column; }
 
+.slide.is-current:has(> .kicker):has(> .display):has(> .lede),
+.slide.is-current:has(> .kicker):has(> .eq):has(> .lede) {
+  gap: 56px;
+}
+.slide.is-current:has(> .kicker):has(> .display):has(> .lede) .kicker,
+.slide.is-current:has(> .kicker):has(> .eq):has(> .lede) .kicker {
+  margin-bottom: 0;
+}
+.slide.is-current:has(> .kicker):has(> .display):has(> .lede) .lede,
+.slide.is-current:has(> .kicker):has(> .eq):has(> .lede) .lede {
+  margin-top: 0;
+}
+
 .slide.gold {
   background: var(--gold);
   color: var(--ink);
@@ -100,23 +121,30 @@ html, body {
 .gold .idx { color: rgba(22, 19, 15, 0.45); }
 
 .kicker {
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  font-family: var(--display);
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
   color: var(--gold);
-  margin-bottom: 28px;
+  margin-bottom: 56px;
+  font-variation-settings: "opsz" 34, "SOFT" 20;
 }
 
-.gold .kicker { color: var(--ink); opacity: 0.7; }
+.gold .kicker { color: rgba(22, 19, 15, 0.5); }
+
+.kicker em {
+  font-style: italic;
+  font-weight: 500;
+  color: inherit;
+}
 
 .display {
-  font-size: 92px;
+  font-size: 64px;
   font-weight: 500;
-  letter-spacing: -0.045em;
-  line-height: 0.95;
-  font-variation-settings: "SOFT" 40, "opsz" 96, "WONK" 1;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  font-variation-settings: "SOFT" 32, "opsz" 72, "WONK" 1;
 }
 
 .display em, .display i {
@@ -179,16 +207,28 @@ html, body {
 .hero {
   justify-content: space-between;
 }
+.hero .display {
+  font-size: 92px;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  font-variation-settings: "SOFT" 40, "opsz" 96, "WONK" 1;
+}
 .hero .meta {
-  font-family: var(--sans);
-  font-size: 16px;
+  font-family: var(--byline);
+  font-size: 20px;
   font-weight: 500;
-  line-height: 1.6;
-  letter-spacing: 0.02em;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  color: #6a6358;
+  font-variation-settings: "opsz" 18;
 }
 .hero .meta span {
   display: block;
-  opacity: 0.55;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: #6a6358;
+  opacity: 1;
 }
 
 /* Who counts */
@@ -422,8 +462,8 @@ html, body {
   font-variation-settings: "opsz" 22, "SOFT" 20;
 }
 
-.display.mid { font-size: 64px; }
-.display.sm { font-size: 52px; }
+.display.mid { font-size: 52px; }
+.display.sm { font-size: 44px; }
 
 .cols {
   display: grid;
