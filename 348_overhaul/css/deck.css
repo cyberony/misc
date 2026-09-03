@@ -257,7 +257,7 @@ html, body {
   line-height: 1.22;
 }
 .who li + li { margin-top: 0.12em; }
-.who .dim { color: var(--muted); }
+.who .dim { color: #fff; }
 
 /* Nested dolls */
 .nest {
