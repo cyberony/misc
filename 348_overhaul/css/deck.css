@@ -58,9 +58,17 @@
   text-decoration: none;
 }
 .slide a.dot-link {
-  border-bottom: 1px dotted currentColor;
-  padding-bottom: 1px;
-  opacity: 0.85;
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(227, 163, 28, 0.7) 0,
+    rgba(227, 163, 28, 0.7) 7px,
+    transparent 7px,
+    transparent 13px
+  );
+  background-size: auto 2px;
+  background-position: 0 100%;
+  background-repeat: repeat-x;
+  padding-bottom: 5px;
 }
 
 html, body {
