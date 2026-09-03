@@ -27,26 +27,130 @@
     if (location.hash !== `#${i + 1}`) history.replaceState(null, "", `#${i + 1}`);
   }
 
+  let ytPlayer = null;
+  let watchTimer = null;
+  let fadeTimer = null;
+  let ytQueue = null;
+
+  function withYT(fn) {
+    if (window.YT && window.YT.Player) {
+      fn();
+      return;
+    }
+    if (!ytQueue) {
+      ytQueue = [];
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(tag);
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (typeof prev === "function") prev();
+        const q = ytQueue;
+        ytQueue = true;
+        q.forEach((cb) => cb());
+      };
+    }
+    if (ytQueue === true) fn();
+    else ytQueue.push(fn);
+  }
+
+  function stopWatch() {
+    clearInterval(watchTimer);
+    watchTimer = null;
+    clearTimeout(fadeTimer);
+    fadeTimer = null;
+  }
+
+  function destroyPlayer() {
+    stopWatch();
+    if (ytPlayer) {
+      try { ytPlayer.destroy(); } catch (e) {}
+      ytPlayer = null;
+    }
+  }
+
+  function readyMount(slide) {
+    const host = slide.querySelector(".yt-host");
+    if (!host) return null;
+    host.replaceChildren();
+    const mount = document.createElement("div");
+    mount.className = "yt-mount";
+    host.appendChild(mount);
+    return mount;
+  }
+
   function closeVideo(slide = slides[i]) {
+    destroyPlayer();
     if (!slide) return;
     slide.classList.remove("is-playing");
-    const iframe = slide.querySelector(".embed iframe");
-    if (iframe) iframe.src = "";
     const panel = slide.querySelector(".embed");
-    if (panel) panel.setAttribute("aria-hidden", "true");
+    if (panel) {
+      panel.classList.remove("is-fading");
+      panel.setAttribute("aria-hidden", "true");
+    }
+    readyMount(slide);
+  }
+
+  function fadeOutVideo(slide) {
+    const panel = slide.querySelector(".embed");
+    if (!panel) return;
+    panel.classList.add("is-fading");
+    fadeTimer = setTimeout(() => closeVideo(slide), 1450);
+  }
+
+  function beginWatch(slide, endAt) {
+    stopWatch();
+    watchTimer = setInterval(() => {
+      if (!ytPlayer || typeof ytPlayer.getCurrentTime !== "function") return;
+      let t = 0;
+      try { t = ytPlayer.getCurrentTime(); } catch (e) { return; }
+      if (t >= endAt - 0.08) {
+        stopWatch();
+        try { ytPlayer.pauseVideo(); } catch (e) {}
+        fadeOutVideo(slide);
+      }
+    }, 120);
   }
 
   function openVideo(link) {
     const slide = link.closest(".slide");
     if (!slide) return;
-    const iframe = slide.querySelector(".embed iframe");
-    if (!iframe) return;
-    const id = link.dataset.yt;
-    const start = link.dataset.ytStart || "0";
-    iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&start=${start}`;
-    slide.classList.add("is-playing");
     const panel = slide.querySelector(".embed");
-    if (panel) panel.setAttribute("aria-hidden", "false");
+    if (!panel) return;
+    destroyPlayer();
+    const mount = readyMount(slide);
+    if (!mount) return;
+    panel.classList.remove("is-fading");
+    slide.classList.add("is-playing");
+    panel.setAttribute("aria-hidden", "false");
+    const id = link.dataset.yt;
+    const start = Number(link.dataset.ytStart || 0);
+    const endAt = link.dataset.ytEnd ? Number(link.dataset.ytEnd) : null;
+    withYT(() => {
+      ytPlayer = new YT.Player(mount, {
+        videoId: id,
+        width: "100%",
+        height: "100%",
+        playerVars: {
+          autoplay: 1,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          start,
+        },
+        events: {
+          onReady(ev) {
+            ev.target.playVideo();
+            if (endAt) beginWatch(slide, endAt);
+          },
+          onStateChange(ev) {
+            if (endAt && window.YT && ev.data === YT.PlayerState.PLAYING) {
+              beginWatch(slide, endAt);
+            }
+          },
+        },
+      });
+    });
   }
 
   function show(n, { resetFrags = true } = {}) {
