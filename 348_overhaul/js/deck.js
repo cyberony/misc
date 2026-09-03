@@ -141,11 +141,16 @@
         events: {
           onReady(ev) {
             ev.target.playVideo();
-            if (endAt) beginWatch(slide, endAt);
           },
           onStateChange(ev) {
-            if (endAt && window.YT && ev.data === YT.PlayerState.PLAYING) {
-              beginWatch(slide, endAt);
+            if (!window.YT) return;
+            if (ev.data === YT.PlayerState.PLAYING) {
+              const stopAt = endAt || Math.max(0, ytPlayer.getDuration() - 0.2);
+              if (stopAt) beginWatch(slide, stopAt);
+            } else if (ev.data === YT.PlayerState.ENDED) {
+              stopWatch();
+              try { ytPlayer.pauseVideo(); } catch (e) {}
+              fadeOutVideo(slide);
             }
           },
         },
