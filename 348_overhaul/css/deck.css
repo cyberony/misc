@@ -50,12 +50,11 @@
   color: inherit;
 }
 .slide a[target="_blank"]::after {
-  content: " ↗";
-  font-family: var(--sans);
-  font-size: 0.65em;
-  opacity: 0.45;
-  vertical-align: super;
-  margin-left: 2px;
+  content: " ▶";
+  font-size: 0.45em;
+  opacity: 0.4;
+  vertical-align: middle;
+  margin-left: 4px;
 }
 
 html, body {
