@@ -6,7 +6,11 @@
   let i = 0;
 
   function frags(slide) {
-    return [...slide.querySelectorAll("[data-frag]")];
+    return [...slide.querySelectorAll("[data-frag]")].sort((a, b) => {
+      const oa = Number(a.dataset.fragOrder || 0);
+      const ob = Number(b.dataset.fragOrder || 0);
+      return oa - ob;
+    });
   }
 
   function revealed(slide) {
