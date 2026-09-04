@@ -419,15 +419,22 @@ html, body {
 .slide.has-side .tl { max-width: none; }
 .side-row {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 48px;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 36px;
   flex: 1;
   min-height: 0;
-  align-items: center;
+  align-items: stretch;
+}
+.side-art {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  height: 100%;
 }
 .side-art img {
   width: 100%;
-  max-height: 500px;
+  max-height: calc(100% - 32px);
   height: auto;
   display: block;
   object-fit: contain;
