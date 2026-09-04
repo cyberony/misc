@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Intro to AI</title>
-  <link rel="stylesheet" href="css/deck.css?v=26">
+  <link rel="stylesheet" href="css/deck.css?v=27">
 </head>
 <body>
   <div class="progress" aria-hidden="true"><span></span></div>
@@ -70,12 +70,16 @@
           <p class="body">AI is not ChatGPT.<br>AI is not deep learning.<br>AI is not machine learning.</p>
           <p class="small" style="margin-top:1.2em;color:var(--muted)">They sit inside it. Symbolic methods still occupy the rest of the box. The field is older, and larger, than the current product cycle.</p>
         </div>
-        <div class="doll" aria-label="AI contains symbolic AI and ML; ML contains DL">
-          <span>AI</span>
-          <span style="position:absolute;left:22px;top:46%">Symbolic</span>
-          <div class="doll-ml">
-            ML
-            <div class="doll-dl">DL</div>
+        <div class="doll-wrap">
+          <div class="doll-outer" data-frag>
+            <span class="doll-ai">AI</span>
+            <div class="doll" aria-label="AI contains symbolic AI and ML; ML contains DL">
+              <span class="doll-sym">Symbolic</span>
+              <div class="doll-ml" data-frag>
+                ML
+                <div class="doll-dl" data-frag>DL</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
