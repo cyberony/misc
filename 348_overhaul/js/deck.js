@@ -13,6 +13,12 @@
     return frags(slide).filter((el) => el.classList.contains("is-on")).length;
   }
 
+  function withGroup(slide, el) {
+    const g = el.dataset.with;
+    if (!g) return [el];
+    return frags(slide).filter((x) => x.dataset.with === g);
+  }
+
   function parseHash() {
     const n = parseInt(location.hash.replace("#", ""), 10);
     if (Number.isFinite(n) && n >= 1 && n <= slides.length) return n - 1;
@@ -176,7 +182,7 @@
     const f = frags(slides[i]);
     const r = revealed(slides[i]);
     if (r < f.length) {
-      f[r].classList.add("is-on");
+      withGroup(slides[i], f[r]).forEach((el) => el.classList.add("is-on"));
       return;
     }
     show(i + 1);
@@ -187,7 +193,7 @@
     const f = frags(slides[i]);
     const r = revealed(slides[i]);
     if (r > 0) {
-      f[r - 1].classList.remove("is-on");
+      withGroup(slides[i], f[r - 1]).forEach((el) => el.classList.remove("is-on"));
       return;
     }
     show(i - 1, { resetFrags: false });
