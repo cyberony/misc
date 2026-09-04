@@ -419,25 +419,21 @@ html, body {
 .slide.has-side .tl { max-width: none; }
 .side-row {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 36px;
-  flex: 1;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 48px;
+  align-items: start;
+  margin-top: 22px;
   min-height: 0;
-  align-items: stretch;
 }
+.side-row .tl { margin-top: 0; }
 .side-art {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 0;
-  height: 100%;
+  width: 280px;
+  justify-self: start;
 }
 .side-art img {
   width: 100%;
-  max-height: calc(100% - 32px);
   height: auto;
   display: block;
-  object-fit: contain;
   filter: sepia(0.35) saturate(0.8) contrast(1.05);
 }
 .side-art figcaption {
