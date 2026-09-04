@@ -417,19 +417,27 @@ html, body {
 
 /* Timeline */
 .slide.has-side .tl { max-width: none; }
+.turk-align {
+  width: max-content;
+  max-width: 100%;
+  margin-top: 22px;
+}
+.turk-align > .tl {
+  margin-top: 0;
+}
+.turk-align > .tl li {
+  grid-template-columns: 140px max-content;
+}
 .side-row {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 48px;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 36px;
   align-items: start;
   margin-top: 22px;
-  min-height: 0;
+  width: 100%;
 }
 .side-row .tl { margin-top: 0; }
-.side-art {
-  width: 280px;
-  justify-self: end;
-}
+.side-art { width: 280px; }
 .side-art img {
   width: 100%;
   height: auto;
