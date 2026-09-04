@@ -442,7 +442,6 @@ html, body {
   width: 100%;
   height: auto;
   display: block;
-  filter: sepia(0.35) saturate(0.8) contrast(1.05);
 }
 .side-art figcaption {
   font-family: var(--sans);
