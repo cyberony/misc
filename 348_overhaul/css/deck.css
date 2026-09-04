@@ -416,6 +416,27 @@ html, body {
 }
 
 /* Timeline */
+.slide.has-corner .tl { max-width: 62%; }
+.corner-art {
+  position: absolute;
+  right: 72px;
+  bottom: 52px;
+  width: 260px;
+}
+.corner-art img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: sepia(0.35) saturate(0.8) contrast(1.05);
+}
+.corner-art figcaption {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  line-height: 1.35;
+  color: var(--muted);
+  margin-top: 8px;
+}
 .tl {
   list-style: none;
   display: flex;
