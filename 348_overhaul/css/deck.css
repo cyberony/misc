@@ -375,7 +375,10 @@ html, body {
   border: 1.5px solid var(--cream);
   padding: 22px;
 }
-.doll-sym {
+.doll-mid {
+  position: absolute;
+  inset: 0;
+}
   position: absolute;
   left: 22px;
   top: 46%;
