@@ -428,7 +428,7 @@ html, body {
 .side-row .tl { margin-top: 0; }
 .side-art {
   width: 280px;
-  justify-self: start;
+  justify-self: end;
 }
 .side-art img {
   width: 100%;
