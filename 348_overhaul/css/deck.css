@@ -244,21 +244,29 @@ html, body {
   font-variation-settings: "SOFT" 40, "opsz" 96, "WONK" 1;
 }
 .hero .meta {
-  font-family: var(--byline);
-  font-size: 20px;
+  font-family: var(--display);
+  font-size: 26px;
   font-weight: 500;
-  line-height: 1.45;
-  letter-spacing: 0.01em;
-  color: #6a6358;
-  font-variation-settings: "opsz" 18;
+  font-style: italic;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variation-settings: "opsz" 26, "SOFT" 40;
 }
 .hero .meta span {
   display: block;
-  font-size: 16px;
-  font-weight: 400;
-  letter-spacing: 0.03em;
-  color: #6a6358;
-  opacity: 1;
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-top: 8px;
+}
+.hero .meta span + span {
+  margin-top: 5px;
+  font-weight: 500;
 }
 
 /* Who counts */
