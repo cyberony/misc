@@ -789,11 +789,24 @@ html, body {
   gap: 16px;
   width: max-content;
   margin: 0;
+  isolation: isolate;
 }
+.cover-cell {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+.cover-cell:hover { z-index: 5; }
 .covers img {
   display: block;
   height: 240px;
   width: auto;
+  transform: scale(1);
+  transform-origin: center center;
+  transition: transform 0.28s ease;
+}
+.cover-cell:hover img {
+  transform: scale(1.45);
 }
 
 .contact {
@@ -1449,4 +1462,5 @@ html, body {
   [data-frag] { opacity: 1; transform: none; }
   .progress span { transition: none; }
   .quiet-tip::after { transition: none; }
+  .covers img { transition: none; }
 }
