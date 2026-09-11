@@ -248,7 +248,7 @@
       closeVideo();
       return;
     }
-    if (e.target.closest("a, button, .embed")) return;
+    if (e.target.closest("a, button, .embed, .qr-dock")) return;
     if (e.clientX < window.innerWidth * 0.18) prev();
     else next();
   });

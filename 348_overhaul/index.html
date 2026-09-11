@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-cat-origin="http://localhost:3000">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Intro to AI</title>
-  <link rel="stylesheet" href="css/deck.css?v=38">
+  <link rel="stylesheet" href="css/deck.css?v=90">
 </head>
 <body>
   <div class="progress" aria-hidden="true"><span></span></div>
@@ -24,8 +24,7 @@
 
     <section class="slide" data-slide="3">
       <p class="kicker">The word "<em>artificial</em>"</p>
-      <h1 class="display">We already know<br>how to make<br><em>fake things.</em></h1>
-      <p class="lede">Tools, forgeries, automata, software. “Artificial” is the boring half of the phrase.</p>
+      <h1 class="display">We know<br>what this is.</h1>
       <div class="idx">03</div>
     </section>
 
@@ -68,7 +67,7 @@
       <div class="nest">
         <div>
           <p class="body">AI is not ChatGPT.<br>AI is not deep learning.<br>AI is not machine learning.</p>
-          <p class="small" data-frag data-frag-order="9" style="margin-top:1.2em;color:var(--muted)">ML and AI are not one and the same. ML is one type of AI. So is everything else in that box. None of it is the whole field. The field is older, and larger, than the current product cycle.</p>
+          <p class="small" data-frag data-frag-order="9" style="margin-top:1.2em;color:var(--muted)">ML and AI are not one and the same. ML is one type of AI. So is everything else in that AI box. None of it is the whole field. The field is older, and larger, than the current product cycle.</p>
         </div>
         <div class="doll-wrap">
           <div class="doll-outer" data-frag>
@@ -95,82 +94,139 @@
     <section class="slide has-side" data-slide="9">
       <p class="kicker">Before code</p>
       <ul class="tl">
-        <li><time>~400 BC</time><span>The Greeks imagine Talos, a bronze guardian, and Pandora, a woman "made, not born."</span></li>
+        <li data-frag data-frag-order="1"><time>~400 BC</time><span>The Greeks imagine Talos, a bronze guardian, and Pandora, a woman "made, not born."</span></li>
       </ul>
       <div class="turk-align">
         <ul class="tl">
-          <li><time>1495</time><span>Leonardo da Vinci sketches a mechanical knight.</span></li>
+          <li data-frag data-frag-order="2"><time>~1495</time><span>Leonardo da Vinci sketches a mechanical knight.</span></li>
         </ul>
         <div class="side-row">
           <ul class="tl">
-            <li><time>1770</time><span>The Mechanical Turk: a chess “automaton” that was a man in a box. The machine was a lie.</span></li>
-            <li><time>1920</time><span>Karel Čapek’s Czech play <i>R.U.R.</i> — Rossum’s Universal Robots — gives us the word <i>robot</i>, from <i>robota</i>: forced labor. Factory-made workers. Then they revolt.</span></li>
+            <li data-frag data-frag-order="3" data-with="turk"><time>1770</time><span>Wolfgang von Kempelen’s Mechanical Turk: a chess “automaton” that was a man in a box. The machine was a lie.</span></li>
+            <li data-frag data-frag-order="4"><time>1920</time><span>Karel Čapek’s Czech play <i>R.U.R.</i> — Rossum’s Universal Robots — gives us the word <i>robot</i>, from <i>robota</i>: forced labor. Factory-made workers. Then they revolt.</span></li>
           </ul>
-          <figure class="side-art">
-            <img src="assets/turk.jpg" alt="Reconstruction of the Mechanical Turk">
-            <figcaption>Heinz Nixdorf MuseumsForum reconstruction</figcaption>
+          <figure class="side-art" data-frag data-frag-order="3" data-with="turk">
+            <img src="assets/turk.jpg" alt="The Mechanical Turk, reconstruction of the 1770 chess automaton">
+            <figcaption>The Mechanical Turk</figcaption>
           </figure>
         </div>
       </div>
       <div class="idx">09</div>
     </section>
 
-    <section class="slide" data-slide="10">
+    <section class="slide fathers-slide" data-slide="10">
       <p class="kicker">The field gets a name</p>
-      <ul class="tl">
-        <li><time>1950</time><span>Turing asks whether machines can think — and proposes a test.</span></li>
-        <li><time>1956</time><span>Dartmouth summer. Ten people plan a six-week workshop. McCarthy coins “artificial intelligence.” That summer has not ended.</span></li>
-        <li><time>early years</time><span>Proofs, ELIZA, SHRDLU, Shakey. Then the wall: a 50-step proof with 5 choices per step is 5<sup>50</sup> paths. You do not brute-force that.</span></li>
-      </ul>
+      <div class="fathers">
+        <article class="fathers-row" data-frag data-frag-order="1">
+          <div class="fathers-copy">
+            <time>1950</time>
+            <h2>Alan Turing</h2>
+            <p>Asks whether machines can think — and proposes a test. The father of modern Computer Science. Some call him the father of AI.</p>
+          </div>
+          <figure>
+            <img src="assets/turing.jpg?v=4" alt="Alan Turing">
+          </figure>
+        </article>
+        <article class="fathers-row fathers-row--flip" data-frag data-frag-order="2">
+          <figure>
+            <img src="assets/mccarthy.jpg?v=2" alt="John McCarthy">
+          </figure>
+          <div class="fathers-copy">
+            <time>1956</time>
+            <h2>John McCarthy</h2>
+            <p>Dartmouth. Summer of ’56. Ten people, six weeks. He coins “artificial intelligence.” Some say <em>he</em> is the father of AI. That summer hasn’t ended yet.</p>
+          </div>
+        </article>
+      </div>
       <div class="idx">10</div>
     </section>
 
     <section class="slide" data-slide="11">
-      <p class="kicker">Why this course exists</p>
-      <h1 class="display">Search. Planning.<br>Representation.<br>Because the naive<br>tree is infinite.</h1>
-      <p class="lede">The combinatorial explosion is not a trivia fact. It is why intelligence — biological or artificial — cannot be “try everything.”</p>
+      <p class="kicker">Early years of the AI era</p>
+      <ul class="tl">
+        <li><time>first works</time><span>Proofs, logical deduction, visual analogy. Shakey the robot plans and moves. ELIZA — ChatGPT’s great-great-grandmother — plays psychotherapist. SHRDLU simulates a block-moving arm.</span></li>
+        <li><time>and then</time><span>Music and poem writers, joke crackers, even self-driving cars.</span></li>
+        <li><time>Boom!</time><span>Combinatorial explosion. A 5-step proof with 5 choices is 5<sup>5</sup> = 3,125 paths. A 50-step proof is 5<sup>50</sup> ≈ 8.9×10<sup>34</sup>. You do not brute-force that.</span></li>
+      </ul>
+      <h1 class="display mid" data-frag>The need for search, planning,<br>and knowledge representation.</h1>
       <div class="idx">11</div>
     </section>
 
-    <section class="slide" data-slide="12">
-      <p class="kicker">Winters</p>
-      <ul class="tl">
-        <li><time>1958–69</time><span>The perceptron is sold as a mind. Minsky and Papert show it is a linear classifier. It cannot even do XOR. Funding cools.</span></li>
-        <li><time>1980s</time><span>Expert systems: hand-built rules, expensive to grow, brittle to keep. Another thaw, then another freeze.</span></li>
-        <li><time>the point</time><span>The work did not stop. The press release did.</span></li>
-      </ul>
+    <section class="slide quote-slide" data-slide="12">
+      <p class="kicker">1943</p>
+      <p class="lede" style="margin-top:0">Warren McCulloch and Walter Pitts invent the Perceptron. Frank Rosenblatt implements it in ’58.</p>
+      <p class="lede" style="margin-top:0.55em">That same year, in a press conference organized by the US Navy, Rosenblatt made statements about the perceptron that caused a heated controversy among the fledgling AI community. Based on those statements, The New York Times reported the perceptron to be</p>
+      <blockquote class="pull" data-frag>
+        <p>“the embryo of an electronic computer that [the Navy] expects will be able to walk, talk, see, write, reproduce itself and be conscious of its existence.”</p>
+      </blockquote>
       <div class="idx">12</div>
     </section>
 
     <section class="slide" data-slide="13">
-      <p class="kicker">The turn</p>
-      <p class="body">Classical AI tried to <em>teach</em> a computer how to do a thing.</p>
-      <p class="body" data-frag style="margin-top:1.1em">Machine learning tries to <em>endow it with the capacity to learn the thing from data.</em></p>
-      <p class="small" data-frag style="margin-top:auto;color:var(--muted)">Neither cancelled the other. We will do both.</p>
+      <p class="kicker">The first AI Winter</p>
+      <ul class="tl">
+        <li><time>1969</time><span>Marvin Minsky and Seymour Papert publish their book, <i>Perceptrons</i>. They say perceptrons are just linear classifiers. They can’t learn a function like XOR.</span></li>
+        <li><time>mid-70s</time><span>Depression settles in. The first AI Winter.</span></li>
+      </ul>
       <div class="idx">13</div>
     </section>
 
-    <section class="slide pair-slide" data-slide="14">
-      <p class="kicker">1997</p>
-      <h2>Deep Blue beats Kasparov. A very smart machine at a very small game — not a person in a box.</h2>
-      <div class="pair">
-        <img src="assets/p13-1.jpeg" alt="Kasparov at the Deep Blue match">
-        <img src="assets/p13-2.jpeg" alt="IBM Deep Blue">
-      </div>
+    <section class="slide" data-slide="14">
+      <p class="kicker">An AI Spring</p>
+      <ul class="tl">
+        <li><time>early 80s</time><span>An AI Spring arrives, rekindling interest in AI, following Japan’s lead. The era of Expert Systems begins.</span></li>
+        <li><time>Expert<br>Systems</time><span>Rule-based. They make simple inferences from knowledge bases of facts. The facts are curated by domain experts.</span></li>
+        <li><time>then</time><span>Smaller systems turn out to be of little use, larger ones costly to make and maintain.</span></li>
+      </ul>
+      <h1 class="display mid" data-frag>It starts to feel cold again...</h1>
       <div class="idx">14</div>
     </section>
 
     <section class="slide" data-slide="15">
-      <p class="kicker">The last twenty-five years</p>
+      <p class="kicker">The second AI Winter</p>
       <ul class="tl">
-        <li><time>compute × data × algorithms</time><span>That product, not a single insight, is what made machine learning loud.</span></li>
-        <li><time>2012–</time><span>Neural nets get rebranded as deep learning and then actually work at scale.</span></li>
-        <li><time>2022</time><span>ChatGPT. An inflection in how the public meets the field — not the end of the field.</span></li>
+        <li><time>late 80s</time><span>The second AI Winter (but work continues by the passionate).</span></li>
+        <li><time>the 90s</time><span>The second AI Spring arrives. GOFAI (Good Old-fashioned AI), aka Symbolic AI, makes way for neural networks, genetic algorithms, and other machine learning.</span></li>
       </ul>
+      <p class="body" data-frag style="margin-top:auto">AI efforts start to shift focus: from <em>teaching</em> a computer to do things...</p>
+      <p class="body" data-frag style="margin-top:0.55em">...to endowing it with the <em>capacity for learning</em> to do things from observation (aka data).</p>
       <div class="idx">15</div>
     </section>
 
-    <section class="slide gold" data-slide="16">
+    <section class="slide pair-slide" data-slide="16">
+      <p class="kicker">1997</p>
+      <h2>Deep Blue beats Kasparov. A big milestone: a machine beat a human considered very intelligent.</h2>
+      <div class="pair">
+        <img src="assets/kasparov.jpg?v=6" alt="Kasparov at the 1997 Deep Blue rematch">
+        <img src="assets/deepblue.jpg" alt="IBM Deep Blue">
+      </div>
+      <div class="idx">16</div>
+    </section>
+
+    <section class="slide" data-slide="17">
+      <p class="kicker">Since Deep Blue</p>
+      <ul class="tl">
+        <li><time>compute × data × algorithms</time><span>That product, a trifecta, is what made ML loud.</span></li>
+        <li><time>2012–</time><span>Neural nets get rebranded as deep learning and then actually work at scale.</span></li>
+        <li><time>November 30,<br>2022</time><span>ChatGPT is released. An inflection point.</span></li>
+      </ul>
+      <div class="idx">17</div>
+    </section>
+
+    <section class="slide" data-slide="18">
+      <p class="kicker">Contemporary AI, in a snapshot</p>
+      <ul class="tl">
+        <li><time>2005</time><span>Stanford Racing Team’s Stanley wins the DARPA Grand Challenge.</span></li>
+        <li><time>2015</time><span>AI turns Van Gogh.</span></li>
+        <li><time>2016</time><span>DeepMind’s AlphaGo beats Go champion Lee Sedol.</span></li>
+        <li><time>2020</time><span>GPT-3 turns heads with natural language generation. Agent57 beats humans in all 57 <span class="quiet-tip" data-msg="The 80s were amazing!">Atari 2600</span> games.</span></li>
+        <li><time>now</time><span>AI offerings abound in the hundreds — language, art, imaging, audio, video, you name it.</span></li>
+      </ul>
+      <h1 class="display mid" data-frag>The next 10 years will be like the past 100...<br>and that’s likely an underestimate.</h1>
+      <div class="idx">18</div>
+    </section>
+
+    <section class="slide gold" data-slide="19">
       <p class="kicker">Why you are here</p>
       <div class="why">
         <article>To take <em>intelligence</em> seriously as a phenomenon, not a product category.</article>
@@ -178,43 +234,84 @@
         <article>To build systems that do something useful, on purpose.</article>
         <article>To sit with the implications — technical, economic, ethical, moral — before they sit with us.</article>
       </div>
-      <div class="idx">16</div>
+      <p class="why-foot" data-frag>To keep an open mind. Without one, the rest of this is just vocabulary.</p>
+      <div class="idx">19</div>
     </section>
 
-    <section class="slide" data-slide="17">
-      <p class="kicker">How this course is built</p>
-      <p class="small" style="margin-bottom:8px;color:var(--muted)">Task-oriented. Five problems we will actually work.</p>
+    <section class="slide gold" data-slide="20">
+      <p class="kicker">Three names. Three ways in.</p>
+      <ul class="held">
+        <li>
+          <b>Theory</b>
+          <span>AI can be understood theoretically.</span>
+        </li>
+        <li>
+          <b>Tasks</b>
+          <span>AI can be defined by its problems — tasks, in the serious sense of the word.</span>
+        </li>
+        <li>
+          <b>Methods</b>
+          <span>AI can be defined by its methods.</span>
+        </li>
+      </ul>
+      <ul class="held held-in">
+        <li>
+          <b>Ask</b>
+          <span>Think beyond the techniques. What they mean, why they work.</span>
+        </li>
+        <li>
+          <b>Crack</b>
+          <span>Try to crack what <em>intelligence</em> may be.</span>
+        </li>
+        <li>
+          <b>Build</b>
+          <span>Focus on tasks, techniques, and applications.</span>
+        </li>
+      </ul>
+      <div class="idx">20</div>
+    </section>
+
+    <section class="slide" data-slide="21">
+      <p class="kicker">We’ll take a task-oriented approach to AI and see how...</p>
       <div class="map">
-        <article><b>01</b><p>Represent knowledge, then reason from it.</p></article>
-        <article><b>02</b><p>Treat decisions as search through a space of possibilities.</p></article>
-        <article><b>03</b><p>Plan a sequence of actions toward a goal.</p></article>
-        <article><b>04</b><p>Learn from observation — machine learning.</p></article>
-        <article><b>05</b><p>Take language as a first-class problem, not a UI.</p></article>
+        <article><b>01</b><p>to do knowledge representation and reasoning (from such representations),</p></article>
+        <article><b>02</b><p>decision-making is a problem of search (through concepts and hypothesis),</p></article>
+        <article><b>03</b><p>an AI agent needs planning of its actions to accomplish something,</p></article>
+        <article><b>04</b><p>machines can be taught to learn by observing (machine learning), and</p></article>
+        <article><b>05</b><p>language is a very important area of consideration in AI.</p></article>
       </div>
-      <div class="idx">17</div>
+      <div class="idx">21</div>
     </section>
 
-    <section class="slide" data-slide="18">
-      <p class="kicker">Three words people throw around</p>
+    <section class="slide" data-slide="22">
+      <p class="kicker">Words people throw around</p>
       <div class="terms">
-        <article>
+        <article class="terms-weak">
           <h3>Weak AI</h3>
           <p>Narrow. Good at a job. Most of what we will build, and most of what ships.</p>
         </article>
         <article>
-          <h3>Strong AI / AGI</h3>
-          <p>Human-level, general. A research horizon and a marketing term. Keep the two unconfused.</p>
+          <h3>Strong AI</h3>
+          <p>Typically refers to human-level intelligence.</p>
         </article>
         <article>
           <h3>Superintelligence</h3>
-          <p>Beyond us. Worth reading about. Not this quarter’s homework.</p>
+          <p>AI that (far) exceeds human intelligence.</p>
+        </article>
+        <article class="terms-follow">
+          <h3>AGI</h3>
+          <p>A marketing term.</p>
+        </article>
+        <article class="terms-follow">
+          <h3>ASI</h3>
+          <p>Also a marketing term.</p>
         </article>
       </div>
-      <div class="idx">18</div>
+      <div class="idx">22</div>
     </section>
 
-    <section class="slide gallery-slide" data-slide="19">
-      <h2>If you read.</h2>
+    <section class="slide gallery-slide" data-slide="23">
+      <h2>Read.</h2>
       <div class="covers">
         <img src="assets/p20-6.jpeg" alt="Asimov, The Complete Robot">
         <img src="assets/p20-1.jpeg" alt="Bostrom, Superintelligence">
@@ -225,11 +322,11 @@
         <img src="assets/p20-5.jpeg" alt="Kahneman, Thinking, Fast and Slow">
         <img src="assets/p20-7.jpeg" alt="Hofstadter, Gödel, Escher, Bach">
       </div>
-      <div class="idx">19</div>
+      <div class="idx">23</div>
     </section>
 
-    <section class="slide gallery-slide" data-slide="20">
-      <h2>If you watch.</h2>
+    <section class="slide gallery-slide" data-slide="24">
+      <h2>Watch.</h2>
       <div class="covers">
         <img src="assets/p21-1.jpeg" alt="Terminator 2">
         <img src="assets/p21-5.jpeg" alt="I, Robot">
@@ -240,19 +337,24 @@
         <img src="assets/p21-3.jpeg" alt="Ex Machina">
         <img src="assets/p21-8.jpeg" alt="Subservience">
       </div>
-      <div class="idx">20</div>
+      <div class="idx">24</div>
     </section>
 
-    <section class="slide" data-slide="21">
+    <section class="slide" data-slide="25">
       <div class="contact">
-        <h1 class="display">One more.</h1>
+        <h1 class="display">One more movie to watch</h1>
         <img src="assets/p22-1.jpeg" alt="Contact, 1997">
-        <p class="small">Not an AI movie. It is about making contact with a mind that is not ours — and about how little of that encounter is the math, and how much of it is us.</p>
+        <p class="small">It’s not an AI movie but has uncanny parallels surrounding our contact with a certain kind of alien intelligence.</p>
       </div>
-      <div class="idx">21</div>
+      <div class="idx">25</div>
     </section>
 
+    <aside id="qrDock" class="qr-dock" hidden>
+      <img id="qrDockImg" alt="Attendance QR">
+      <p class="qr-dock-status" id="qrDockStatus"></p>
+    </aside>
   </div>
-  <script src="js/deck.js?v=6"></script>
+  <script src="js/deck.js?v=7"></script>
+  <script src="js/attendance-qr.js?v=1"></script>
 </body>
 </html>
