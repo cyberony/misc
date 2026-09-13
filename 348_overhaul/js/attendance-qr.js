@@ -58,7 +58,7 @@
   function requestToken() {
     if (waitingAuth) return;
     waitingAuth = true;
-    setStatus("Sign in to CAT if asked, then press Q again.");
+    setStatus("Sign in to CAT if asked, then type QRC again.");
     const w = window.open(
       `${catOrigin()}/attendance-deck-auth.html`,
       "msai-cat-auth",
@@ -66,7 +66,7 @@
     );
     if (!w) {
       waitingAuth = false;
-      setStatus("Allow pop-ups, then press Q.");
+      setStatus("Allow pop-ups, then type QRC.");
     }
     window.setTimeout(() => {
       waitingAuth = false;
@@ -133,22 +133,50 @@
     if (visible()) generateQr();
   });
 
+  const CHORD = "qrc";
+  const CHORD_MS = 1500;
+  let chord = "";
+  let chordTimer = null;
+
+  function resetChord() {
+    chord = "";
+    if (chordTimer) {
+      clearTimeout(chordTimer);
+      chordTimer = null;
+    }
+  }
+
   document.addEventListener(
     "keydown",
     (e) => {
       if (e.altKey || e.metaKey || e.ctrlKey) return;
       const k = e.key;
-      if (k === "q" || k === "Q") {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        toggle();
-        return;
-      }
       if (k === "Escape" && visible()) {
         e.preventDefault();
         e.stopImmediatePropagation();
+        resetChord();
         hide();
+        return;
       }
+      if (k.length !== 1) {
+        resetChord();
+        return;
+      }
+      const next = chord + k.toLowerCase();
+      if (CHORD.startsWith(next)) {
+        chord = next;
+        if (chordTimer) clearTimeout(chordTimer);
+        if (chord === CHORD) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          resetChord();
+          toggle();
+        } else {
+          chordTimer = setTimeout(resetChord, CHORD_MS);
+        }
+        return;
+      }
+      resetChord();
     },
     true,
   );
