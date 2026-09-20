@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-cat-origin="http://localhost:3000">
+<html lang="en" data-cat-origin="https://msai-cat.165.124.25.23.sslip.io">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Intro to AI</title>
-  <link rel="stylesheet" href="css/deck.css?v=94">
+  <link rel="stylesheet" href="css/deck.css?v=105">
 </head>
 <body>
   <div class="progress" aria-hidden="true"><span></span></div>
@@ -349,12 +349,30 @@
       <div class="idx">25</div>
     </section>
 
-    <aside id="qrDock" class="qr-dock" hidden>
-      <img id="qrDockImg" alt="Attendance QR">
-      <p class="qr-dock-status" id="qrDockStatus"></p>
-    </aside>
   </div>
-  <script src="js/deck.js?v=10"></script>
-  <script src="js/attendance-qr.js?v=2"></script>
+  <div id="qrAuth" class="qr-auth" hidden>
+    <form id="qrAuthForm" class="qr-auth-card">
+      <p class="qr-auth-kicker">MSAI · CAT</p>
+      <h2>Take attendance</h2>
+      <p class="qr-auth-lede">Sign in. A CAT session in another tab is not enough.</p>
+      <label class="qr-auth-label">Email
+        <input id="qrAuthEmail" name="email" type="email" required autocomplete="username">
+      </label>
+      <label class="qr-auth-label">Password
+        <input id="qrAuthPassword" name="password" type="password" required autocomplete="current-password">
+      </label>
+      <p id="qrAuthError" class="qr-auth-error" hidden></p>
+      <div class="qr-auth-actions">
+        <button type="submit" class="qr-auth-submit">Sign in</button>
+        <button type="button" id="qrAuthCancel" class="qr-auth-cancel">Cancel</button>
+      </div>
+    </form>
+  </div>
+  <aside id="qrDock" class="qr-dock" hidden>
+    <img id="qrDockImg" alt="Attendance QR">
+    <p class="qr-dock-status" id="qrDockStatus"></p>
+  </aside>
+  <script src="js/deck.js?v=16"></script>
+  <script src="js/attendance-qr.js?v=7"></script>
 </body>
 </html>

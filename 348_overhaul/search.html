@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-deck="search" data-cat-origin="https://msai-cat.165.124.25.23.sslip.io">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Search</title>
-  <link rel="stylesheet" href="css/deck.css?v=58">
+  <link rel="stylesheet" href="css/deck.css?v=109">
 </head>
 <body>
   <div class="progress" aria-hidden="true"><span></span></div>
@@ -17,23 +17,31 @@
     </section>
 
     <section class="slide" data-slide="2">
-      <p class="kicker">Intelligence, for this course</p>
-      <p class="body">Treat intelligence as <em>mapping a situation onto a decision, a prediction, or an action</em> — by search, by reasoning, or by learning.</p>
+      <p class="kicker">Intelligence, the artificial kind</p>
+      <p class="body">Making decisions or predictions given a circumstance — loosely, a <em>problem</em>.</p>
       <div class="rule"></div>
-      <p class="small">The operation can be computation. It can be reasoning. Or it can be search. Search is the one we can actually watch.</p>
+      <p class="small">Any decision-making, any prediction, any thought, any utterance… …can be thought of as…</p>
+      <h1 class="display mid" style="margin-top:28px">a mapping from<br>a <em>problem space</em> to a <em>solution space.</em></h1>
       <div class="idx">02</div>
     </section>
 
     <section class="slide" data-slide="3">
-      <p class="kicker">Before the operation</p>
-      <h1 class="display mid">It all starts with<br><em>representation.</em></h1>
-      <p class="lede">Words. Vectors of those words. Pixels. Digitized sound. You cannot search what you have not made into a state.</p>
+      <p class="kicker">How the mapping happens</p>
+      <h1 class="display mid">Search is one of<br>the ways we can<br>do it.</h1>
+      <p class="lede">The mapping is an operation. Computation. Reasoning. Or <em>search</em>.</p>
       <div class="idx">03</div>
     </section>
 
     <section class="slide" data-slide="4">
-      <p class="kicker">A toy world, then the explosion</p>
-      <p class="body" style="margin-bottom:28px">Suppose the computer is to learn <em>fish</em>, and we allow it only these features.</p>
+      <p class="kicker">Before the operation</p>
+      <h1 class="display mid">It all starts with<br><em>representation.</em></h1>
+      <p class="lede">Words. Vectors of those words. Pixels. Digitized sound. You cannot search what you have not made into a state.</p>
+      <div class="idx">04</div>
+    </section>
+
+    <section class="slide" data-slide="5">
+      <p class="kicker">Six features of a fish</p>
+      <p class="body" style="margin-bottom:28px">Say we want our computer to learn about <em>fish</em>, and we care only about these features.</p>
       <div class="feats">
         <article><b>Length</b><span>small · medium · large</span></article>
         <article><b>Width</b><span>narrow · wide</span></article>
@@ -42,26 +50,111 @@
         <article><b>Dorsal fin</b><span>yes · no</span></article>
         <article><b>Hazel eyes</b><span>yes · no</span></article>
       </div>
-      <p class="product">3 × 2 × 2 × 2 × 2 × 2 = 96 instances</p>
-      <div class="idx">04</div>
-    </section>
-
-    <section class="slide" data-slide="5">
-      <p class="kicker">Then the tables stack</p>
-      <h1 class="display">96 rows.<br><em>2</em><sup>96</sup> concepts.</h1>
-      <p class="lede" data-frag>Then 2<sup>(2<sup>96</sup>)</sup> hypotheses — more than the atoms in the universe. Six features of a fish.</p>
       <div class="idx">05</div>
     </section>
 
-    <section class="slide gold" data-slide="6">
-      <p class="kicker">The point of the fish</p>
-      <h1 class="display">We do not list.<br>We <em>search.</em></h1>
-      <p class="lede">If a handful of features does this, the space a mind actually works in is not enumerable. Intelligence cannot be “try everything.” That is why this lecture exists.</p>
+    <section class="slide" data-slide="6">
+      <div class="fish-lead">
+        <p class="kicker">Instances</p>
+        <p class="body">A dataset of examples.</p>
+      </div>
+      <div class="fish-sheet">
+      <table class="fish-table">
+        <colgroup>
+          <col><col><col><col><col><col><col>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Length</th><th>Width</th><th>Shade</th><th>Dotted</th><th>Dorsal fin</th><th>Hazel eyes</th><th>Label</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>small</td><td>narrow</td><td>dark</td><td>yes</td><td>no</td><td>yes</td><td>salmon</td></tr>
+          <tr><td>medium</td><td>narrow</td><td>dark</td><td>no</td><td>no</td><td>yes</td><td>trout</td></tr>
+          <tr><td>small</td><td>wide</td><td>light</td><td>no</td><td>yes</td><td>yes</td><td>bass</td></tr>
+          <tr><td>large</td><td>wide</td><td>dark</td><td>yes</td><td>yes</td><td>no</td><td>salmon</td></tr>
+          <tr><td>small</td><td>narrow</td><td>dark</td><td>yes</td><td>no</td><td>no</td><td>salmon</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="fish-foot">
+        <p class="body">Each example is an <em>instance</em>. How many unique instances can there be?</p>
+        <h1 class="display mid fish-num" data-frag>3 × 2 × 2 × 2 × 2 × 2 = <em>96</em></h1>
+      </div>
       <div class="idx">06</div>
     </section>
 
     <section class="slide" data-slide="7">
-      <p class="kicker">A space small enough to draw</p>
+      <div class="fish-lead">
+        <p class="kicker">Concepts</p>
+        <p class="body">Imagine a table with 96 rows, each a unique instance.<br>The salmon are indicated by a 1.</p>
+      </div>
+      <div class="fish-sheet">
+      <table class="fish-table">
+        <colgroup>
+          <col><col><col><col><col><col><col>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Length</th><th>Width</th><th>Shade</th><th>Dotted</th><th>Dorsal fin</th><th>Hazel eyes</th><th>Label</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>small</td><td>narrow</td><td>dark</td><td>yes</td><td>no</td><td>yes</td><td>1</td></tr>
+          <tr><td>medium</td><td>narrow</td><td>dark</td><td>no</td><td>no</td><td>yes</td><td>0</td></tr>
+          <tr><td>small</td><td>wide</td><td>light</td><td>no</td><td>yes</td><td>yes</td><td>0</td></tr>
+          <tr><td>large</td><td>wide</td><td>dark</td><td>yes</td><td>yes</td><td>no</td><td>1</td></tr>
+          <tr class="gap"><td colspan="7">· · ·</td></tr>
+          <tr><td>large</td><td>narrow</td><td>light</td><td>no</td><td>yes</td><td>no</td><td>1</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="fish-foot">
+        <p class="body">That’s the <em>concept</em> of a salmon. How many unique concepts can there be?</p>
+        <h1 class="display mid fish-num" data-frag><em>2</em><sup>96</sup> concepts</h1>
+      </div>
+      <div class="idx">07</div>
+    </section>
+
+    <section class="slide" data-slide="8">
+      <p class="kicker">Hypotheses</p>
+      <div class="cols uneven top">
+        <table class="fish-table narrow">
+          <thead>
+            <tr><th>Concept</th><th>Allow</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>1</td></tr>
+            <tr><td>2</td><td>0</td></tr>
+            <tr><td>3</td><td>1</td></tr>
+            <tr><td>4</td><td>1</td></tr>
+            <tr class="gap"><td colspan="2">· · ·</td></tr>
+            <tr><td>2<sup>96</sup></td><td>0</td></tr>
+          </tbody>
+        </table>
+        <div>
+          <p class="body">Now imagine a table with 2<sup>96</sup> rows, each a unique concept. Allowed concepts are indicated by a 1.</p>
+          <p class="body" style="margin-top:1.1em">Each such table denotes a <em>hypothesis</em>. How many unique hypotheses can there be?</p>
+        </div>
+      </div>
+      <div class="fish-foot">
+        <div class="fish-num fish-num-row">
+          <h1 class="display mid" data-frag data-frag-order="1"><em>2</em><sup>(2<sup>96</sup>)</sup></h1>
+          <p class="small" data-frag data-frag-order="2">This number is larger than the number of atoms in the universe.</p>
+        </div>
+      </div>
+      <div class="idx">08</div>
+    </section>
+
+    <section class="slide gold" data-slide="9">
+      <p class="kicker">The point of the fish</p>
+      <h1 class="display">We do not list.<br>We <em>search.</em></h1>
+      <p class="lede">If a handful of features does this, the space a mind actually works in is not enumerable. Intelligence cannot be “try everything.” That is why this lecture exists.</p>
+      <div class="idx">09</div>
+    </section>
+
+    <section class="slide" data-slide="10">
+      <p class="kicker">8-Puzzle</p>
       <div class="puzzle-pair">
         <figure>
           <div class="puzzle" aria-label="Start state">
@@ -69,38 +162,48 @@
             <b>6</b><b>1</b><b>8</b>
             <b>7</b><b>3</b><b>2</b>
           </div>
-          <figcaption>Start</figcaption>
+          <figcaption>Start state</figcaption>
         </figure>
         <figure>
           <div class="puzzle" aria-label="Goal state">
             <b>1</b><b>2</b><b>3</b>
             <b>8</b><b class="blank"></b><b>4</b>
             <b>7</b><b>6</b><b>5</b>
+            <svg class="puzzle-loop" viewBox="0 0 100 100" aria-hidden="true">
+              <path d="M 37.3 18.5 A 34 34 0 1 1 21.2 68.0 L 17.8 70.1 L 19.4 53.8 L 34.7 59.5 L 31.3 61.7 A 22 22 0 1 0 41.8 29.6 Z"/>
+            </svg>
           </div>
-          <figcaption>Goal · clockwise</figcaption>
+          <figcaption>Goal state</figcaption>
         </figure>
       </div>
-      <p class="lede">The 8-puzzle. Slide a tile into the blank. Each board is a state. Each legal slide is an action. A solution is a path.</p>
-      <div class="idx">07</div>
+      <p class="lede">Slide a tile into the blank. Each board is a state. Each legal slide is an action. A solution is a path from the start state to the end state through actions.</p>
+      <div class="idx">10</div>
     </section>
 
-    <section class="slide tree-photo" data-slide="8">
+    <section class="slide" data-slide="11">
+      <p class="kicker">A tree</p>
+      <h1 class="display mid">The problem can be<br><em>formalized</em><br>and<br><em>represented</em> as a tree.</h1>
+      <p class="lede">Then a solution is a path you can trace down it.</p>
+      <div class="idx">11</div>
+    </section>
+
+    <section class="slide tree-photo" data-slide="12">
       <p class="kicker">Moves become a tree</p>
       <div class="tree-frame">
         <img src="assets/search/ink_p14.png" alt="8-puzzle search tree with one solution path highlighted">
       </div>
       <p class="small">One path that works: 1–3–7–14–26–46. The rest of the tree is still there, thickening underneath.</p>
-      <div class="idx">08</div>
+      <div class="idx">12</div>
     </section>
 
-    <section class="slide gold" data-slide="9">
+    <section class="slide gold" data-slide="13">
       <p class="kicker">Every tree search</p>
       <h1 class="display">Check.<br>Expand.<br><em>Repeat.</em></h1>
       <p class="lede">Look at a node. If it is not the goal, generate its children. That is the whole family of algorithms. They disagree only about which node you check next.</p>
-      <div class="idx">09</div>
+      <div class="idx">13</div>
     </section>
 
-    <section class="slide" data-slide="10">
+    <section class="slide" data-slide="14">
       <p class="kicker">Two different objects</p>
       <div class="cols uneven">
         <div>
@@ -116,17 +219,17 @@
           </div>
         </div>
       </div>
-      <div class="idx">10</div>
+      <div class="idx">14</div>
     </section>
 
-    <section class="slide" data-slide="11">
+    <section class="slide" data-slide="15">
       <p class="kicker">The only interesting data structure</p>
       <h1 class="display">The <em>fringe.</em></h1>
       <p class="lede">Also called the frontier: every node slated to be checked. You pop one. You test it. If it is not the goal, you push its children. Which nodes wait there — and in what order — <em>is</em> the algorithm.</p>
-      <div class="idx">11</div>
+      <div class="idx">15</div>
     </section>
 
-    <section class="slide" data-slide="12">
+    <section class="slide" data-slide="16">
       <p class="kicker">Order is everything</p>
       <div class="split-idea">
         <article>
@@ -140,19 +243,19 @@
           <p>Plates. The last one on is the first one off. You dive until you cannot, then you come back.</p>
         </article>
       </div>
-      <div class="idx">12</div>
+      <div class="idx">16</div>
     </section>
 
-    <section class="slide tree-photo" data-slide="13">
+    <section class="slide tree-photo" data-slide="17">
       <p class="kicker">Breadth-first · on the tree</p>
       <div class="tree-frame">
         <img src="assets/search/ink_p15.png" alt="BFS exploring the 8-puzzle tree level by level">
       </div>
       <p class="small">Finish a generation before you start the next. Node 16, when we use it as a goal, sits on level 3 — BFS will meet everyone shallower first.</p>
-      <div class="idx">13</div>
+      <div class="idx">17</div>
     </section>
 
-    <section class="slide walk-slide" data-slide="14">
+    <section class="slide walk-slide" data-slide="18">
       <p class="kicker">BFS · walk the fringe</p>
       <div class="walk" data-walk="bfs">
         <div class="walk-copy">
@@ -166,26 +269,26 @@
         </div>
         <div class="walk-viz"></div>
       </div>
-      <div class="idx">14</div>
+      <div class="idx">18</div>
     </section>
 
-    <section class="slide" data-slide="15">
+    <section class="slide" data-slide="19">
       <p class="kicker">Breadth-first</p>
       <h1 class="display mid">Always expand<br>the <em>shallowest</em><br>unexpanded node.</h1>
       <p class="lede">You spend memory keeping a whole generation in the fringe. You get the shortest path in number of steps.</p>
-      <div class="idx">15</div>
+      <div class="idx">19</div>
     </section>
 
-    <section class="slide tree-photo" data-slide="16">
+    <section class="slide tree-photo" data-slide="20">
       <p class="kicker">Depth-first · on the tree</p>
       <div class="tree-frame">
         <img src="assets/search/ink_p16.png" alt="DFS diving down the 8-puzzle tree">
       </div>
       <p class="small">Dive until you cannot. Then back up one and dive again. Same tree as BFS. Opposite handwriting.</p>
-      <div class="idx">16</div>
+      <div class="idx">20</div>
     </section>
 
-    <section class="slide walk-slide" data-slide="17">
+    <section class="slide walk-slide" data-slide="21">
       <p class="kicker">DFS · walk the fringe</p>
       <div class="walk" data-walk="dfs">
         <div class="walk-copy">
@@ -199,17 +302,17 @@
         </div>
         <div class="walk-viz"></div>
       </div>
-      <div class="idx">17</div>
+      <div class="idx">21</div>
     </section>
 
-    <section class="slide" data-slide="18">
+    <section class="slide" data-slide="22">
       <p class="kicker">Depth-first</p>
       <h1 class="display mid">Always expand<br>the <em>deepest</em><br>unexpanded node.</h1>
       <p class="lede">A stack pops the last child you pushed. If you want to walk left to right, push right to left. Same algorithm. Opposite handwriting.</p>
-      <div class="idx">18</div>
+      <div class="idx">22</div>
     </section>
 
-    <section class="slide" data-slide="19">
+    <section class="slide" data-slide="23">
       <p class="kicker">Why we keep both</p>
       <table class="cmp">
         <thead>
@@ -223,10 +326,10 @@
         </tbody>
       </table>
       <p class="keys"><span><b>b</b> branching factor</span><span><b>d</b> depth of shallowest goal</span><span><b>m</b> maximum depth</span></p>
-      <div class="idx">19</div>
+      <div class="idx">23</div>
     </section>
 
-    <section class="slide" data-slide="20">
+    <section class="slide" data-slide="24">
       <p class="kicker">The method has to fit the space</p>
       <div class="terms">
         <article>
@@ -242,25 +345,25 @@
           <p>Plenty of memory does not make BFS free. Scarce memory does not make DFS wise. Wait one more idea.</p>
         </article>
       </div>
-      <div class="idx">20</div>
+      <div class="idx">24</div>
     </section>
 
-    <section class="slide gold" data-slide="21">
+    <section class="slide gold" data-slide="25">
       <p class="kicker">What we actually want</p>
       <h1 class="display">The guarantees<br>of BFS.<br>The memory of<br><em>DFS.</em></h1>
-      <div class="idx">21</div>
+      <div class="idx">25</div>
     </section>
 
-    <section class="slide" data-slide="22">
+    <section class="slide" data-slide="26">
       <p class="kicker">Iterative deepening</p>
       <p class="body">Run depth-first with a ceiling L. Then raise L: 0, 1, 2, … until the shallowest goal. Same visit order as BFS. Same memory as DFS.</p>
       <div class="rule"></div>
       <p class="small">Depth-limited search alone is incomplete if the goal sits past L. Iterative deepening keeps lifting the ceiling.</p>
       <p class="lede">It re-searches the top of the tree every time. That sounds wasteful. The last layer costs more than all the others stacked. Waste that is asymptotically free. Time and space both O(b<sup>d</sup>).</p>
-      <div class="idx">22</div>
+      <div class="idx">26</div>
     </section>
 
-    <section class="slide" data-slide="23">
+    <section class="slide" data-slide="27">
       <p class="kicker">Uninformed search · the scorecard</p>
       <table class="cmp">
         <thead>
@@ -274,23 +377,23 @@
         </tbody>
       </table>
       <p class="keys"><span>They look only at the tree, not at the states — except to ask: is this the goal? Have I been here?</span></p>
-      <div class="idx">23</div>
+      <div class="idx">27</div>
     </section>
 
-    <section class="slide gold" data-slide="24">
+    <section class="slide gold" data-slide="28">
       <p class="kicker">Informed search</p>
       <h1 class="display">Ask more of a<br>state than<br><em>are you the goal?</em></h1>
-      <div class="idx">24</div>
+      <div class="idx">28</div>
     </section>
 
-    <section class="slide" data-slide="25">
+    <section class="slide" data-slide="29">
       <p class="kicker">Two kinds of instruction</p>
       <p class="body">An <em>algorithm</em> is a set of unambiguous steps. It generally stops. It usually aims at optimality, completeness, accuracy, precision.</p>
       <p class="body" data-frag style="margin-top:1.1em">A <em>heuristic</em> is a rule of thumb. It trades those italics for speed. Good enough, soon enough.</p>
-      <div class="idx">25</div>
+      <div class="idx">29</div>
     </section>
 
-    <section class="slide" data-slide="26">
+    <section class="slide" data-slide="30">
       <p class="kicker">Two guesses for the 8-puzzle</p>
       <div class="h-pair">
         <figure>
@@ -314,10 +417,10 @@
           </article>
         </div>
       </div>
-      <div class="idx">26</div>
+      <div class="idx">30</div>
     </section>
 
-    <section class="slide" data-slide="27">
+    <section class="slide" data-slide="31">
       <p class="kicker">Best-first</p>
       <p class="body" style="margin-bottom:8px">Give every node a score <em>f(n)</em>. Keep the fringe as a priority queue: most desirable first.</p>
       <div class="terms" style="margin-top:28px">
@@ -334,17 +437,17 @@
           <p>BFS used a queue. DFS used a stack. Greedy and A* use a priority queue — sorted by that score.</p>
         </article>
       </div>
-      <div class="idx">27</div>
+      <div class="idx">31</div>
     </section>
 
-    <section class="slide gold" data-slide="28">
+    <section class="slide gold" data-slide="32">
       <p class="kicker">The one line to keep</p>
       <p class="eq"><em>f(n) = g(n) + h(n)</em></p>
       <p class="lede" style="margin-top:36px"><em>g</em> is the road behind you. <em>h</em> is a rumor about the road ahead. <em>f</em> is whether this path still deserves to be walked.</p>
-      <div class="idx">28</div>
+      <div class="idx">32</div>
     </section>
 
-    <section class="slide" data-slide="29">
+    <section class="slide" data-slide="33">
       <p class="kicker">Romania, because everyone does</p>
       <div class="cols uneven top">
         <div>
@@ -381,10 +484,10 @@
           <text class="hi" x="328" y="74">Neamt</text>
         </svg>
       </div>
-      <div class="idx">29</div>
+      <div class="idx">33</div>
     </section>
 
-    <section class="slide walk-slide" data-slide="30">
+    <section class="slide walk-slide" data-slide="34">
       <p class="kicker">A* · on a map, step by step</p>
       <div class="walk astar" data-walk="astar">
         <div class="walk-copy">
@@ -393,27 +496,27 @@
         </div>
         <div class="walk-viz"></div>
       </div>
-      <div class="idx">30</div>
+      <div class="idx">34</div>
     </section>
 
-    <section class="slide tree-photo" data-slide="31">
+    <section class="slide tree-photo" data-slide="35">
       <p class="kicker">Same 8-puzzle, three handwritings</p>
       <div class="tree-frame">
         <img src="assets/search/ink_p69.png" alt="A-star tree versus BFS and DFS on the 8-puzzle">
       </div>
       <p class="small">A* walks a spine. BFS inflates a generation. DFS dives the wrong well. That is the whole argument for a heuristic.</p>
-      <div class="idx">31</div>
+      <div class="idx">35</div>
     </section>
 
-    <section class="slide" data-slide="32">
+    <section class="slide" data-slide="36">
       <p class="kicker">Trees are a special case</p>
       <p class="body">All trees are graphs. Not all graphs are trees. A tree is a DAG in which every node has one parent.</p>
       <div class="rule"></div>
       <p class="small"><em>Tree search</em> walks a graph as if it were a tree. You may meet the same state twice. <em>Graph search</em> keeps a closed list so you do not. The closed list costs memory. The duplicate visits cost time. Pick your bill.</p>
-      <div class="idx">32</div>
+      <div class="idx">36</div>
     </section>
 
-    <section class="slide" data-slide="33">
+    <section class="slide" data-slide="37">
       <p class="kicker">When the rumor is legal</p>
       <div class="terms">
         <article>
@@ -429,24 +532,24 @@
           <p>Most heuristics you will write are both admissible and consistent. If you somehow write an inconsistent one, only tree search is still safe. Graph search may skip the optimal path.</p>
         </article>
       </div>
-      <div class="idx">33</div>
+      <div class="idx">37</div>
     </section>
 
-    <section class="slide gold" data-slide="34">
+    <section class="slide gold" data-slide="38">
       <p class="kicker">A last geometry</p>
       <h1 class="display">Then someone<br>tries to<br><em>stop you.</em></h1>
       <p class="lede">Games. An adversary. Strategic thinking — and the old question, sitting there again: is that intelligence?</p>
-      <div class="idx">34</div>
+      <div class="idx">38</div>
     </section>
 
-    <section class="slide" data-slide="35">
+    <section class="slide" data-slide="39">
       <p class="kicker">Minimax</p>
       <p class="body">Max wants the value of the position high. Min wants it low. Both assume the other will play perfectly. You unroll the tree to a terminal, write +1 / 0 / −1, and back the numbers up.</p>
       <p class="lede" data-frag>The name is not Max and Min glued together. Minimax means: choose the move that <em>minimizes the maximum loss</em> the opponent can inflict.</p>
-      <div class="idx">35</div>
+      <div class="idx">39</div>
     </section>
 
-    <section class="slide" data-slide="36">
+    <section class="slide" data-slide="40">
       <p class="kicker">You do not owe the whole tree a look</p>
       <div class="cols">
         <div>
@@ -473,18 +576,41 @@
           </div>
         </div>
       </div>
-      <div class="idx">36</div>
+      <div class="idx">40</div>
     </section>
 
-    <section class="slide" data-slide="37">
+    <section class="slide" data-slide="41">
       <p class="kicker">What we actually learned</p>
       <h1 class="display mid">Not a favorite<br>algorithm.<br>A sense of<br><em>suitability.</em></h1>
       <p class="lede">Each method has a space it is honest in, and a space where it lies — with memory, with time, with a path that is legal and still wrong. The work is matching the method to the map.</p>
-      <div class="idx">37</div>
+      <div class="idx">41</div>
     </section>
 
   </div>
+  <div id="qrAuth" class="qr-auth" hidden>
+    <form id="qrAuthForm" class="qr-auth-card">
+      <p class="qr-auth-kicker">MSAI · CAT</p>
+      <h2>Take attendance</h2>
+      <p class="qr-auth-lede">Sign in. A CAT session in another tab is not enough.</p>
+      <label class="qr-auth-label">Email
+        <input id="qrAuthEmail" name="email" type="email" required autocomplete="username">
+      </label>
+      <label class="qr-auth-label">Password
+        <input id="qrAuthPassword" name="password" type="password" required autocomplete="current-password">
+      </label>
+      <p id="qrAuthError" class="qr-auth-error" hidden></p>
+      <div class="qr-auth-actions">
+        <button type="submit" class="qr-auth-submit">Sign in</button>
+        <button type="button" id="qrAuthCancel" class="qr-auth-cancel">Cancel</button>
+      </div>
+    </form>
+  </div>
+  <aside id="qrDock" class="qr-dock" hidden>
+    <img id="qrDockImg" alt="Attendance QR">
+    <p class="qr-dock-status" id="qrDockStatus"></p>
+  </aside>
   <script src="js/walk.js"></script>
-  <script src="js/deck.js?v=6"></script>
+  <script src="js/deck.js?v=8"></script>
+  <script src="js/attendance-qr.js?v=9"></script>
 </body>
 </html>

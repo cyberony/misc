@@ -205,8 +205,17 @@
     if (window.Walk) Walk.finish(slides[i]);
   }
 
+  function qrGutter() {
+    if (!document.body.classList.contains("has-qr-margin")) return 0;
+    const qr = Math.min(280, Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.22));
+    return qr + 40;
+  }
+
   function fit() {
-    const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    const g = qrGutter();
+    document.body.style.setProperty("--qr-gutter", `${g}px`);
+    const s = Math.min((window.innerWidth - g) / 1280, window.innerHeight / 720);
+    stage.style.left = `calc(50% - ${g / 2}px)`;
     stage.style.transform = `translate(-50%, -50%) scale(${s})`;
   }
 
@@ -215,6 +224,10 @@
 
   document.addEventListener("keydown", (e) => {
     if (e.altKey || e.metaKey || e.ctrlKey) return;
+    const tag = e.target && e.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    const auth = document.getElementById("qrAuth");
+    if (auth && !auth.hidden) return;
     const k = e.key;
     if (k === "Escape" && slides[i] && slides[i].classList.contains("is-playing")) {
       e.preventDefault();
@@ -248,7 +261,7 @@
       closeVideo();
       return;
     }
-    if (e.target.closest("a, button, .embed, .qr-dock")) return;
+    if (e.target.closest("a, button, .embed, .qr-dock, .qr-auth")) return;
     if (e.clientX < window.innerWidth * 0.18) prev();
     else next();
   });
@@ -267,5 +280,6 @@
   }, { passive: true });
 
   fit();
+  requestAnimationFrame(() => stage.classList.add("is-ready"));
   show(parseHash());
 })();
