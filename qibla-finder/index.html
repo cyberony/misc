@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Qibla — the direction of the Kaaba from where you are</title>
+  <meta name="description" content="A simple, calm Qibla finder. See the direction and distance to the Kaaba from your location, with a live compass on phones.">
+  <meta name="theme-color" content="#f4f1e9">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function () {
+      var theme = null;
+      try { theme = localStorage.getItem('qibla.theme'); } catch (e) {}
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+</head>
+<body>
+  <div class="app" id="app" data-view="idle" data-compass="checking">
+    <header class="top">
+      <p class="brand">Qibla</p>
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch theme">
+        <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+        <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M5.3 18.7l1.5-1.5M17.2 6.8l1.5-1.5"/></svg>
+      </button>
+    </header>
+
+    <main class="main">
+      <section class="stage" aria-label="Compass">
+        <div class="compass" id="compass">
+          <svg class="dial" id="dial" viewBox="0 0 460 460" role="img" aria-labelledby="dial-title">
+            <title id="dial-title">Compass showing the direction of the Qibla</title>
+          </svg>
+        </div>
+      </section>
+
+      <section class="info">
+        <p class="eyebrow" id="eyebrow">Direction of the Kaaba</p>
+        <h1 class="headline" id="headline">Find the Qibla from wherever you are.</h1>
+        <p class="subline" id="subline">Share your location, or choose a place, to see the direction and distance to Mecca.</p>
+
+        <dl class="facts" id="facts" hidden>
+          <div class="fact">
+            <dt>Bearing</dt>
+            <dd><span id="fact-bearing"></span> <span class="fact-unit" id="fact-point"></span></dd>
+          </div>
+          <div class="fact">
+            <dt>Distance to Mecca</dt>
+            <dd><span id="fact-distance"></span> <span class="fact-unit" id="fact-distance-unit"></span></dd>
+          </div>
+        </dl>
+        <p class="place" id="place" hidden>
+          <span class="place-name" id="place-name"></span>
+          <span class="place-coords" id="place-coords"></span>
+        </p>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btn-compass" type="button" hidden>Start compass</button>
+          <button class="btn btn-primary" id="btn-locate" type="button">Use my location</button>
+          <button class="btn" id="btn-place" type="button">Choose a place</button>
+        </div>
+
+        <p class="hint" id="hint"></p>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>Your location stays on this device.</p>
+    </footer>
+  </div>
+
+  <dialog class="sheet" id="place-dialog" aria-labelledby="place-title">
+    <div class="sheet-head">
+      <h2 id="place-title">Choose a place</h2>
+      <button class="icon-btn" id="place-close" type="button" aria-label="Close">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+
+    <p class="notice" id="place-notice" hidden></p>
+
+    <form id="city-form" autocomplete="off">
+      <label class="field-label" for="city-input">City or town</label>
+      <input class="field" id="city-input" type="search" inputmode="search" enterkeyhint="search"
+             placeholder="Istanbul, Lagos, Kuala Lumpur…" autocapitalize="words" spellcheck="false">
+    </form>
+    <p class="field-status" id="city-status" role="status"></p>
+    <ul class="results" id="city-results"></ul>
+
+    <details class="coords" id="coords">
+      <summary>Enter coordinates instead</summary>
+      <form class="coords-form" id="coords-form" novalidate>
+        <div class="coords-row">
+          <div>
+            <label class="field-label" for="lat-input">Latitude</label>
+            <input class="field" id="lat-input" type="text" placeholder="51.5074" autocomplete="off">
+          </div>
+          <div>
+            <label class="field-label" for="lon-input">Longitude</label>
+            <input class="field" id="lon-input" type="text" placeholder="-0.1278" autocomplete="off">
+          </div>
+        </div>
+        <p class="field-status" id="coords-status" role="alert"></p>
+        <button class="btn btn-primary btn-block" type="submit">Use these coordinates</button>
+      </form>
+    </details>
+
+    <button class="btn btn-quiet btn-block" id="place-locate" type="button">Use my current location</button>
+    <p class="credit">Place search by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>. Only the name you type is sent.</p>
+  </dialog>
+
+  <p class="sr-only" id="announce" role="status" aria-live="polite"></p>
+
+  <noscript>
+    <p class="noscript">This Qibla finder needs JavaScript to work out the direction from your location.</p>
+  </noscript>
+
+  <script src="geo.js"></script>
+  <script src="declination.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
