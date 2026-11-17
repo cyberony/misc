@@ -1,8 +1,10 @@
 (function () {
   'use strict';
 
-  const { KM_PER_MILE, norm360, angleDiff, bearing, distanceKm, compassPoint, isValidCoord, formatCoords } =
-    window.QiblaGeo;
+  const {
+    KM_PER_MILE, norm360, angleDiff, bearing, distanceKm, compassPoint, isValidCoord, formatCoords,
+    formatAccuracy, shouldAcceptFix,
+  } = window.QiblaGeo;
   const { declination } = window.QiblaDeclination;
 
   const GEOCODE_URL = 'https://geocoding-api.open-meteo.com/v1/search';
@@ -15,6 +17,8 @@
   const ALIGN_ENTER = 2.5;
   const ALIGN_EXIT = 5;
   const AT_KAABA_KM = 0.2;
+  const GPS_PRECISE = { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 };
+  const GPS_COARSE = { enableHighAccuracy: false, timeout: 10000, maximumAge: 10 * 60 * 1000 };
 
   const $ = (id) => document.getElementById(id);
   const app = $('app');
@@ -30,9 +34,9 @@
     place: $('place'),
     placeName: $('place-name'),
     placeCoords: $('place-coords'),
+    placeAccuracy: $('place-accuracy'),
     hint: $('hint'),
     announce: $('announce'),
-    btnCompass: $('btn-compass'),
     btnLocate: $('btn-locate'),
     btnPlace: $('btn-place'),
     themeToggle: $('theme-toggle'),
@@ -51,7 +55,8 @@
 
   const state = {
     view: 'idle', // idle | locating | ready
-    location: null, // { lat, lon, label, source }
+    location: null, // { lat, lon, label, source: gps | city | coords, accuracy? }
+    gpsFresh: false, // false while a GPS location is only the one remembered from the last visit
     qibla: 0,
     distanceKm: 0,
     declination: 0,
@@ -233,7 +238,7 @@
   function staticSubline() {
     switch (state.compass) {
       case 'prompt':
-        return 'North is at the top of the dial. Start the compass to follow it as you turn.';
+        return 'North is at the top of the dial. Tap anywhere to start the compass.';
       case 'denied':
         return 'North is at the top of the dial. Motion access is off, so the compass can’t follow your movement.';
       case 'unavailable':
@@ -260,7 +265,6 @@
     els.btnLocate.hidden = ready;
     els.btnLocate.disabled = locating;
     els.btnPlace.disabled = locating;
-    els.btnCompass.hidden = !(ready && state.compass === 'prompt' && !atKaaba);
     setText(els.btnPlace, ready ? 'Change location' : 'Choose a place');
 
     let headline;
@@ -305,8 +309,12 @@
       setText(els.point, atKaaba ? '' : compassPoint(state.qibla).abbr);
       setText(els.distance, distance);
       setText(els.distanceUnit, unit);
-      setText(els.placeName, state.location.label);
-      setText(els.placeCoords, formatCoords(state.location.lat, state.location.lon));
+      const place = state.location;
+      const fromGps = place.source === 'gps';
+      // Fresh GPS coordinates speak for themselves; a remembered or chosen place is named.
+      setText(els.placeName, fromGps ? (state.gpsFresh ? '' : 'Last visit') : place.label);
+      setText(els.placeCoords, formatCoords(place.lat, place.lon, place.source === 'city' ? 2 : 5));
+      setText(els.placeAccuracy, fromGps && state.gpsFresh ? formatAccuracy(place.accuracy) : '');
     }
   }
 
@@ -316,15 +324,19 @@
 
   /* ---------- Location ---------- */
 
-  function setLocation(location, { persist = true, quiet = false } = {}) {
+  function setLocation(location, { persist = true, quiet = false, fresh = true } = {}) {
     state.location = location;
+    state.gpsFresh = location.source === 'gps' && fresh;
     state.qibla = bearing(location.lat, location.lon);
     state.distanceKm = distanceKm(location.lat, location.lon);
     state.declination = declination(location.lat, location.lon, new Date());
     state.view = 'ready';
     state.message = '';
     target.needle = state.qibla;
-    if (persist) store.set(STORE_LOCATION, JSON.stringify(location));
+    if (persist) {
+      const { lat, lon, label, source } = location;
+      store.set(STORE_LOCATION, JSON.stringify({ lat, lon, label, source }));
+    }
     updateHeading();
     if (!quiet) {
       const [distance, unit] = formatDistance(state.distanceKm);
@@ -339,15 +351,12 @@
     try {
       const saved = JSON.parse(store.get(STORE_LOCATION));
       if (saved && isValidCoord(saved.lat, saved.lon)) {
-        setLocation(
-          {
-            lat: saved.lat,
-            lon: saved.lon,
-            label: typeof saved.label === 'string' ? saved.label.slice(0, 120) : 'Saved location',
-            source: saved.source === 'gps' ? 'gps' : 'place',
-          },
-          { persist: false, quiet: true }
-        );
+        const label = typeof saved.label === 'string' ? saved.label.slice(0, 120) : 'Saved location';
+        let source = saved.source;
+        if (source !== 'gps' && source !== 'city' && source !== 'coords') {
+          source = label === 'Chosen coordinates' ? 'coords' : 'city';
+        }
+        setLocation({ lat: saved.lat, lon: saved.lon, label, source }, { persist: false, quiet: true, fresh: false });
         return true;
       }
     } catch (e) {
@@ -356,35 +365,105 @@
     return false;
   }
 
-  function locate({ silent = false } = {}) {
+  /* ---------- GPS ---------- */
+
+  const gps = { run: 0, watchId: null, tracking: false, silent: false, fix: null, returnView: 'idle' };
+
+  function clearGpsWatch() {
+    if (gps.watchId !== null) {
+      navigator.geolocation.clearWatch(gps.watchId);
+      gps.watchId = null;
+    }
+  }
+
+  function stopGps() {
+    gps.run++;
+    gps.tracking = false;
+    clearGpsWatch();
+  }
+
+  function acceptFix(position) {
+    const { latitude: lat, longitude: lon, accuracy } = position.coords;
+    if (!isValidCoord(lat, lon)) return;
+    const fix = { lat, lon, accuracy, time: Date.now() };
+    if (!shouldAcceptFix(gps.fix, fix)) return;
+    const first = !gps.fix;
+    gps.fix = fix;
+    setLocation({ lat, lon, accuracy, label: 'Current location', source: 'gps' }, { quiet: gps.silent || !first });
+  }
+
+  function gpsFailed(denied) {
+    const silent = gps.silent;
+    stopGps();
+    if (silent && state.view === 'ready') {
+      state.message = denied
+        ? 'Location access is off. Showing where you were last time.'
+        : 'Couldn’t update your location. Showing where you were last time.';
+      render();
+      return;
+    }
+    state.view = gps.returnView;
+    render();
+    openPlaceDialog(
+      denied
+        ? 'Location access is off. Search for your city, or enter coordinates, instead.'
+        : 'Your location couldn’t be found just now. Search for your city instead, or try again.'
+    );
+  }
+
+  // Asks for a precise fix and keeps listening, so the first rough position sharpens as the
+  // GPS settles. If no precise fix arrives in time, one coarse (network) position is used.
+  function watchGps() {
+    const run = ++gps.run;
+    let triedCoarse = false;
+    clearGpsWatch();
+    const onFix = (position) => {
+      if (run === gps.run) acceptFix(position);
+    };
+    const onError = (error) => {
+      if (run !== gps.run || gps.fix) return;
+      if (error && error.code === 1) {
+        gpsFailed(true);
+      } else if (!triedCoarse) {
+        triedCoarse = true;
+        navigator.geolocation.getCurrentPosition(
+          onFix,
+          (coarseError) => {
+            if (run === gps.run && !gps.fix) gpsFailed(Boolean(coarseError && coarseError.code === 1));
+          },
+          GPS_COARSE
+        );
+      }
+    };
+    gps.watchId = navigator.geolocation.watchPosition(onFix, onError, GPS_PRECISE);
+  }
+
+  function startGps({ silent = false } = {}) {
     if (!('geolocation' in navigator)) {
       if (!silent) openPlaceDialog('This browser can’t share its location. Search for your city instead.');
       return;
     }
-    const previousView = state.view;
+    gps.tracking = true;
+    gps.silent = silent;
+    gps.fix = null;
+    gps.returnView = state.view === 'ready' ? 'ready' : 'idle';
     if (!silent) {
       state.view = 'locating';
       state.message = '';
       render();
     }
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude: lat, longitude: lon } = position.coords;
-        if (!isValidCoord(lat, lon)) return;
-        setLocation({ lat, lon, label: 'Current location', source: 'gps' }, { quiet: silent });
-      },
-      (error) => {
-        if (silent) return;
-        state.view = previousView === 'ready' ? 'ready' : 'idle';
-        render();
-        openPlaceDialog(
-          error && error.code === 1
-            ? 'Location access is off. Search for your city, or enter coordinates, instead.'
-            : 'Your location couldn’t be found just now. Search for your city instead, or try again.'
-        );
-      },
-      { enableHighAccuracy: false, timeout: 15000, maximumAge: 5 * 60 * 1000 }
-    );
+    watchGps();
+  }
+
+  function onVisibilityChange() {
+    if (!gps.tracking) return;
+    if (document.hidden) {
+      gps.run++;
+      clearGpsWatch();
+    } else {
+      if (gps.fix) gps.silent = true;
+      watchGps();
+    }
   }
 
   /* ---------- Compass ---------- */
@@ -413,7 +492,9 @@
     }
     if (state.aligned && !wasAligned) {
       announce('Facing the Qibla.');
-      if (navigator.vibrate) navigator.vibrate(18);
+      // Browsers refuse to vibrate before the first tap, which an auto-started compass may not have had.
+      const tapped = !navigator.userActivation || navigator.userActivation.hasBeenActive;
+      if (navigator.vibrate && tapped) navigator.vibrate(18);
     }
 
     animate();
@@ -458,45 +539,84 @@
       return;
     }
     listenForOrientation();
-    // iOS only delivers headings after a tap-triggered permission request. Some desktop
-    // browsers expose the same method without having a compass, so only offer it on touch devices.
+    // iOS only delivers headings once the page has asked for motion access. Some desktop
+    // browsers expose the same method without having a compass, so only ask on touch devices.
     const needsPermission =
       typeof DeviceOrientationEvent.requestPermission === 'function' &&
       (navigator.maxTouchPoints > 0 || coarsePointer.matches);
+    if (needsPermission) {
+      requestCompass('load');
+      return;
+    }
     sensorTimer = setTimeout(() => {
       if (state.compass === 'checking') {
-        state.compass = needsPermission ? 'prompt' : 'unavailable';
+        state.compass = 'unavailable';
         render();
       }
-    }, needsPermission ? 600 : 2500);
+    }, 2500);
   }
 
-  function requestCompass() {
-    els.btnCompass.disabled = true;
+  let compassAsking = false;
+  let touchEndRefusals = 0;
+  let clickRefusals = 0;
+
+  function onGesture(event) {
+    if (event.type === 'touchend' && touchEndRefusals >= 2) return;
+    requestCompass(event.type);
+  }
+
+  function waitForGesture(on) {
+    const method = on ? 'addEventListener' : 'removeEventListener';
+    document[method]('touchend', onGesture, true);
+    document[method]('click', onGesture, true);
+  }
+
+  // Safari answers straight away when motion access was already decided, and otherwise only
+  // asks from inside a tap. So this is tried on load, then again on the first tap anywhere.
+  function requestCompass(trigger) {
+    if (compassAsking || state.compass === 'live' || state.compass === 'denied') return;
+    compassAsking = true;
     let request;
     try {
-      request = DeviceOrientationEvent.requestPermission();
+      request = Promise.resolve(DeviceOrientationEvent.requestPermission());
     } catch (e) {
       request = Promise.reject(e);
     }
-    request
-      .then((result) => {
-        if (result !== 'granted') throw new Error(result);
-        // Stays on "prompt" only if the sensor never reports a heading.
-        sensorTimer = setTimeout(() => {
-          if (state.compass !== 'live') {
-            state.compass = 'unavailable';
-            render();
-          }
-        }, 3000);
-      })
-      .catch(() => {
-        if (state.compass !== 'live') state.compass = 'denied';
-      })
-      .then(() => {
-        els.btnCompass.disabled = false;
+    request.then(
+      (result) => {
+        compassAsking = false;
+        waitForGesture(false);
+        if (state.compass === 'live') return;
+        if (result === 'granted') {
+          state.compass = 'checking';
+          clearTimeout(sensorTimer);
+          sensorTimer = setTimeout(() => {
+            if (state.compass !== 'live') {
+              state.compass = 'unavailable';
+              render();
+            }
+          }, 3000);
+        } else {
+          state.compass = 'denied';
+        }
         render();
-      });
+      },
+      () => {
+        compassAsking = false;
+        if (state.compass === 'live') return;
+        if (trigger === 'touchend') touchEndRefusals++;
+        if (trigger === 'click') clickRefusals++;
+        if (clickRefusals >= 2) {
+          // Refused from a real tap twice: the page is not allowed to ask here at all.
+          waitForGesture(false);
+          state.compass = 'unavailable';
+        } else {
+          state.compass = 'prompt';
+          waitForGesture(true);
+        }
+        render();
+      }
+    );
   }
 
   /* ---------- Place dialog ---------- */
@@ -548,7 +668,8 @@
       button.append(name, sub);
       button.addEventListener('click', () => {
         const label = place.country && place.country !== place.name ? `${place.name}, ${place.country}` : place.name;
-        setLocation({ lat: place.latitude, lon: place.longitude, label, source: 'place' });
+        stopGps();
+        setLocation({ lat: place.latitude, lon: place.longitude, label, source: 'city' });
         closePlaceDialog();
       });
       item.appendChild(button);
@@ -632,7 +753,8 @@
       els.lonInput.focus();
       return;
     }
-    setLocation({ lat, lon, label: 'Chosen coordinates', source: 'place' });
+    stopGps();
+    setLocation({ lat, lon, label: 'Chosen coordinates', source: 'coords' });
     closePlaceDialog();
   }
 
@@ -668,13 +790,12 @@
     buildDial();
     initCompass();
 
-    els.btnLocate.addEventListener('click', () => locate());
+    els.btnLocate.addEventListener('click', () => startGps());
     els.btnPlace.addEventListener('click', () => openPlaceDialog(''));
-    els.btnCompass.addEventListener('click', requestCompass);
     $('place-close').addEventListener('click', closePlaceDialog);
     $('place-locate').addEventListener('click', () => {
       closePlaceDialog();
-      locate();
+      startGps();
     });
     els.dialog.addEventListener('click', (event) => {
       if (event.target !== els.dialog) return;
@@ -695,13 +816,17 @@
     const restored = restoreLocation();
     render();
 
-    // Refresh quietly when the browser already has permission, so a returning visitor
-    // who has travelled is not shown a stale direction.
-    if (navigator.permissions && navigator.permissions.query && (!restored || state.location.source === 'gps')) {
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    if (restored) {
+      // A returning visitor who used GPS gets a fresh fix without asking for it again;
+      // one who chose a place keeps that place.
+      if (state.location.source === 'gps') startGps({ silent: true });
+    } else if (navigator.permissions && navigator.permissions.query) {
       navigator.permissions
         .query({ name: 'geolocation' })
         .then((status) => {
-          if (status.state === 'granted') locate({ silent: restored });
+          if (status.state === 'granted' && state.view === 'idle') startGps();
         })
         .catch(() => {});
     }

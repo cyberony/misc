@@ -377,15 +377,31 @@ input {
   color: var(--ink);
 }
 
+.place-name:empty {
+  display: none;
+}
+
 .place-name::after {
   content: "·";
   margin: 0 0.5em;
   color: var(--faint);
 }
 
-.place-coords {
+.place-coords,
+.place-accuracy {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.place-accuracy:not(:empty)::before {
+  content: "·";
+  margin: 0 0.5em 0 0.25em;
+  color: var(--faint);
+}
+
+/* Lets a tap anywhere on the page count as a click on iOS, which is how the compass starts. */
+.app[data-compass="prompt"] {
+  cursor: pointer;
 }
 
 .actions {

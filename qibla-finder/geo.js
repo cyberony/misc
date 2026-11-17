@@ -56,8 +56,29 @@
     return `${part(lat, 'N', 'S')}, ${part(lon, 'E', 'W')}`;
   }
 
+  /** A label such as "±8 m" for a reported accuracy radius in metres; empty when unknown. */
+  function formatAccuracy(metres) {
+    if (!Number.isFinite(metres) || metres <= 0) return '';
+    if (metres < 1000) return `±${Math.max(1, Math.round(metres))} m`;
+    return `±${(metres / 1000).toFixed(metres < 10000 ? 1 : 0)} km`;
+  }
+
+  /**
+   * Whether a new position fix ({ lat, lon, accuracy in metres, time in ms }) should replace
+   * the one on show. A coarser fix only wins once the old one is stale, or when the device
+   * has clearly moved outside both error circles.
+   */
+  function shouldAcceptFix(previous, next, staleMs = 20000) {
+    if (!previous) return true;
+    const radius = (fix) => (Number.isFinite(fix.accuracy) && fix.accuracy >= 0 ? fix.accuracy : Infinity);
+    if (radius(next) <= radius(previous)) return true;
+    if (next.time - previous.time > staleMs) return true;
+    return distanceKm(next.lat, next.lon, previous) * 1000 > radius(previous) + radius(next);
+  }
+
   const api = {
     KAABA, KM_PER_MILE, norm360, angleDiff, bearing, distanceKm, compassPoint, isValidCoord, formatCoords,
+    formatAccuracy, shouldAcceptFix,
   };
 
   if (typeof module === 'object' && module.exports) module.exports = api;

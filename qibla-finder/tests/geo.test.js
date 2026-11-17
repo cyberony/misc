@@ -46,6 +46,27 @@ assert.equal(geo.compassPoint(58.5).abbr, 'ENE');
 assert.equal(geo.compassPoint(359).abbr, 'N');
 assert.equal(geo.compassPoint(295).name, 'west-northwest');
 assert.equal(geo.formatCoords(40.7128, -74.006), '40.71° N, 74.01° W');
+assert.equal(geo.formatCoords(41.878113, -87.629799, 5), '41.87811° N, 87.62980° W');
+assert.equal(geo.formatCoords(-6.2, 106.8, 5), '6.20000° S, 106.80000° E');
+assert.equal(geo.formatAccuracy(7.6), '±8 m');
+assert.equal(geo.formatAccuracy(0.2), '±1 m');
+assert.equal(geo.formatAccuracy(999.4), '±999 m');
+assert.equal(geo.formatAccuracy(1530), '±1.5 km');
+assert.equal(geo.formatAccuracy(25000), '±25 km');
+assert.equal(geo.formatAccuracy(NaN), '');
+assert.equal(geo.formatAccuracy(undefined), '');
+
+// Position fixes: a sharper fix always wins; a coarser one only when stale or clearly elsewhere.
+const fix = (lat, lon, accuracy, time) => ({ lat, lon, accuracy, time });
+const here = fix(41.8781, -87.6298, 20, 0);
+assert.ok(geo.shouldAcceptFix(null, here));
+assert.ok(geo.shouldAcceptFix(here, fix(41.87812, -87.62981, 8, 1000)), 'sharper fix');
+assert.ok(geo.shouldAcceptFix(here, fix(41.8781, -87.6298, 20, 1000)), 'equal accuracy');
+assert.ok(!geo.shouldAcceptFix(here, fix(41.8782, -87.6299, 1500, 5000)), 'coarse fix soon after a sharp one');
+assert.ok(geo.shouldAcceptFix(here, fix(41.8782, -87.6299, 1500, 25000)), 'coarse fix once the sharp one is stale');
+assert.ok(geo.shouldAcceptFix(here, fix(41.8881, -87.6298, 30, 5000)), 'moved about 1.1 km');
+assert.ok(!geo.shouldAcceptFix(here, fix(41.8783, -87.6298, 30, 5000)), 'moved about 22 m, inside the error circles');
+assert.ok(!geo.shouldAcceptFix(here, fix(41.8881, -87.6298, NaN, 5000)), 'unknown accuracy');
 assert.ok(geo.isValidCoord(-90, 180));
 assert.ok(!geo.isValidCoord(91, 0));
 assert.ok(!geo.isValidCoord(NaN, 0));
